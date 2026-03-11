@@ -1,0 +1,159 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 10px;
+  color: #d4af37;
+  padding: 10px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 500;
+  color: #d4af37;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* список */
+.tickets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* билет */
+.ticket-button {
+  padding: 10px;
+
+  border: 1px solid #d4af37;
+  border-radius: 18px;
+
+  background: transparent;
+  transition: all 0.35s ease;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ticket-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(212,175,55,0.15),
+    rgba(212,175,55,0.05)
+  );
+
+  box-shadow:
+    0 0 20px rgba(212,175,55,0.25),
+    0 0 40px rgba(212,175,55,0.1);
+
+  transform: translateY(-3px);
+}
+
+/* верхняя строка */
+.ticket-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ticket-city {
+  font-size: 20px;
+  font-weight: 500;
+  color: #d4af37;
+}
+
+.ticket-type {
+  font-size: 14px;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+.ticket-add {
+  font-size: 14px;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
+/* основная инфа */
+.ticket-info {
+  font-size: 15px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ticket-place {
+  font-weight: 500;
+}
+
+/* ссылка */
+.ticket-map {
+  color: #d4af37;
+  text-decoration: none;
+  width: fit-content;
+  transition: all 0.3s ease;
+}
+
+.ticket-map:hover {
+  text-decoration: underline;
+}
+
+.ticket-status {
+  img {
+    width: 100%;
+  }
+}
+
+
+
+.buy-button {
+  padding: 14px 34px;
+
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+
+  background: transparent;
+  color: #d4af37;
+
+  border: 1.5px solid #d4af37;
+  border-radius: 40px;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+      white-space: nowrap;
+}
+
+
+.loader-wrapper {
+  position: relative;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6); // затемнение фона
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  min-height: 50vh;
+}
+
+.gold-loader {
+  width: 60px;
+  height: 60px;
+  border: 6px solid transparent;
+  border-top: 6px solid #d4af37;   // золотой
+  border-right: 6px solid #d4af37; // делаем полукруг
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

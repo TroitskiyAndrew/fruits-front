@@ -1,0 +1,493 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 10px;
+  color: #d4af37;
+  padding: 10px;
+}
+
+.schema {
+  position: relative;
+  border: 1.5px solid #d4af37;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 250px;
+  min-width: 250px;
+}
+
+.schema-image {
+  height: 250px;
+  transition: opacity 0.3s ease;
+}
+
+.schema-image.hidden {
+  opacity: 0;
+}
+
+/* Лоадер контейнер */
+.loader {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.ticket-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Золотой спиннер */
+.gold-spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid transparent;
+  border-top: 6px solid #d4af37; // золотой
+  border-right: 6px solid #d4af37; // делаем полукруг
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.timing {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.event {
+  display: flex;
+  column-gap: 4px
+}
+
+.venue-link {
+  color: #d4af37 !important;
+}
+
+
+.adults {
+  font-weight: 500;
+  color: white;
+}
+
+.buy-button {
+  padding: 14px 34px;
+
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+
+  background: transparent;
+  color: #d4af37;
+
+  border: 1.5px solid #d4af37;
+  border-radius: 40px;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tickets-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Карточка билета */
+.ticket-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 5px;
+  padding: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+
+  background: #0c0c0c;
+
+  transition: all 0.3s ease;
+}
+
+.ticket-card:hover {
+  border-color: #d4af37;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+}
+
+.ticket-info {
+  display: flex;
+  flex-direction: column;
+  row-gap: 3px;
+}
+
+/* Информация */
+.ticket-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #d4af37;
+}
+
+.ticket-prices {
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.ticket-add {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.warning {
+  color: red;
+}
+
+/* Контролы */
+.ticket-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Кнопки +/- */
+.control-btn {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+  border: 1px solid #d4af37;
+
+  background: transparent;
+  color: #d4af37;
+  font-size: 20px;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: #d4af37;
+  color: black;
+}
+
+.control-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Количество */
+.ticket-count {
+  min-width: 24px;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+}
+
+.qr {
+  max-width: 90%;
+  max-height: 70%;
+}
+
+.instruction {
+  text-align: center;
+}
+
+.white {
+  color: white;
+}
+
+.important {
+  font-size: 20px;
+  font-weight: 900;
+  color: black;
+  text-align: center;
+  background-color: #d4af37;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.phone {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.combo-block {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 20px;
+  width: 100%;
+}
+
+.combo-title {
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 500;
+  color: white;
+}
+
+.combo-events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* карточка */
+.combo-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+
+  background: #0c0c0c;
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.combo-item:hover {
+  border-color: #d4af37;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+.combo-item:active {
+  transform: scale(0.98);
+}
+
+/* выбранная карточка */
+.combo-item.selected {
+  border-color: #d4af37;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.08), #0c0c0c);
+}
+
+/* чекбокс */
+.combo-checkbox {
+  position: relative;
+
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+
+  border-radius: 50%;
+  border: 2px solid #d4af37;
+
+  background-color: transparent;
+
+  transition: all 0.25s ease;
+}
+
+/* внутренняя точка */
+.combo-checkbox::after {
+  content: "";
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+  background: black;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+
+  transition: transform 0.2s ease;
+}
+
+/* выбранный чекбокс */
+.combo-item.selected .combo-checkbox {
+  background-color: #d4af37;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.7);
+}
+
+/* показываем точку */
+.combo-item.selected .combo-checkbox::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* информация */
+.combo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.combo-type {
+  font-size: 14px;
+  color: #d4af37;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.combo-date {
+  font-size: 14px;
+  color: white;
+}
+
+.combo-place {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.currency-switch {
+  display: flex;
+  width: 100%;
+  max-width: 320px;
+  background: #111;
+  border: 1px solid #bfa046;
+  border-radius: 14px;
+  overflow: hidden;
+  align-self: center;
+}
+
+.segment {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  color: #9a9a9a;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+
+  &:hover {
+    background: rgba(191, 160, 70, 0.1);
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #bfa046, #e6c76a);
+    color: #000;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* вертикальные разделители */
+.segment:not(:last-child) {
+  border-right: 1px solid rgba(191, 160, 70, 0.25);
+}
+
+
+.gold-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* скрываем нативный checkbox */
+.gold-checkbox input {
+  display: none;
+}
+
+/* кастомная коробка */
+.checkmark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+
+  background: #0f0f0f;
+  border: 2px solid #d4af37;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease;
+}
+
+/* галочка */
+.checkmark::after {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border: solid #d4af37;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* когда выбран */
+.gold-checkbox input:checked + .checkmark {
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+}
+
+.gold-checkbox input:checked + .checkmark::after {
+  opacity: 1;
+}
+
+/* текст */
+.label-text {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+
+.gold-input {
+  display: inline-block;
+}
+
+.gold-input input {
+  width: 200px;
+  padding: 12px 16px;
+  font-size: 16px;
+
+  background: #0b0b0b;
+  color: #ffd700;
+
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  outline: none;
+
+  transition: all 0.25s ease;
+}
+
+/* placeholder */
+.gold-input input::placeholder {
+  color: #a8892a;
+}
+
+/* hover */
+.gold-input input:hover {
+  border-color: #ffd700;
+}
+
+/* focus */
+.gold-input input:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+/* убрать стрелки у number (Chrome) */
+.gold-input input::-webkit-outer-spin-button,
+.gold-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* убрать стрелки Firefox */
+.gold-input input[type=number] {
+  -moz-appearance: textfield;
+}

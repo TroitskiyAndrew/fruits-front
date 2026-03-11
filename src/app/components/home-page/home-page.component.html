@@ -1,0 +1,123 @@
+<div class="wrapper">
+  <div class="photo-wrapper">
+    <img src="assets/main.png" alt="Фото" class="photo">
+    <div class="buttons">
+      @if (stateService.userTickets().length > 0) {
+      <button class="tour-button" (click)="openMyTickets()">
+        Мои билеты
+      </button>
+      }
+      <button class="tour-button" (click)="scrollTo('tour')">
+        Купить билеты
+      </button>
+    </div>
+  </div>
+
+
+  <div class="reels">
+    <div class="title">Кто такой Дмитрий Сверлов?</div>
+    <div class="text">
+      <div class="text-item">
+        ЕДИНИЦЫ знают его как невероятного любовника
+      </div>
+      <div class="text-item">
+        ДЕСЯТКИ знают его как человека который больше всего в жизни любит крабовый салат и когда люди на его слова
+        делают АХАХАХ
+      </div>
+      <div class="text-item">
+        СОТНИ знают его как участника комедийных проектов на ТНТ, СТС, ТНТ-4, где над его приколам угорали такие мэтры
+        как Слепаков, Белый, Светлаков, Мартиросян, Воля, Соболев.
+      </div>
+      <div class="text-item">
+        ТЫСЯЧИ знают его как комика-гастролирующего по всему миру, на чьи концерты всегда солд-аут.
+      </div>
+      <div class="text-item">
+        МИЛЛИОНЫ знают по его угарным рилсам в инсте. Типа этих:
+      </div>
+    </div>
+    <app-instagram-reels-carousel [reels]="reels"></app-instagram-reels-carousel>
+  </div>
+  <button class="important buy-button" (click)="scrollTo('tour')">
+    Посмотреть билеты
+  </button>
+  <div class="text title">
+    Этот легендарик выступит с двумя разными по формату шоу:
+  </div>
+  <div id="concert" class="concert">
+    <div class="title">Стендап-концерт</div>
+    <div class="text">
+      <div class="text-item">
+        1.5 часа отточенных приколдесов про Азию, менталитет, путешествия, перелеты и даже история как он подрался с
+        леди-боем😱 Эта программа стала легендарной и собирает sold out по всему миру, теперь настало время Вьетнама.
+      </div>
+      <div class="text-item">
+        Зацените отзывы зрителей на концерт:
+      </div>
+    </div>
+    <app-media-carousel [items]="concertMedia"></app-media-carousel>
+  </div>
+  <button class="important buy-button" (click)="scrollTo('tour')">
+    Когда в моем городе?
+  </button>
+  <div id="improvisation" class="improvisation">
+    <div class="title">Стендап-импровизация с залом</div>
+    <div class="text">
+      <div class="text-item">
+        На тотальном угаре, со стебом и прожаркой Дмитрий знакомится со зрителями и через общение и приколы помогает
+        людям найти друзей, любовь, решения проблем, прорекламировать свои услуги и найти клиентов.
+      </div>
+      <div class="text-item">
+        Это и стендап-шоу и нетворкинг, для тех кто захочет поболтать.
+      </div>
+      <div class="text-item">
+        Ну а потом всей толпой новых знакомых можно знатно затусить, возможно даже будет оргия😱
+      </div>
+      <div class="text-item">
+        Зацените, приколы со зрителями:
+      </div>
+    </div>
+
+    <app-media-carousel [items]="improvisationMedia"></app-media-carousel>
+  </div>
+  <div id="tour" class="tour" #tour>
+    <div class="title title-small text">Ну всё, ищи свой город ниже и хватай билеты в телеграмм боте!</div>
+    <div class="important">
+      Внимание! При покупке билетов сразу на 2 шоу скидка 20%
+    </div>
+
+    @if(stateService.cities().length){
+    <div class="city-block" *ngFor="let city of stateService.cities()">
+
+      <span class="city-title">
+        {{ city.name }}
+      </span>
+
+      <div class="events">
+
+        <button class="event-button" *ngFor="let event of city.events" (click)="openEvent(event)">
+
+          <span class="event-date">
+            {{ event.date }}
+          </span>
+
+          <span class="event-place">
+            {{ event.start }}
+          </span>
+
+          <span class="event-type">
+            {{ eventsNames[event.type] }}
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+    } @else {
+    <div class="loader">
+      <div class="gold-spinner"></div>
+    </div>
+    }
+  </div>
+
+</div>

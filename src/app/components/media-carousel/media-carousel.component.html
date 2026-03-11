@@ -1,0 +1,40 @@
+<div class="carousel-wrapper">
+
+  <button class="nav left" (click)="scrollLeft()">‹</button>
+
+  <div #carousel class="carousel">
+
+    <div
+      class="media-item"
+      #mediaItem
+      *ngFor="let item of items">
+
+      <div
+        class="media-inner"
+        (click)="onContainerClick(mediaItem)">
+
+        <img
+          *ngIf="item.type === 'image'"
+          [src]="item.src"
+          loading="lazy"
+          alt=""
+        />
+
+        <video
+          *ngIf="item.type === 'video'"
+          #videoEl
+          [src]="item.src"
+          preload="metadata"
+          playsinline
+          muted>
+        </video>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <button class="nav right" (click)="scrollRight()">›</button>
+
+</div>

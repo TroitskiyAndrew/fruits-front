@@ -1,0 +1,19 @@
+@forward "./styles/main.scss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body { height: 100%; }
+body { margin: 0;  background-color: black;}
+
+.instagram-media {
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+html, body {
+  font-family: 'Montserrat', sans-serif;
+}
