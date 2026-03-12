@@ -1,12 +1,13 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
+import { IProduct } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
-  cities = signal<any[]>([]);
+  products = signal<IProduct[]>([]);
 
   discountEvent = '';
   source = '';
@@ -14,7 +15,7 @@ export class StateService {
 
   sessionId = this.generateSecureId();
 
-  user = signal<any>({userId: 480144364, pressedStart: true});
+  user = signal<any>({ userId: 480144364, pressedStart: true, admin: true });
   isStartPressed = computed(() => this.user().pressedStart);
   isAdmin = computed(() => this.user().admin || false);
 
@@ -27,8 +28,8 @@ export class StateService {
       const user = await this.apiService.getUser(this.telegrammService.user?.id || 0);
       this.user.set(user || {});
     }
-
-
+    const products = await this.apiService.getAllProducts();
+    this.products.set(products);
   }
   generateSecureId(length: number = 10): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -49,6 +49,7 @@ export interface IProduct {
   description: string;
   measure: string;
   amount: number;
+  wright: number;
   deleted: boolean;
   price: Record<Currency, number>
 }

@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
+import { IProduct } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +10,11 @@ import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } 
 export class ApiService {
 
   constructor(private http: HttpClient) { }
-  async getCities(): Promise<any[]> {
-    const url = `${environment.backendUrl}/cities`;
+
+  async getAllProducts(): Promise<IProduct[]> {
+    const url = `${environment.backendUrl}/all-products`;
     return this.http
-      .get<any[]>(url)
+      .post<IProduct[]>(url, {query: {}})
       .toPromise()
       .then(res => res || [])
       .catch(() => {
