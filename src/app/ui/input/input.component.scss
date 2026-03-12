@@ -1,0 +1,50 @@
+.ui-input {
+  display: flex;
+  align-items: center;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 10px;
+
+  padding: 0 12px;
+
+  height: 42px;
+
+  gap: 8px;
+}
+
+.ui-input input {
+  flex: 1;
+
+  background: transparent;
+
+  border: none;
+
+  outline: none;
+
+  color: var(--color-text);
+
+  font-size: 14px;
+}
+
+.icon {
+  opacity: 0.7;
+}
+
+.clear {
+  background: none;
+
+  border: none;
+
+  color: var(--color-text-soft);
+
+  cursor: pointer;
+}
+
+.suffix {
+  color: var(--color-text-soft);
+
+  font-size: 13px;
+}

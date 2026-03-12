@@ -1,0 +1,30 @@
+<ng-container *ngIf="link; else buttonTpl">
+
+  <a routerLink="{{link}}" class="btn" [ngClass]="[
+'btn-' + variant,
+'size-' + size,
+icon ? 'icon' : ''
+]">
+
+    <ng-content />
+
+  </a>
+
+</ng-container>
+
+
+<ng-template #buttonTpl>
+
+  <button class="btn" [disabled]="disabled || loading" (click)="click()" [ngClass]="[
+'btn-' + variant,
+'size-' + size,
+icon ? 'icon' : ''
+]">
+
+    <span *ngIf="loading" class="loader"></span>
+
+    <ng-content *ngIf="!loading" />
+
+  </button>
+
+</ng-template>

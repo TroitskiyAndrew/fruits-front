@@ -1,0 +1,33 @@
+<div class="ui-input">
+
+<span
+*ngIf="icon"
+class="icon"
+>
+{{icon}}
+</span>
+
+<input
+[type]="type"
+[placeholder]="placeholder"
+[value]="value"
+[disabled]="disabled"
+(input)="change($event)"
+/>
+
+<button
+*ngIf="clearable && value"
+class="clear"
+(click)="clear()"
+>
+✕
+</button>
+
+<span
+*ngIf="suffix"
+class="suffix"
+>
+{{suffix}}
+</span>
+
+</div>

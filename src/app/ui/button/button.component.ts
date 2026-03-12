@@ -1,23 +1,33 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'ui-button',
   standalone: true,
-  template: `
-
-<button
-class="btn"
-[ngClass]="type"
->
-
-<ng-content/>
-
-</button>
-
-`
+  imports: [NgClass, RouterLink],
+  templateUrl: './ui-button.component.html',
+  styleUrls: ['./ui-button.component.scss']
 })
-export class ButtonComponent {
+export class UIButtonComponent {
 
-  @Input() type = 'btn-primary'
+  @Input() variant: 'primary' | 'outline' | 'ghost' = 'primary';
+
+  @Input() size: 'm' | 's' = 'm';
+
+  @Input() icon = false;
+
+  @Input() disabled = false;
+
+  @Input() loading = false;
+
+  @Input() link?: string;
+
+  @Output() action = new EventEmitter<void>();
+
+  click(){
+    if(this.disabled || this.loading) return
+    this.action.emit()
+  }
 
 }
