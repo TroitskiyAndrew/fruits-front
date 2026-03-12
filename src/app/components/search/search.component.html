@@ -2,10 +2,12 @@
 
   <div class="input-container">
     <input type="text" [formControl]="searchControl" placeholder="Поиск Гостя..." autocomplete="off" />
-
-    <div *ngIf="searchControl.value" class="clear-btn" (click)="clearInput()">
+    @if (searchControl.value) {
+    <div class="clear-btn" (click)="clearInput()">
       ✕
     </div>
+
+    }
   </div>
   @if(loading) {
   <div class="loader">
@@ -15,9 +17,12 @@
   }
   @if (results.length) {
   <ul>
-    <li *ngFor="let item of results" (click)="selectItem(item)">
+    @for (item of results; track $index) {
+    <li (click)="selectItem(item)">
       {{ item.name }}
     </li>
+
+    }
   </ul>
   }
 

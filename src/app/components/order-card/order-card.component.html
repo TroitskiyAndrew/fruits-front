@@ -1,0 +1,41 @@
+<ui-card>
+
+  <ui-row>
+
+    <div>
+      Order
+      <ui-badge>
+        {{order.userId}}
+      </ui-badge>
+    </div>
+
+    <ui-price [amount]="order.total" currency="RUB" />
+
+  </ui-row>
+
+  <div class="subtitle">
+
+    {{order.products.length}}
+    products
+
+  </div>
+
+  <ui-stack>
+    @for (p of order.products; track $index) {
+    <ui-row>
+
+      <div>
+        {{p.product.name}}
+      </div>
+
+      <div class="subtitle">
+        x{{p.amount}}
+      </div>
+
+    </ui-row>
+
+    }
+
+  </ui-stack>
+
+</ui-card>

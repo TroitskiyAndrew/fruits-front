@@ -1,0 +1,19 @@
+<div class="title">
+  Products
+</div>
+
+<ui-button size="s" (action)="createProduct()">
+  Add product
+</ui-button>
+
+<ui-input icon="🔍" placeholder="Search product" [formControl]="search" [clearable]="true" />
+
+<ui-stack>
+  @for (item of products; track $index) {
+  @if (item.set){
+  <set-card [set]="item" (edit)="editSet(item)" />
+  } @else {
+  <product-card [product]="item" (edit)="editProduct(item)" />
+  }
+  }
+</ui-stack>

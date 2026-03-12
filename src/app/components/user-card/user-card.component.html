@@ -1,0 +1,30 @@
+<ui-card>
+
+  <ui-row>
+
+    <ui-avatar>
+      👤
+    </ui-avatar>
+
+    <ui-stack>
+
+      <div>
+        {{user.user.first_name}}
+        {{user.user.last_name}}
+      </div>
+
+      <div class="subtitle">
+        {{user.user.username}}
+      </div>
+
+    </ui-stack>
+    @if(user.admin) {
+    <ui-badge>
+      admin
+    </ui-badge>
+
+    }
+
+  </ui-row>
+
+</ui-card>

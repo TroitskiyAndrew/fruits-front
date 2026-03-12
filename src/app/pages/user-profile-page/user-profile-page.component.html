@@ -1,0 +1,17 @@
+<user-card [user]="user" />
+
+<div class="title">
+  Orders
+</div>
+@for (order of orders; track $index) {
+<order-card [order]="order" />
+
+}
+
+<div class="title">
+  Payments
+</div>
+@for (payment of payments; track $index) {
+<payment-card [payment]="payment" />
+
+}

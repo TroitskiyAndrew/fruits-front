@@ -8,7 +8,7 @@ import { IProduct } from '../models/models';
 })
 export class StateService {
   products = signal<IProduct[]>([]);
-
+  queryParams: Record<string, any> = {};
   discountEvent = '';
   source = '';
   target = '';

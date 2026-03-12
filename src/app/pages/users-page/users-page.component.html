@@ -1,0 +1,13 @@
+<div class="title">
+  Users
+</div>
+
+<ui-input icon="🔍" placeholder="Search user" [formControl]="search" [clearable]="true" />
+
+<ui-stack>
+  @for (user of users; track $index) {
+  <user-card [user]="user" (click)="openUser(user)" />
+
+  }
+
+</ui-stack>

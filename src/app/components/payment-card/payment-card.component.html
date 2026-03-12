@@ -1,0 +1,33 @@
+<ui-card>
+
+  <ui-row>
+
+    <div>
+      {{payment.from}}
+      →
+      {{payment.to}}
+    </div>
+
+    <ui-price [amount]="payment.amount" [currency]="payment.currency" />
+
+  </ui-row>
+
+  <ui-row>
+    @if(payment.confirmed) {
+    <ui-badge>
+      confirmed
+    </ui-badge>
+    } @else {
+    <ui-badge>
+      pending
+    </ui-badge>
+    }
+
+
+    <div class="subtitle">
+      {{payment.payed}}
+    </div>
+
+  </ui-row>
+
+</ui-card>

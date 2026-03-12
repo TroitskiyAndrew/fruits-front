@@ -37,13 +37,15 @@ export interface IOrderProduct {
   contains: IOrderProduct[];
 }
 
-export enum Currency{
+export enum Currency {
   Rub = 'rub',
   VND = 'vnd',
   USDT = 'usdt'
 }
 
-export interface IProduct {
+
+
+type BaseProduct = {
   id: string;
   name: string;
   description: string;
@@ -51,12 +53,18 @@ export interface IProduct {
   amount: number;
   wright: number;
   deleted: boolean;
-  price: Record<Currency, number>
+  price: Record<Currency, number>;
+  set: boolean;
 }
 
-export interface ISet extends IProduct {
+export type IProduct = BaseProduct & {
+  set: false
+}
+
+export type ISet = BaseProduct & {
   defaultProducts: Record<string, IProduct>
   additionalProducts: Record<string, IProduct>
+  set: true;
 }
 
 export interface IPayment {

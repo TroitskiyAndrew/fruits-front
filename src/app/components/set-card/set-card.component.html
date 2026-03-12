@@ -1,0 +1,45 @@
+<ui-card>
+
+  <ui-row>
+
+    <div class="title">
+      {{set.name}}
+    </div>
+
+    <ui-button variant="ghost" size="s" (action)="expanded=!expanded">
+      {{expanded ? 'hide' : 'expand'}}
+    </ui-button>
+
+  </ui-row>
+
+  <ui-row>
+
+    <ui-price [amount]="set.price.rub" currency="RUB" />
+
+    <ui-button variant="outline" size="s">
+      edit
+    </ui-button>
+
+  </ui-row>
+  @if (expanded) {
+  <ui-stack>
+    @for (item of set.defaultProducts | keyvalue; track $index) {
+    <ui-row>
+
+      <div>
+        {{item.value.name}}
+      </div>
+
+      <div class="subtitle">
+        x{{item.value.amount}}
+      </div>
+
+    </ui-row>
+
+    }
+
+  </ui-stack>
+
+  }
+
+</ui-card>

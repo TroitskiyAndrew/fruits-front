@@ -1,33 +1,28 @@
 <div class="ui-input">
 
-<span
-*ngIf="icon"
-class="icon"
->
-{{icon}}
-</span>
+  @if(icon) {
 
-<input
-[type]="type"
-[placeholder]="placeholder"
-[value]="value"
-[disabled]="disabled"
-(input)="change($event)"
-/>
+  <span class="icon">
+    {{icon}}
+  </span>
+  }
 
-<button
-*ngIf="clearable && value"
-class="clear"
-(click)="clear()"
->
-✕
-</button>
+  <input [type]="type" [placeholder]="placeholder" [value]="value" [disabled]="disabled" (input)="change($event)" />
 
-<span
-*ngIf="suffix"
-class="suffix"
->
-{{suffix}}
-</span>
+
+  @if(clearable && value) {
+
+  <button class="clear" (click)="clear()">
+    ✕
+  </button>
+  }
+
+
+  @if (suffix) {
+  <span class="suffix">
+    {{suffix}}
+  </span>
+
+  }
 
 </div>

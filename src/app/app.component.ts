@@ -23,24 +23,24 @@ export class AppComponent {
       for(const paramStr of params) {
         const [param, value] = paramStr.split('_SPLIT_');
         switch (param) {
-          case 'EVENT':
-            this.router.navigate(['event', value]);
-            break;
-          case 'TICKET':
-            this.router.navigate(['check-ticket', value]);
-            break;
-          case 'SESSION':
-            this.stateService.sessionId = value;
-            this.apiService.getCities();
-            break;
-          case 'SOURCE':
-            this.apiService.saveSource(value);
-            break;
-          case 'DISCOUNT':
-            const [eventId, source] = value.split('_D_');
-            this.stateService.discountEvent = eventId;
-            this.stateService.source = source || '';
-            break;
+          // case 'EVENT':
+          //   this.router.navigate(['event', value]);
+          //   break;
+          // case 'TICKET':
+          //   this.router.navigate(['check-ticket', value]);
+          //   break;
+          // case 'SESSION':
+          //   this.stateService.sessionId = value;
+          //   this.apiService.getCities();
+          //   break;
+          // case 'SOURCE':
+          //   this.apiService.saveSource(value);
+          //   break;
+          // case 'DISCOUNT':
+          //   const [eventId, source] = value.split('_D_');
+          //   this.stateService.discountEvent = eventId;
+          //   this.stateService.source = source || '';
+          //   break;
 
           default:
             break;

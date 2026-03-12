@@ -1,0 +1,29 @@
+<ui-card>
+
+  <ui-row>
+
+    <div class="title">
+      {{product.name}}
+    </div>
+
+    <ui-button variant="outline" size="s">
+      edit
+    </ui-button>
+
+  </ui-row>
+
+  <div class="subtitle">
+    {{product.measure}}
+  </div>
+
+  <ui-row>
+
+    <ui-price [amount]="product.price.rub" currency="RUB" />
+
+    <ui-price [amount]="product.price.vnd" currency="VND" />
+
+    <ui-price [amount]="product.price.usdt" currency="USDT" />
+
+  </ui-row>
+
+</ui-card>
