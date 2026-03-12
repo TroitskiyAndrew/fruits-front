@@ -23,7 +23,7 @@ import { StackComponent } from '../../ui/stack/stack.component';
   standalone: true,
   imports: [CommonModule, UserCardComponent,
     OrderCardComponent,
-    PaymentCardComponent],
+    PaymentCardComponent, PageComponent],
   templateUrl: './user-profile-page.component.html'
 })
 export class UserProfilePageComponent {

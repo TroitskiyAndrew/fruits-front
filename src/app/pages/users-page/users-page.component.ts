@@ -20,7 +20,7 @@ import { SectionComponent } from '../../ui/section/section.component';
 @Component({
   selector: 'users-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UserCardComponent, InputComponent, StackComponent],
+  imports: [CommonModule, ReactiveFormsModule, UserCardComponent, InputComponent, StackComponent, PageComponent],
   templateUrl: './users-page.component.html'
 })
 export class UsersPageComponent {

@@ -1,28 +1,22 @@
-@if (link) {
+<button
+  class="btn"
+  [disabled]="disabled || loading"
+  (click)="click()"
+  [ngClass]="[
+    'btn-' + variant,
+    'size-' + size,
+    icon ? 'icon' : ''
+  ]"
+>
 
-<a routerLink="{{link}}" class="btn" [ngClass]="[
-'btn-' + variant,
-'size-' + size,
-icon ? 'icon' : ''
-]">
-
-  <ng-content />
-
-</a>
-} @else {
-<button class="btn" [disabled]="disabled || loading" (click)="click()" [ngClass]="[
-'btn-' + variant,
-'size-' + size,
-icon ? 'icon' : ''
-]">
   @if (loading) {
-  <span class="loader"></span>
+
+    <span class="loader"></span>
 
   } @else {
-  <ng-content />
+
+    <ng-content />
 
   }
 
-
 </button>
-}

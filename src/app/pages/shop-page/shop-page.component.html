@@ -1,11 +1,13 @@
-<div class="title">
-  Shop Sets
-</div>
+<ui-page>
+  <div class="title">
+    Shop Sets
+  </div>
 
-<ui-stack>
-  @for (set of sets; track $index) {
-  <set-card [set]="set" (edit)="editSet(set)" />
+  <ui-stack>
+    @for (set of sets; track $index) {
+    <set-card [set]="set" (edit)="editSet(set)" />
 
-  }
+    }
 
-</ui-stack>
+  </ui-stack>
+</ui-page>

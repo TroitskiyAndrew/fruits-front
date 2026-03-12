@@ -21,7 +21,7 @@ import { SectionComponent } from '../../ui/section/section.component';
 @Component({
   selector: 'products-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, InputComponent, StackComponent, SetCardComponent, ProductCardComponent],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, InputComponent, StackComponent, SetCardComponent, ProductCardComponent, PageComponent],
   templateUrl: './products-page.component.html'
 })
 export class ProductsPageComponent {

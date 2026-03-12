@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'ui-button',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './button.component.html',
   styleUrls: ['./button.component.scss']
 })
@@ -23,11 +23,21 @@ export class ButtonComponent {
 
   @Input() link?: string;
 
+  @Input() text: string = '';
+
   @Output() action = new EventEmitter<void>();
 
+  constructor(private router: Router){}
+
   click(){
-    if(this.disabled || this.loading) return
-    this.action.emit()
+    if(this.disabled || this.loading) {
+      return
+    }
+    if(this.link){
+      this.router.navigate([this.link])
+    } else {
+      this.action.emit()
+    }
   }
 
 }

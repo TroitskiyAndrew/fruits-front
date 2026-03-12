@@ -20,7 +20,7 @@ import { SectionComponent } from '../../ui/section/section.component';
 @Component({
   selector: 'payments-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, PaymentCardComponent, InputComponent, StackComponent],
+  imports: [CommonModule, ReactiveFormsModule, PaymentCardComponent, InputComponent, StackComponent, PageComponent],
   templateUrl: './payments-page.component.html'
 })
 export class PaymentsPageComponent {

@@ -19,7 +19,7 @@ import { SectionComponent } from '../../ui/section/section.component';
 @Component({
   selector: 'shop-page',
   standalone: true,
-  imports: [CommonModule, SetCardComponent, StackComponent],
+  imports: [CommonModule, SetCardComponent, StackComponent, PageComponent],
   templateUrl: './shop-page.component.html'
 })
 export class ShopPageComponent {

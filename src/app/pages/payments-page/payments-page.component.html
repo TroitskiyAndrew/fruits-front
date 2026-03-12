@@ -1,17 +1,19 @@
-<div class="title">
-  Payments
-</div>
+<ui-page>
+  <div class="title">
+    Payments
+  </div>
 
-<ui-input placeholder="From" [formControl]="fromFilter" />
+  <ui-input placeholder="From" [formControl]="fromFilter" />
 
-<ui-input placeholder="To" [formControl]="toFilter" />
+  <ui-input placeholder="To" [formControl]="toFilter" />
 
-<ui-input placeholder="Currency" [formControl]="currencyFilter" />
+  <ui-input placeholder="Currency" [formControl]="currencyFilter" />
 
-<ui-stack>
-  @for (payment of payments; track $index) {
-  <payment-card [payment]="payment" />
+  <ui-stack>
+    @for (payment of payments; track $index) {
+    <payment-card [payment]="payment" />
 
-  }
+    }
 
-</ui-stack>
+  </ui-stack>
+</ui-page>

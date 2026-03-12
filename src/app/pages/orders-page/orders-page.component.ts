@@ -21,7 +21,7 @@ import { SectionComponent } from '../../ui/section/section.component';
 @Component({
   selector: 'orders-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, InputComponent, StackComponent, OrderCardComponent],
+  imports: [CommonModule, ReactiveFormsModule, InputComponent, StackComponent, OrderCardComponent, PageComponent],
   templateUrl: './orders-page.component.html'
 })
 export class OrdersPageComponent {
