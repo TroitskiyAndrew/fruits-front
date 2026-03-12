@@ -13,13 +13,16 @@
 @forward "base/fonts";
 @forward "base/typography";
 @forward "base/helpers";
+@forward "base/tokens";
 
 // 4. Layout-related sections
+@forward "layout/layout";
 
 // 5. Components
 // @forward "components/button";
- @forward "components/block";
+ @forward "components/button";
  @forward "components/input";
+ @forward "components/components";
 
 // 6. Page-specific styles
 @forward "pages/home";

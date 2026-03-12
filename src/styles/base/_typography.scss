@@ -1,8 +1,17 @@
 @use '../abstracts/variables' as *;
-/**
- * Basic typography style for copy text
- */
-body {
-  color: $text-color;
-  font-size: 18px;
+
+
+.title{
+font-size:18px;
+font-weight:600;
+}
+
+.subtitle{
+font-size:13px;
+color:var(--color-text-soft);
+}
+
+.price{
+color:var(--color-gold);
+font-weight:600;
 }

@@ -1,19 +1,24 @@
 @forward "./styles/main.scss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
 }
 
-html, body { height: 100%; }
-body { margin: 0;  background-color: black;}
+body{
 
-.instagram-media {
-  max-width: 100% !important;
-  margin: 0 auto !important;
-}
+background:var(--color-bg);
+color:var(--color-text);
 
-html, body {
-  font-family: 'Montserrat', sans-serif;
+font-family:
+
+-apple-system,
+BlinkMacSystemFont,
+Inter,
+Roboto,
+sans-serif;
+
+font-size:14px;
+
 }
