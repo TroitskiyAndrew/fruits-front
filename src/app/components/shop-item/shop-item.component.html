@@ -23,17 +23,15 @@
       @switch (currency) {
       @case (Currency.Rub) {
       <div>₽</div>
-      <div>{{ product?.price?.rub }}</div>
       }
       @case (Currency.VND) {
       <div>₫</div>
-      <div>{{ product?.price?.vnd }}k</div>
       }
       @case (Currency.USDT) {
       <div>$</div>
-      <div>{{ product?.price?.usdt }}</div>
-      }
-      }
+    }
+  }
+    <div>{{ totalPrice }}</div>
 
     </ui-grid>
 
@@ -78,7 +76,7 @@
 
       <ui-button variant="ghost" (action)="cancel()">
 
-        Cancel
+        Отмена
 
       </ui-button>
 
