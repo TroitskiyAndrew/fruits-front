@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
-import { SetCardComponent } from '../../components/set-card/set-card.component';
-import { IProduct, ISet } from '../../models/models';
+import { IProduct, ISet, Currency } from '../../models/models';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { StackComponent } from '../../ui/stack/stack.component';
 import { InputComponent } from '../../ui/input/input.component';
@@ -16,24 +15,46 @@ import { PageComponent } from '../../ui/page/page.component';
 import { PriceComponent } from '../../ui/price/price.component';
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
+import { StateService } from '../../services/state.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 
 @Component({
   selector: 'products-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, InputComponent, StackComponent, SetCardComponent, ProductCardComponent, PageComponent],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, InputComponent, StackComponent, ProductCardComponent, PageComponent],
   templateUrl: './products-page.component.html'
 })
 export class ProductsPageComponent {
 
-  search = new FormControl('');
+  creating = false;
 
-  products: (IProduct | ISet)[] = [];
+  createType: 'product' | 'set' = 'product';
+
+  searchControl = new FormControl('');
+
+  search = toSignal(this.searchControl.valueChanges, { initialValue: '' });
+
+  products = computed(() => {
+    const searchValue = this.search()?.toLowerCase() || '';
+
+    return this.stateService.products()
+      .filter(p => p.name.toLowerCase().includes(searchValue))
+      .sort((a, b) => (b.set ? 1 : 0) - (a.set ? 1 : 0));
+  });
+
+  constructor(private stateService: StateService) { }
 
   createProduct() { }
 
   editProduct(product: IProduct) { }
 
   editSet(set: ISet) { }
+
+  addProduct(product: IProduct | ISet) {
+
+    this.creating = false;
+
+  }
 
 }

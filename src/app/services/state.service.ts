@@ -29,6 +29,7 @@ export class StateService {
       this.user.set(user || {});
     }
     const products = await this.apiService.getAllProducts();
+    console.log('products', products)
     this.products.set(products);
   }
   generateSecureId(length: number = 10): string {

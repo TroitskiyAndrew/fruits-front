@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { IProduct } from '../models/models';
+import { IProduct, ISet } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -93,5 +93,28 @@ export class ApiService {
           return throwError(() => err);
         })
       );
+  }
+
+  async createProduct( product: Omit<IProduct | ISet, 'id'>): Promise<IProduct | null> {
+    const url = `${environment.backendUrl}/products`;
+    return this.http
+      .post<IProduct>(url, {product})
+      .toPromise()
+      .then(res => res || null)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return null
+      })
+  }
+  async updateProduct( product: IProduct | ISet): Promise<IProduct | ISet | null> {
+    const url = `${environment.backendUrl}/products/${product.id}`;
+    return this.http
+      .put<IProduct | ISet | null>(url, {product})
+      .toPromise()
+      .then(res => res || null)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return null
+      })
   }
 }

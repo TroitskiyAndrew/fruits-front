@@ -1,23 +1,13 @@
-import {
-  Component,
-  Input,
-  forwardRef
-} from '@angular/core';
-
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule
-} from '@angular/forms';
-
+import { Component, Input, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'ui-input',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './input.component.html',
-  styleUrls: ['./input.component.scss'],
+  styleUrl: './input.component.scss',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -28,48 +18,41 @@ import { CommonModule } from '@angular/common';
 })
 export class InputComponent implements ControlValueAccessor {
 
-  @Input() type: 'text' | 'number' | 'search' | 'password' = 'text';
+  @Input() label = ''
+  @Input() placeholder = ''
+  @Input() type: 'text' | 'number' = 'text'
+  @Input() clearable = false
 
-  @Input() placeholder = '';
+  value: any = ''
+  disabled = false
 
-  @Input() icon?: string;
+  onChange: any = () => {}
+  onTouched: any = () => {}
 
-  @Input() suffix?: string;
-
-  @Input() clearable = false;
-
-  @Input() disabled = false;
-
-  value: any = '';
-
-  onChange: any = () => { };
-  onTouched: any = () => { };
-
-  writeValue(value: any): void {
-    this.value = value;
+  writeValue(value: any) {
+    this.value = value
   }
 
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
+  registerOnChange(fn: any) {
+    this.onChange = fn
   }
 
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
+  registerOnTouched(fn: any) {
+    this.onTouched = fn
   }
 
-  setDisabledState(disabled: boolean): void {
-    this.disabled = disabled;
+  setDisabledState(isDisabled: boolean) {
+    this.disabled = isDisabled
   }
 
-  change(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.value = input.value;
-    this.onChange(this.value);
+  change(value: any) {
+    this.value = value
+    this.onChange(value)
   }
 
   clear() {
-    this.value = '';
-    this.onChange('');
+    this.value = ''
+    this.onChange('')
   }
 
 }

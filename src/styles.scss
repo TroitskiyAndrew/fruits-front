@@ -1,24 +1,16 @@
 @forward "./styles/main.scss";
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-body{
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, Inter, Roboto, sans-serif;
 
-background:var(--color-bg);
-color:var(--color-text);
-
-font-family:
-
--apple-system,
-BlinkMacSystemFont,
-Inter,
-Roboto,
-sans-serif;
-
-font-size:14px;
-
+  font-size: 14px;
 }

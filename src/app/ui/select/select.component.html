@@ -1,0 +1,15 @@
+<label *ngIf="label">{{ label }}</label>
+
+<select
+  [ngModel]="value"
+  (change)="onChangeSelect($event)"
+  [compareWith]="compareWith"
+  [disabled]="disabled"
+>
+  <option
+    *ngFor="let option of options"
+    [ngValue]="option.value"
+  >
+    {{ option.label }}
+  </option>
+</select>

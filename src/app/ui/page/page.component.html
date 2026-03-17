@@ -1,0 +1,9 @@
+<div class="page">
+  <ng-content />
+  @if (showBack) {
+  <ui-button class="back" (action)="goBack()">
+    Назад
+  </ui-button>
+
+  }
+</div>

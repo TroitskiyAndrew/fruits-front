@@ -1,109 +1,92 @@
-.btn{
+.btn {
+  border: none;
 
-border:none;
+  border-radius: 10px;
 
-border-radius:10px;
+  font-weight: 600;
 
-font-weight:600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-display:flex;
-align-items:center;
-justify-content:center;
+  gap: 8px;
 
-gap:8px;
+  cursor: pointer;
 
-cursor:pointer;
-
-transition:all .15s ease;
-
+  transition: all 0.15s ease;
 }
 
 /* sizes */
 
-.size-m{
-
-height:44px;
-padding:0 16px;
-
+.size-m {
+  height: 44px;
+  padding: 0 16px;
 }
 
-.size-s{
-
-height:34px;
-padding:0 12px;
-
+.size-s {
+  height: 34px;
+  padding: 0 12px;
 }
 
 /* icon */
 
-.icon{
-
-width:44px;
-padding:0;
-
+.icon {
+  padding: 0;
 }
 
 /* variants */
 
-.btn-primary{
-
-background:var(--color-gold);
-color:black;
-
+.btn-primary {
+  background: var(--color-gold);
+  color: black;
 }
 
-.btn-primary:hover{
-
-background:var(--color-gold-soft);
-
+.btn-primary:hover {
+  background: var(--color-gold-soft);
 }
 
-.btn-outline{
+.btn-outline {
+  background: transparent;
 
-background:transparent;
+  border: 1px solid var(--color-gold);
 
-border:1px solid var(--color-gold);
-
-color:var(--color-gold);
-
+  color: var(--color-gold);
 }
 
-.btn-ghost{
-
-background:transparent;
-color:var(--color-text);
-
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text);
 }
 
 /* disabled */
 
-button:disabled{
-
-opacity:.4;
-cursor:not-allowed;
-
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* loader */
 
-.loader{
+.loader {
+  width: 16px;
+  height: 16px;
 
-width:16px;
-height:16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
 
-border:2px solid transparent;
-border-top:2px solid currentColor;
+  border-radius: 50%;
 
-border-radius:50%;
-
-animation:spin 0.8s linear infinite;
-
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin{
-
-to{
-transform:rotate(360deg);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+i {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
 }

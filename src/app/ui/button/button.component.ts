@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'ui-button',
@@ -11,28 +11,31 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class ButtonComponent {
 
-  @Input() variant: 'primary' | 'outline' | 'ghost' = 'primary';
+  @Input() variant: 'primary' | 'outline' | 'ghost' = 'primary'
 
-  @Input() size: 'm' | 's' = 'm';
+  @Input() size: 'm' | 's' = 'm'
 
-  @Input() icon = false;
+  @Input() icon = false
 
-  @Input() disabled = false;
+  @Input() disabled = false
 
-  @Input() loading = false;
+  @Input() loading = false
 
-  @Input() link?: string;
+  @Input() link?: string
 
-  @Input() text: string = '';
+  @Input() text: string = ''
 
-  @Output() action = new EventEmitter<void>();
+  // 🔥 NEW
+  @Input() fa?: string
+  @Input() iconRight = false
+
+  @Output() action = new EventEmitter<void>()
 
   constructor(private router: Router){}
 
   click(){
-    if(this.disabled || this.loading) {
-      return
-    }
+    if(this.disabled || this.loading) return
+
     if(this.link){
       this.router.navigate([this.link])
     } else {

@@ -43,29 +43,31 @@ export enum Currency {
   USDT = 'usdt'
 }
 
-
+export enum Measure {
+  KG = 'кг',
+  Item = 'шт'
+}
 
 type BaseProduct = {
   id: string;
   name: string;
   description: string;
-  measure: string;
+  measure: Measure;
   amount: number;
-  wright: number;
+  weight: number;
   deleted: boolean;
   price: Record<Currency, number>;
   set: boolean;
 }
 
-export type IProduct = BaseProduct & {
-  set: false
-}
-
 export type ISet = BaseProduct & {
-  defaultProducts: Record<string, IProduct>
-  additionalProducts: Record<string, IProduct>
+  defaultProducts: Record<string, IProduct & {count: number}>
+  additionalProducts: Record<string, IProduct & {count: number}>
   set: true;
 }
+
+export type IProduct = (BaseProduct & {  set: false}) | ISet;
+
 
 export interface IPayment {
   id: string;

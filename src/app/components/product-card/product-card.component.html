@@ -1,29 +1,126 @@
 <ui-card>
 
-  <ui-row>
+  @if (!editing) {
 
-    <div class="title">
-      {{product.name}}
+  <div class="row">
+
+    <div class="col left">
+
+      <div class="title">
+        {{ product?.name }} (
+          @if(product?.set){
+             {{ product?.weight }} кг
+          } @else {
+            {{ product?.amount }} {{ product?.measure }}
+          }
+          )
+      </div>
+
+      <div class="subtitle">
+        {{ product?.description }}
+      </div>
+
     </div>
 
-    <ui-button variant="outline" size="s">
-      edit
-    </ui-button>
+    <ui-grid [columns]="3" alignX="center" [gap]="5">
+      <div>₽</div>
+      <div>₫</div>
+      <div>$</div>
+      <div>{{ product?.price?.rub }}</div>
+      <div>{{ product?.price?.vnd }}k</div>
+      <div>{{ product?.price?.usdt }}</div>
 
-  </ui-row>
+    </ui-grid>
 
-  <div class="subtitle">
-    {{product.measure}}
+    <ui-button (action)="startEdit()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-pen"> </ui-button>
+
   </div>
 
-  <ui-row>
+  }
 
-    <ui-price [amount]="product.price.rub" currency="RUB" />
+  @if (editing) {
 
-    <ui-price [amount]="product.price.vnd" currency="VND" />
+  <ui-stack [formGroup]="form">
 
-    <ui-price [amount]="product.price.usdt" currency="USDT" />
+    <ui-toggler [options]="typeOptions" formControlName="set">
+    </ui-toggler>
 
-  </ui-row>
+    <ui-input label="Название" formControlName="name" [clearable]="true">
+    </ui-input>
+
+    <ui-input label="Описание" formControlName="description" [clearable]="true">
+    </ui-input>
+
+    <ui-row class="row">
+      @if(form.controls['set'].getRawValue()){
+        <div>Вес: {{defaultsWeight}}кг</div>
+      } @else {
+      <ui-select label="ед.и." [options]="measureOptions" formControlName="measure">
+      </ui-select>
+
+      <ui-input label="Вес" type="number" formControlName="weight">
+      </ui-input>
+
+      <ui-input label="Кол-во" type="number" formControlName="amount">
+      </ui-input>
+      }
+
+    </ui-row>
+
+    <ui-row class="row">
+
+      <ui-input label="RUB" type="number" formControlName="priceRub">
+      </ui-input>
+
+      <ui-input label="VND" type="number" formControlName="priceVnd">
+      </ui-input>
+
+      <ui-input label="USDT" type="number" formControlName="priceUsdt">
+      </ui-input>
+
+    </ui-row>
+
+    @if (isSet) {
+
+    <ui-stack [formGroup]="defaultsForm">
+
+      @for (p of products(); track p.id) {
+
+      <ui-row class="product-row">
+
+        <div class="product-name">
+          {{ p.name }}
+        </div>
+
+        <ui-counter [formControlName]="p.id">
+        </ui-counter>
+
+      </ui-row>
+
+      }
+
+    </ui-stack>
+
+    }
+
+    <ui-row class="actions">
+
+      <ui-button variant="primary" (action)="saveProduct()">
+
+        Save
+
+      </ui-button>
+
+      <ui-button variant="ghost" (action)="cancel()">
+
+        Cancel
+
+      </ui-button>
+
+    </ui-row>
+
+  </ui-stack>
+
+  }
 
 </ui-card>

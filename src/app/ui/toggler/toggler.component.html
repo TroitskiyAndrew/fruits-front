@@ -1,0 +1,15 @@
+<div class="toggler">
+
+  @for (opt of options; track opt.value) {
+
+    <div
+      class="option"
+      [class.active]="value === opt.value"
+      (click)="select(opt.value)"
+    >
+      {{ opt.label }}
+    </div>
+
+  }
+
+</div>

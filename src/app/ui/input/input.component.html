@@ -1,28 +1,29 @@
-<div class="ui-input">
+<div class="field">
 
-  @if(icon) {
-
-  <span class="icon">
-    {{icon}}
-  </span>
+  @if (label) {
+    <label>{{ label }}</label>
   }
 
-  <input [type]="type" [placeholder]="placeholder" [value]="value" [disabled]="disabled" (input)="change($event)" />
+  <div class="input-wrapper">
 
+    <input
+      [type]="type"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      (input)="change($any($event.target).value)"
+      (blur)="onTouched()"
+    />
 
-  @if(clearable && value) {
+    @if (clearable && value) {
+      <button
+        type="button"
+        class="clear"
+        (click)="clear()">
+        ×
+      </button>
+    }
 
-  <button class="clear" (click)="clear()">
-    ✕
-  </button>
-  }
-
-
-  @if (suffix) {
-  <span class="suffix">
-    {{suffix}}
-  </span>
-
-  }
+  </div>
 
 </div>

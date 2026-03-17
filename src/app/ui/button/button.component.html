@@ -15,7 +15,18 @@
 
   } @else {
 
+    <!-- icon left -->
+    @if (fa && !iconRight) {
+      <i [class]="fa"></i>
+    }
+
+    <!-- content -->
     <ng-content />
+
+    <!-- icon right -->
+    @if (fa && iconRight) {
+      <i [class]="fa"></i>
+    }
 
   }
 

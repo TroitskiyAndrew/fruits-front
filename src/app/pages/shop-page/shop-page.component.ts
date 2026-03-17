@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { SetCardComponent } from '../../components/set-card/set-card.component';
 import { ISet } from '../../models/models';
 import { StackComponent } from '../../ui/stack/stack.component';
 import { CommonModule } from '@angular/common';
@@ -14,12 +13,13 @@ import { PageComponent } from '../../ui/page/page.component';
 import { PriceComponent } from '../../ui/price/price.component';
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
+import { ProductCardComponent } from "../../components/product-card/product-card.component";
 
 
 @Component({
   selector: 'shop-page',
   standalone: true,
-  imports: [CommonModule, SetCardComponent, StackComponent, PageComponent],
+  imports: [CommonModule, StackComponent, PageComponent, ProductCardComponent],
   templateUrl: './shop-page.component.html'
 })
 export class ShopPageComponent {
