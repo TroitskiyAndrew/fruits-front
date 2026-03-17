@@ -29,9 +29,9 @@
       }
       @case (Currency.USDT) {
       <div>$</div>
-    }
-  }
-    <div>{{ totalPrice }}</div>
+      }
+      }
+      <div>{{ totalPrice }}</div>
 
     </ui-grid>
 
@@ -50,10 +50,22 @@
 
       @for (p of products(); track p.id) {
 
-      <ui-row class="product-row">
+      <ui-row>
 
-        <div class="product-name">
-          {{ p.name }}
+        <div>
+          {{ p.name }} ({{p.amount}} {{p.measure}}) - {{p.price[this.currency]}}
+          @switch (currency) {
+          @case (Currency.Rub) {
+          ₽
+          }
+          @case (Currency.VND) {
+          ₫
+          }
+          @case (Currency.USDT) {
+          $
+          }
+          }
+
         </div>
 
         <ui-counter [min]="product!.defaultProducts[p.id]?.count || 0" [formControlName]="p.id">

@@ -126,9 +126,10 @@ export class ShopItemComponent implements OnInit {
 
   get totalPrice(): number {
     const obj = (this.form().get('defaultProducts') as FormGroup).getRawValue() as Record<string, number>;
+    const defaultProducts = this.product?.defaultProducts || {}
     return (this.product?.price[this.currency] || 0) +  Object.entries(obj).reduce((acc: number, entry) => {
       const product = this.productsMap().get(entry[0])
-      acc += (product?.price[this.currency] || 0) * entry[1];
+      acc += (product?.price[this.currency] || 0) * (entry[1] - (defaultProducts[entry[0]]?.count || 0));
       return acc;
     }, 0);
   }
