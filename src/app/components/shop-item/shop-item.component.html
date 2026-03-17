@@ -5,13 +5,16 @@
     <div class="col left">
 
       <div class="title">
-        {{ product?.name }} (
+        {{ product?.name }}
+        @if(defaultsWeight > 0){
+          (
         @if(product?.set){
-        {{ product?.weight }} кг
+        {{ defaultsWeight }} кг
         } @else {
         {{ product?.amount }} {{ product?.measure }}
         }
         )
+        }
       </div>
 
       <div class="subtitle">
@@ -42,8 +45,6 @@
   <ui-stack [formGroup]="form()">
 
     <ui-row class="row">
-      <div>Вес: {{defaultsWeight}}кг</div>
-
     </ui-row>
     @if (showProducts) {
     <ui-stack [formGroup]="defaultsForm">
