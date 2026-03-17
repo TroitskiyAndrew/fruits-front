@@ -88,8 +88,8 @@
 
       <ui-row class="product-row">
 
-        <div class="product-name">
-          {{ p.name }}
+        <div>
+          {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
 
         <ui-counter [formControlName]="p.id">

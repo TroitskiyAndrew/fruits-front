@@ -1,18 +1,17 @@
 <ui-page>
   <div class="title">
-    Products
+    Товары
   </div>
 
   <ui-button (action)="creating = true">
-    Create product
+    Новый продукт/набор
   </ui-button>
 
   @if (creating) {
 
   <product-card (cancelEvent)="creating = false" (save)="creating = false" />
 
-  }
-
+  } @else {
   <ui-input icon="🔍" placeholder="Search product" [formControl]="searchControl" [clearable]="true" />
 
   <ui-stack>
@@ -20,4 +19,7 @@
     <product-card [product]="item" />
     }
   </ui-stack>
+  }
+
+
 </ui-page>
