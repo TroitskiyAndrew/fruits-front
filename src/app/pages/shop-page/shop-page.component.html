@@ -2,12 +2,12 @@
   <div class="title">
     Shop Sets
   </div>
-
-  <ui-stack>
-    @for (set of sets; track $index) {
-    <product-card [product]="set" (edit)="editSet(set)" />
-
+  <ui-toggler [options]="currencyOptions" [value]="currencyVal" (valueChange)="currencyVal = $event"></ui-toggler>
+  <ui-stack class="w-100">
+    @for (set of sets(); track $index) {
+      @if(selectedSet() == null || selectedSet() === set.id){
+        <shop-item [product]="set" [currency]="currencyVal" (choose)="selectSet(set.id)" (cancelEvent)="cancelSelect()"/>
+      }
     }
-
   </ui-stack>
 </ui-page>

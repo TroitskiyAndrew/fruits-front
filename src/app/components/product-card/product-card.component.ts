@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, computed } from '@angul
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import { IProduct, ISet, Measure } from '../../models/models'
+import {  ISetProducts, ISimpleProduct, Measure, Product } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -37,17 +37,17 @@ import { GridComponent } from "../../ui/grid/grid.component";
 })
 export class ProductCardComponent implements OnInit {
 
-  @Input() product?: IProduct | ISet
+  @Input() product?: Product
   @Input() editable = false
   products = computed(() => {
     return this.stateService.products().filter(p => !p.set)
   })
-  productsMap = computed<Map<string, IProduct>>(() => this.products().reduce((map, product) => {
+  productsMap = computed<Map<string, ISimpleProduct>>(() => this.products().reduce((map, product) => {
     map.set(product.id, product);
     return map;
   }, new Map()));
 
-  @Output() save = new EventEmitter<IProduct | ISet>()
+  @Output() save = new EventEmitter<Product>()
   @Output() cancelEvent = new EventEmitter()
 
   form!: FormGroup
@@ -73,13 +73,14 @@ export class ProductCardComponent implements OnInit {
       this.creating = true;
     }
 
-    const p = this.product as ISet | undefined
+    const p = this.product as Product | undefined
 
     const defaults: Record<string, any> = {}
-
-    this.products().forEach(prod => {
-      defaults[prod.id] = p?.defaultProducts?.[prod.id]?.count ?? 0
-    })
+    if(p?.set){
+      this.products().forEach(prod => {
+        defaults[prod.id] = p?.defaultProducts?.[prod.id]?.count ?? 0
+      })
+    }
 
     this.form = this.fb.group({
 
@@ -146,9 +147,9 @@ export class ProductCardComponent implements OnInit {
       },
       set: v.set
     }
-    let result: ISet | IProduct = base
+    let result: Product = base
     if (v.set) {
-      const defaults: ISet['defaultProducts'] = {}
+      const defaults: ISetProducts = {}
       Object.entries(v.defaultProducts).forEach(([id, count]: any) => {
 
         const product = this.productsMap().get(id)

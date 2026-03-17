@@ -30,7 +30,7 @@ export interface Order {
 }
 
 export interface IOrderProduct {
-  product: IProduct;
+  product: Product;
   amount: number;
   price: number;
   currency: Currency;
@@ -48,7 +48,7 @@ export enum Measure {
   Item = 'шт'
 }
 
-type BaseProduct = {
+interface ProductBase  {
   id: string;
   name: string;
   description: string;
@@ -60,14 +60,17 @@ type BaseProduct = {
   set: boolean;
 }
 
-export type ISet = BaseProduct & {
-  defaultProducts: Record<string, IProduct & {count: number}>
-  additionalProducts: Record<string, IProduct & {count: number}>
+export type ISetProducts = Record<string, ISimpleProduct & {count: number}>;
+
+export interface ISet  extends ProductBase  {
+  defaultProducts: ISetProducts;
+  additionalProducts: ISetProducts;
   set: true;
 }
 
-export type IProduct = (BaseProduct & {  set: false}) | ISet;
+export interface ISimpleProduct extends ProductBase {  set: false};
 
+export type Product = ISet | ISimpleProduct;
 
 export interface IPayment {
   id: string;

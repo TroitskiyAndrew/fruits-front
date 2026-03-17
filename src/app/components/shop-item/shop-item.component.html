@@ -1,0 +1,91 @@
+<ui-card>
+
+  <div class="row">
+
+    <div class="col left">
+
+      <div class="title">
+        {{ product?.name }} (
+        @if(product?.set){
+        {{ product?.weight }} кг
+        } @else {
+        {{ product?.amount }} {{ product?.measure }}
+        }
+        )
+      </div>
+
+      <div class="subtitle">
+        {{ product?.description }}
+      </div>
+
+    </div>
+    <ui-grid [columns]="1" alignX="center" [gap]="5">
+      @switch (currency) {
+      @case (Currency.Rub) {
+      <div>₽</div>
+      <div>{{ product?.price?.rub }}</div>
+      }
+      @case (Currency.VND) {
+      <div>₫</div>
+      <div>{{ product?.price?.vnd }}k</div>
+      }
+      @case (Currency.USDT) {
+      <div>$</div>
+      <div>{{ product?.price?.usdt }}</div>
+      }
+      }
+
+    </ui-grid>
+
+
+  </div>
+  @if (showProducts) {
+
+  <ui-stack [formGroup]="form()">
+
+    <ui-row class="row">
+      <div>Вес: {{defaultsWeight}}кг</div>
+
+    </ui-row>
+    @if (showProducts) {
+    <ui-stack [formGroup]="defaultsForm">
+
+      @for (p of products(); track p.id) {
+
+      <ui-row class="product-row">
+
+        <div class="product-name">
+          {{ p.name }}
+        </div>
+
+        <ui-counter [min]="product!.defaultProducts[p.id]?.count || 0" [formControlName]="p.id">
+        </ui-counter>
+
+      </ui-row>
+
+      }
+    </ui-stack>
+
+    }
+
+    <ui-row class="actions">
+
+      <ui-button variant="primary" (action)="saveProduct()">
+
+        Добавить в корзину
+
+      </ui-button>
+
+      <ui-button variant="ghost" (action)="cancel()">
+
+        Cancel
+
+      </ui-button>
+
+    </ui-row>
+
+  </ui-stack>
+
+  }
+
+</ui-card>

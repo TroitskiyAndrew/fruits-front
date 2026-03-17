@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { IProduct, ISet } from '../models/models';
+import { Product, ISet } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,10 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  async getAllProducts(): Promise<IProduct[]> {
+  async getAllProducts(): Promise<Product[]> {
     const url = `${environment.backendUrl}/all-products`;
     return this.http
-      .post<IProduct[]>(url, {query: {}})
+      .post<Product[]>(url, {query: {}})
       .toPromise()
       .then(res => res || [])
       .catch(() => {
@@ -95,10 +95,10 @@ export class ApiService {
       );
   }
 
-  async createProduct( product: Omit<IProduct | ISet, 'id'>): Promise<IProduct | null> {
+  async createProduct( product: Omit<Product, 'id'>): Promise<Product | null> {
     const url = `${environment.backendUrl}/products`;
     return this.http
-      .post<IProduct>(url, {product})
+      .post<Product>(url, {product})
       .toPromise()
       .then(res => res || null)
       .catch(() => {
@@ -106,10 +106,10 @@ export class ApiService {
         return null
       })
   }
-  async updateProduct( product: IProduct | ISet): Promise<IProduct | ISet | null> {
+  async updateProduct( product: Product): Promise<Product | null> {
     const url = `${environment.backendUrl}/products/${product.id}`;
     return this.http
-      .put<IProduct | ISet | null>(url, {product})
+      .put<Product | null>(url, {product})
       .toPromise()
       .then(res => res || null)
       .catch(() => {

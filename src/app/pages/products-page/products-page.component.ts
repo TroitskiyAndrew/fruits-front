@@ -1,7 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
-import { IProduct, ISet, Currency } from '../../models/models';
+import { ISet, Currency, Product } from '../../models/models';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { StackComponent } from '../../ui/stack/stack.component';
 import { InputComponent } from '../../ui/input/input.component';
@@ -47,11 +47,11 @@ export class ProductsPageComponent {
 
   createProduct() { }
 
-  editProduct(product: IProduct) { }
+  editProduct(product: Product) { }
 
   editSet(set: ISet) { }
 
-  addProduct(product: IProduct | ISet) {
+  addProduct(product: Product) {
 
     this.creating = false;
 

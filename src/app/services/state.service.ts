@@ -1,13 +1,13 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { IProduct } from '../models/models';
+import { Product } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
-  products = signal<IProduct[]>([]);
+  products = signal<Product[]>([]);
   queryParams: Record<string, any> = {};
   discountEvent = '';
   source = '';

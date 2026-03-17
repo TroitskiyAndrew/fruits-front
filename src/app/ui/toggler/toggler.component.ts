@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef } from '@angular/core'
+import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 
@@ -25,21 +25,37 @@ export class TogglerComponent implements ControlValueAccessor {
 
   @Input() options: TogglerOption[] = []
 
-  value: any
+  // 👉 теперь value можно передавать извне
+  @Input() set value(v: any) {
+    this._value = v
+  }
+
+  get value(): any {
+    return this._value
+  }
+
+  @Output() valueChange = new EventEmitter<any>()
+
+  private _value: any
 
   onChange = (v: any) => {}
   onTouched = () => {}
 
   select(v: any) {
+    if (this._value === v) return
 
-    this.value = v
+    this._value = v
+
+    // reactive forms
     this.onChange(v)
     this.onTouched()
 
+    // внешний биндинг
+    this.valueChange.emit(v)
   }
 
   writeValue(v: any): void {
-    this.value = v
+    this._value = v
   }
 
   registerOnChange(fn: any): void {
@@ -49,5 +65,4 @@ export class TogglerComponent implements ControlValueAccessor {
   registerOnTouched(fn: any): void {
     this.onTouched = fn
   }
-
 }
