@@ -1,49 +1,72 @@
 <ui-card>
 
-  @if (!editing) {
+
+
+  @if(compactView || usage === ProductUsage.Browsing) {
 
   <div class="row">
 
     <div class="col left">
 
       <div class="title">
-        {{ product?.name }} (
-          @if(product?.set){
-             {{ product?.weight }} кг
-          } @else {
-            {{ product?.amount }} {{ product?.measure }}
-          }
-          )
+        {{ p_name() }} (@if(p_set()){{{ p_weight() }} кг} @else {{{ p_amount() }} {{ p_measure() }}})
       </div>
 
       <div class="subtitle">
-        {{ product?.description }}
+        {{ p_description() }}
       </div>
 
     </div>
 
+    @switch (usage) {
+    @case (ProductUsage.Editing) {
     <ui-grid [columns]="3" alignX="center" [gap]="5">
       <div>₽</div>
       <div>₫</div>
       <div>$</div>
-      <div>{{ product?.price?.rub }}</div>
-      <div>{{ product?.price?.vnd }}k</div>
-      <div>{{ product?.price?.usdt }}</div>
+      <div>{{ p_priceRUB() }}</div>
+      <div>{{ p_priceVND() }}k</div>
+      <div>{{ p_priceUSDT() }}</div>
 
     </ui-grid>
 
     <ui-button (action)="startEdit()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-pen"> </ui-button>
+    }
+    @case (ProductUsage.Browsing) {
+    <ui-grid [columns]="1" alignX="center" [gap]="5">
+      @switch (currency) {
+      @case (Currency.Rub) {
+      <div>₽</div>
+      }
+      @case (Currency.VND) {
+      <div>₫</div>
+      }
+      @case (Currency.USDT) {
+      <div>$</div>
+      }
+      }
+      <div>{{ price }}</div>
+
+    </ui-grid>
+    }
+    }
+
+
 
   </div>
 
   }
-
-  @if (editing) {
+  @if(!compactView) {
 
   <ui-stack [formGroup]="form()">
-
-    <ui-toggler [options]="typeOptions" formControlName="set">
-    </ui-toggler>
+    @if(editing) {
+    <div class="row">
+      <ui-toggler [options]="typeOptions" formControlName="set">
+      </ui-toggler>
+      @if(isSet) {
+      ({{weight}} кг)
+      }
+    </div>
 
     <ui-input label="Название" formControlName="name" [clearable]="true">
     </ui-input>
@@ -53,7 +76,6 @@
 
     <ui-row class="row">
       @if(form().controls['set'].getRawValue()){
-        <div>Вес: {{defaultsWeight}}кг</div>
       } @else {
       <ui-select label="ед.и." [options]="measureOptions" formControlName="measure">
       </ui-select>
@@ -67,24 +89,25 @@
 
     </ui-row>
 
-    <ui-row class="row">
+    <ui-row class="row" [formGroup]="pricesForm">
 
-      <ui-input label="RUB" type="number" formControlName="priceRub">
+      <ui-input label="RUB" type="number" formControlName="rub">
       </ui-input>
 
-      <ui-input label="VND" type="number" formControlName="priceVnd">
+      <ui-input label="VND" type="number" formControlName="vnd">
       </ui-input>
 
-      <ui-input label="USDT" type="number" formControlName="priceUsdt">
+      <ui-input label="USDT" type="number" formControlName="usdt">
       </ui-input>
 
     </ui-row>
+    }
 
     @if (isSet) {
 
-    <ui-stack [formGroup]="defaultsForm">
+    <ui-stack [formGroup]="productsForm">
 
-      @for (p of products(); track p.id) {
+      @for (p of simpleProducts(); track p.id) {
 
       <ui-row class="product-row">
 
@@ -104,14 +127,22 @@
     }
 
     <ui-row class="actions">
-
+      @switch (usage) {
+      @case (ProductUsage.Editing) {
       <ui-button variant="primary" (action)="saveProduct()">
-
         Сохранить
-
       </ui-button>
+      }
+      @case (ProductUsage.Browsing) {
+      <ui-button variant="primary" (action)="saveProduct()">
+        Добавить в корзину
+      </ui-button>
+      }
+      }
 
-      <ui-button variant="ghost" (action)="cancel()">
+
+
+      <ui-button variant="primary" (action)="onCancel()">
 
         Отмена
 
@@ -120,7 +151,8 @@
     </ui-row>
 
   </ui-stack>
-
   }
+
+
 
 </ui-card>

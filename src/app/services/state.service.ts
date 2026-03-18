@@ -1,13 +1,18 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Product } from '../models/models';
+import { Currency, Product } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
   products = signal<Product[]>([]);
+  cart = signal<Product[]>([]);
+  currency = signal<Currency>(Currency.Rub);
+  cartTotal = computed(() => {
+    return this.cart().reduce((acc, product) => acc += product.price[this.currency()], 0)
+  })
   queryParams: Record<string, any> = {};
   discountEvent = '';
   source = '';

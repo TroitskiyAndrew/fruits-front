@@ -1,3 +1,5 @@
+import { FormControl, FormGroup } from "@angular/forms";
+
 export interface IUser {
   id: string;
   user: ITelegrammUser;
@@ -48,7 +50,7 @@ export enum Measure {
   Item = 'шт'
 }
 
-interface ProductBase  {
+interface ProductBase {
   id: string;
   name: string;
   description: string;
@@ -60,15 +62,19 @@ interface ProductBase  {
   set: boolean;
 }
 
-export type ISetProducts = Record<string, ISimpleProduct & {count: number}>;
+export type ISetProducts = Record<string, ISimpleProduct & { count: number }>;
 
-export interface ISet  extends ProductBase  {
-  defaultProducts: ISetProducts;
-  additionalProducts: ISetProducts;
+export interface ISet extends ProductBase {
+  products: ISetProducts;
+  fixedPrice: boolean;
   set: true;
 }
 
-export interface ISimpleProduct extends ProductBase {  set: false};
+export type ProductForm = Omit<ISet, 'set'>  & {
+  set: boolean;
+}
+
+export interface ISimpleProduct extends ProductBase { set: false };
 
 export type Product = ISet | ISimpleProduct;
 
@@ -98,5 +104,12 @@ export interface Share {
   payed: bigint | null;
   confirmed: boolean,
   type: PaymentType;
+}
+
+export type ControlsOf<T> = {
+  [K in keyof T]:
+  T[K] extends Record<string, any>
+  ? FormGroup<any>
+  : FormControl<T[K]>
 }
 

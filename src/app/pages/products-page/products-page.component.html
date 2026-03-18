@@ -9,14 +9,14 @@
 
   @if (creating) {
 
-  <product-card (cancelEvent)="creating = false" (save)="creating = false" />
+  <product-card (cancelEditing)="creating = false" (save)="creating = false" />
 
   } @else {
   <ui-input icon="🔍" placeholder="Search product" [formControl]="searchControl" [clearable]="true" />
 
   <ui-stack>
     @for (item of products(); track $index) {
-    <product-card [product]="item" />
+    <product-card [product]="item" [usage]="ProductUsage.Editing" />
     }
   </ui-stack>
   }

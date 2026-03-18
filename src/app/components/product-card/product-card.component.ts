@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, computed } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostListener } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import { ISetProducts, ISimpleProduct, Measure, Product } from '../../models/models'
+import { ControlsOf, Currency, ISet, ISetProducts, ISimpleProduct, Measure, Product, ProductForm } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -15,6 +15,11 @@ import { TogglerComponent } from '../../ui/toggler/toggler.component'
 import { StateService } from '../../services/state.service'
 import { ApiService } from '../../services/api.service'
 import { GridComponent } from "../../ui/grid/grid.component";
+
+export enum ProductUsage {
+  Editing,
+  Browsing
+}
 
 @Component({
   selector: 'product-card',
@@ -35,50 +40,133 @@ import { GridComponent } from "../../ui/grid/grid.component";
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
-export class ProductCardComponent implements OnInit {
+export class ProductCardComponent {
+  @Input() usage: ProductUsage = ProductUsage.Browsing;
+  ProductUsage = ProductUsage;
+  @Input() currency: Currency = Currency.Rub;
+  Currency = Currency;
+  product = input<Product | undefined>();
+  p_id = computed(() => {
+    return this.product()?.name || crypto.randomUUID();
+  })
+  p_name = computed(() => {
+    return this.product()?.name || '';
+  })
+  p_description = computed(() => {
+    return this.product()?.description || '';
+  })
+  p_set = computed(() => {
+    return this.product()?.set || false;
+  })
+  p_weight = computed(() => {
+    return this.product()?.weight || 0;
+  })
+  p_amount = computed(() => {
+    return this.product()?.amount || 0;
+  })
+  p_measure = computed(() => {
+    return this.product()?.measure || Measure.KG;
+  })
+  p_price = computed<Record<Currency, number>>(() => {
+    return this.product()?.price || {
+      rub: 0,
+      vnd: 0,
+      usdt: 0,
+    };
+  })
+  p_priceRUB = computed(() => {
+    return this.p_price().rub;
+  })
+  p_priceVND = computed(() => {
+    return this.p_price().vnd;
+  })
+  p_priceUSDT = computed(() => {
+    return this.p_price().usdt;
+  })
+  p_deleted = computed(() => {
+    return this.product()?.deleted || false;
+  })
+  p_fixedPrice = computed(() => {
+    const product = this.product();
+    return product?.set ? product.fixedPrice : false;
+  })
 
-  @Input() product?: Product
-  @Input() editable = false
-  products = computed(() => {
+  get price() {
+    switch (this.usage) {
+      case ProductUsage.Editing:
+        return this.form().controls.price.controls[this.currency].getRawValue()
+        break;
+      default:
+        return this.p_price()[this.currency]
+        break;
+    }
+
+  }
+
+  get weight() {
+    const product = this.product();
+    if (product && !product.set) {
+      return product.weight;
+    } else {
+      const products = this.form().getRawValue().products;
+      return Object.entries(products).reduce((acc: number, [id, count]: [string, number]) => {
+        const product = this.simpleProductsMap().get(id)
+        acc += (product?.weight || 0) * count;
+        return acc;
+      }, 0);
+    }
+  }
+
+  simpleProducts = computed(() => {
     return this.stateService.products().filter(p => !p.set)
   })
-  productsMap = computed<Map<string, ISimpleProduct>>(() => this.products().reduce((map, product) => {
+  simpleProductsMap = computed<Map<string, ISimpleProduct>>(() => this.simpleProducts().reduce((map, product) => {
     map.set(product.id, product);
     return map;
   }, new Map()));
 
-  @Output() save = new EventEmitter<Product>()
-  @Output() cancelEvent = new EventEmitter()
+  @Output() accept = new EventEmitter<Product>();
+  @Output() cancel = new EventEmitter();
+  @Output() compactClick = new EventEmitter();
 
-  form = computed(() => {
-    const p = this.product as Product | undefined
+  form = computed<FormGroup<ControlsOf<ProductForm>>>(() => {
+    const p = this.product()
 
-    const defaults: Record<string, any> = {}
-    const products = this.products();
-    products.forEach(prod => {
-        defaults[prod.id] = p?.set ? p?.defaultProducts?.[prod.id]?.count ?? 0 : 0
-      })
+    const productsControls = new FormGroup<ControlsOf<Record<string, number>>>({})
 
-    return this.fb.group({
-
-      name: [this.product?.name ?? ''],
-      description: [this.product?.description ?? ''],
-      measure: [this.product?.measure ?? Measure.KG],
-      weight: [this.product?.weight ?? 1],
-      amount: [this.product?.amount ?? 1],
-
-      priceRub: [this.product?.price?.rub ?? 0],
-      priceVnd: [this.product?.price?.vnd ?? 0],
-      priceUsdt: [this.product?.price?.usdt ?? 0],
-
-      set: [this.product?.set ?? false],
-
-      defaultProducts: this.fb.group(defaults)
-
+    this.simpleProducts().forEach(prod => {
+      productsControls.addControl(
+        prod.id,
+        new FormControl(
+          p?.set ? p?.products?.[prod.id]?.count ?? 0 : 0,
+          { nonNullable: true }
+        )
+      )
     })
+    const priceControls = new FormGroup<ControlsOf<Record<Currency, number>>>({
+      rub: new FormControl(this.p_priceRUB(), { nonNullable: true }),
+      vnd: new FormControl(this.p_priceVND(), { nonNullable: true }),
+      usdt: new FormControl(this.p_priceUSDT(), { nonNullable: true }),
+    })
+    return new FormGroup<ControlsOf<ProductForm>>({
+      id: new FormControl(this.p_id(), { nonNullable: true }),
+      deleted: new FormControl(this.p_deleted(), { nonNullable: true }),
+      name: new FormControl(this.p_name(), { nonNullable: true }),
+      description: new FormControl(this.p_description(), { nonNullable: true }),
+      measure: new FormControl(this.p_measure(), { nonNullable: true }),
+      weight: new FormControl(this.p_weight(), { nonNullable: true }),
+      amount: new FormControl(this.p_amount(), { nonNullable: true }),
+      price: priceControls,
+      fixedPrice: new FormControl(this.p_fixedPrice(), { nonNullable: true }),
+      set: new FormControl(p?.set ?? false, { nonNullable: true }),
+      products: productsControls
+    })
+
   })
-  editing = false
-  creating = false
+  editing = false;
+  browsing = false;
+
+  compactView = true;
 
   measureOptions = [
     { label: 'шт', value: Measure.Item },
@@ -90,69 +178,70 @@ export class ProductCardComponent implements OnInit {
     { label: 'Набор', value: true }
   ]
 
-  constructor(private fb: FormBuilder, private stateService: StateService, private apiService: ApiService) { }
+  priceOptions = [
+    { label: 'Фиксированная цена', value: true },
+    { label: 'Минимальная цена', value: false },
+  ]
 
-  ngOnInit(): void {
-
-    if (!this.product) {
-      this.editing = true;
-      this.creating = true;
+  @HostListener('click', [])
+  onHostClick() {
+    if (this.compactView && this.usage === ProductUsage.Browsing) {
+      this.compactView = false;
+      this.compactClick.emit();
     }
-
-
-
   }
+
+  constructor(private fb: FormBuilder, private stateService: StateService, private apiService: ApiService) { }
 
   get isSet() {
     return this.form().value.set
   }
 
-  get defaultsForm(): FormGroup {
-    return this.form().get('defaultProducts') as FormGroup
+  get productsForm(): FormGroup {
+    return this.form().get('products') as FormGroup
+  }
+  get pricesForm(): FormGroup {
+    return this.form().get('price') as FormGroup
   }
 
   get defaultsWeight(): number {
-    const obj = (this.form().get('defaultProducts') as FormGroup).getRawValue() as Record<string, number>;
-    return Object.entries(obj).reduce((acc: number, entry) => {
-      const product = this.productsMap().get(entry[0])
-      acc += (product?.weight || 0) * entry[1];
+    const obj = (this.form().get('products') as FormGroup).getRawValue() as Record<string, number>;
+    return Object.entries(obj).reduce((acc: number, [id, count]: [string, number]) => {
+      const product = this.simpleProductsMap().get(id)
+      acc += (product?.weight || 0) * count;
       return acc;
     }, 0);
   }
 
   startEdit() {
-    this.editing = true
+    this.editing = true;
+    this.compactView = false;
   }
 
-  cancel() {
+  onCancel() {
     this.editing = false;
-    this.cancelEvent.emit()
+    this.compactView = true;
+    this.cancel.emit()
   }
 
   async saveProduct() {
-
-    const v = this.form().value
-
+    const v = this.form().getRawValue()
     let result: Product = {
-      id: this.product?.id ?? crypto.randomUUID(),
-      name: v.name || '',
-      description: v.description || '',
-      measure: v.measure || Measure.KG,
+      id: this.p_id(),
+      name: v.name,
+      description: v.description,
+      measure: v.measure,
       amount: Number(v.amount),
       weight: Number(v.weight),
       deleted: false,
-      price: {
-        rub: Number(v.priceRub),
-        vnd: Number(v.priceVnd),
-        usdt: Number(v.priceUsdt)
-      },
+      price: v.price as Record<Currency, number>,
       set: false
     }
     if (v.set) {
       const defaults: ISetProducts = {}
-      Object.entries(v.defaultProducts || {}).forEach(([id, count]: any) => {
+      Object.entries(v.products || {}).forEach(([id, count]: any) => {
 
-        const product = this.productsMap().get(id)
+        const product = this.simpleProductsMap().get(id)
 
         if (product && count > 0) {
           defaults[id] = {
@@ -167,17 +256,17 @@ export class ProductCardComponent implements OnInit {
       result = {
         ...result,
         set: true,
-        defaultProducts: defaults,
+        fixedPrice: v.fixedPrice || false,
+        products: defaults,
         weight: this.defaultsWeight,
-        additionalProducts: {}
       }
 
     }
 
-    this.save.emit(result)
+    this.accept.emit(result)
 
 
-    if (this.creating) {
+    if (!this.product()) {
       try {
         const newProduct = await this.apiService.createProduct(result);
         if (newProduct) {
@@ -206,7 +295,49 @@ export class ProductCardComponent implements OnInit {
       }
     }
     this.editing = false;
-    this.creating = false;
+  }
+  async addToCart() {
+    const v = this.form().getRawValue()
+    let result: Product = {
+      id: this.p_id(),
+      name: v.name,
+      description: v.description,
+      measure: v.measure,
+      amount: Number(v.amount),
+      weight: Number(v.weight),
+      deleted: false,
+      price: v.price as Record<Currency, number>,
+      set: false
+    }
+    if (v.set) {
+      const defaults: ISetProducts = {}
+      Object.entries(v.products || {}).forEach(([id, count]: any) => {
+
+        const product = this.simpleProductsMap().get(id)
+
+        if (product && count > 0) {
+          defaults[id] = {
+            ...product,
+            count
+          }
+        }
+
+      })
+
+
+      result = {
+        ...result,
+        set: true,
+        fixedPrice: v.fixedPrice || false,
+        products: defaults,
+        weight: this.defaultsWeight,
+      }
+
+    }
+
+    this.accept.emit(result)
+
+    this.editing = false;
   }
 
 }

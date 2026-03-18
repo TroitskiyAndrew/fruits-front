@@ -33,7 +33,8 @@ export class ButtonComponent {
 
   constructor(private router: Router){}
 
-  click(){
+  click(event: Event){
+    event.stopPropagation()
     if(this.disabled || this.loading) return
 
     if(this.link){

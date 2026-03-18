@@ -1,5 +1,5 @@
 import { Component, computed, effect, signal } from '@angular/core';
-import { Currency, ISet, Measure } from '../../models/models';
+import { Currency, ISet, Measure, Product } from '../../models/models';
 import { StackComponent } from '../../ui/stack/stack.component';
 import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '../../ui/avatar/avatar.component';
@@ -14,16 +14,16 @@ import { PriceComponent } from '../../ui/price/price.component';
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
 import { StateService } from '../../services/state.service';
-import { ShopItemComponent } from '../../components/shop-item/shop-item.component';
 import { FormControl } from '@angular/forms';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ProductCardComponent, ProductUsage } from "../../components/product-card/product-card.component";
 
 
 @Component({
   selector: 'shop-page',
   standalone: true,
-  imports: [CommonModule, StackComponent, PageComponent, ShopItemComponent, TogglerComponent],
+  imports: [CommonModule, StackComponent, PageComponent, TogglerComponent, ProductCardComponent],
   templateUrl: './shop-page.component.html'
 })
 export class ShopPageComponent {
@@ -33,35 +33,22 @@ export class ShopPageComponent {
     { label: '₫', value: Currency.VND },
     { label: '$', value: Currency.USDT },
   ]
-  Currency = Currency
-  currencyVal = Currency.Rub;
+  currency = computed(() => this.stateService.currency())
+  ProductUsage = ProductUsage;
   trigger = signal<boolean>(false)
   selectedSet = signal<string | null>(null)
   sets = computed(() => {
     const sets = this.stateService.products().filter(p => p.set);
     this.trigger()
-    const mySet: ISet = {
-      id: 'newSet',
-      name: 'Свой набор',
-      description: 'Выбрать самостоятельно',
-      measure: Measure.Item,
-      amount: 1,
-      weight: 0,
-      deleted: false,
-      price: {
-        [Currency.Rub]: 0,
-        [Currency.VND]: 0,
-        [Currency.USDT]: 0,
-      },
-      set: true,
-      defaultProducts: {},
-      additionalProducts: {},
-    }
-    return [...sets, mySet];
+    return sets;
   });
 
 
   constructor(private stateService: StateService) { }
+
+  changeCurrency(currency: Currency){
+    this.stateService.currency.set(currency)
+  }
 
   selectSet(id: string) {
     this.selectedSet.set(id);
@@ -74,6 +61,10 @@ export class ShopPageComponent {
   cancelSelect() {
     this.triggerSets()
     this.selectedSet.set(null);
+  }
+  addToCart(product: Product){
+    this.stateService.cart.set([...this.stateService.cart(), product]);
+
   }
 
 }

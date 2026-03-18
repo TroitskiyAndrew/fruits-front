@@ -1,7 +1,7 @@
 <button
   class="btn"
   [disabled]="disabled || loading"
-  (click)="click()"
+  (click)="click($event)"
   [ngClass]="[
     'btn-' + variant,
     'size-' + size,
