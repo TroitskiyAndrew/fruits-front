@@ -40,7 +40,7 @@
 
   @if (editing) {
 
-  <ui-stack [formGroup]="form">
+  <ui-stack [formGroup]="form()">
 
     <ui-toggler [options]="typeOptions" formControlName="set">
     </ui-toggler>
@@ -52,7 +52,7 @@
     </ui-input>
 
     <ui-row class="row">
-      @if(form.controls['set'].getRawValue()){
+      @if(form().controls['set'].getRawValue()){
         <div>Вес: {{defaultsWeight}}кг</div>
       } @else {
       <ui-select label="ед.и." [options]="measureOptions" formControlName="measure">

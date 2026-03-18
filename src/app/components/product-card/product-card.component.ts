@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, computed } from '@angul
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import {  ISetProducts, ISimpleProduct, Measure, Product } from '../../models/models'
+import { ISetProducts, ISimpleProduct, Measure, Product } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -50,7 +50,33 @@ export class ProductCardComponent implements OnInit {
   @Output() save = new EventEmitter<Product>()
   @Output() cancelEvent = new EventEmitter()
 
-  form!: FormGroup
+  form = computed(() => {
+    const p = this.product as Product | undefined
+
+    const defaults: Record<string, any> = {}
+    const products = this.products();
+    products.forEach(prod => {
+        defaults[prod.id] = p?.set ? p?.defaultProducts?.[prod.id]?.count ?? 0 : 0
+      })
+
+    return this.fb.group({
+
+      name: [this.product?.name ?? ''],
+      description: [this.product?.description ?? ''],
+      measure: [this.product?.measure ?? Measure.KG],
+      weight: [this.product?.weight ?? 1],
+      amount: [this.product?.amount ?? 1],
+
+      priceRub: [this.product?.price?.rub ?? 0],
+      priceVnd: [this.product?.price?.vnd ?? 0],
+      priceUsdt: [this.product?.price?.usdt ?? 0],
+
+      set: [this.product?.set ?? false],
+
+      defaultProducts: this.fb.group(defaults)
+
+    })
+  })
   editing = false
   creating = false
 
@@ -73,50 +99,25 @@ export class ProductCardComponent implements OnInit {
       this.creating = true;
     }
 
-    const p = this.product as Product | undefined
 
-    const defaults: Record<string, any> = {}
-    if(p?.set){
-      this.products().forEach(prod => {
-        defaults[prod.id] = p?.defaultProducts?.[prod.id]?.count ?? 0
-      })
-    }
-
-    this.form = this.fb.group({
-
-      name: [this.product?.name ?? ''],
-      description: [this.product?.description ?? ''],
-      measure: [this.product?.measure ?? Measure.KG],
-      weight: [this.product?.weight ?? 1],
-      amount: [this.product?.amount ?? 1],
-
-      priceRub: [this.product?.price?.rub ?? 0],
-      priceVnd: [this.product?.price?.vnd ?? 0],
-      priceUsdt: [this.product?.price?.usdt ?? 0],
-
-      set: [this.product?.set ?? false],
-
-      defaultProducts: this.fb.group(defaults)
-
-    })
 
   }
 
   get isSet() {
-    return this.form.value.set
+    return this.form().value.set
   }
 
   get defaultsForm(): FormGroup {
-    return this.form.get('defaultProducts') as FormGroup
+    return this.form().get('defaultProducts') as FormGroup
   }
 
   get defaultsWeight(): number {
-    const obj = (this.form.get('defaultProducts') as FormGroup).getRawValue() as Record<string, number>;
+    const obj = (this.form().get('defaultProducts') as FormGroup).getRawValue() as Record<string, number>;
     return Object.entries(obj).reduce((acc: number, entry) => {
-        const product = this.productsMap().get(entry[0])
-        acc += (product?.weight || 0) * entry[1];
-        return acc;
-      }, 0);
+      const product = this.productsMap().get(entry[0])
+      acc += (product?.weight || 0) * entry[1];
+      return acc;
+    }, 0);
   }
 
   startEdit() {
@@ -130,13 +131,13 @@ export class ProductCardComponent implements OnInit {
 
   async saveProduct() {
 
-    const v = this.form.value
+    const v = this.form().value
 
-    const base = {
+    let result: Product = {
       id: this.product?.id ?? crypto.randomUUID(),
-      name: v.name,
-      description: v.description,
-      measure: v.measure,
+      name: v.name || '',
+      description: v.description || '',
+      measure: v.measure || Measure.KG,
       amount: Number(v.amount),
       weight: Number(v.weight),
       deleted: false,
@@ -145,12 +146,11 @@ export class ProductCardComponent implements OnInit {
         vnd: Number(v.priceVnd),
         usdt: Number(v.priceUsdt)
       },
-      set: v.set
+      set: false
     }
-    let result: Product = base
     if (v.set) {
       const defaults: ISetProducts = {}
-      Object.entries(v.defaultProducts).forEach(([id, count]: any) => {
+      Object.entries(v.defaultProducts || {}).forEach(([id, count]: any) => {
 
         const product = this.productsMap().get(id)
 
@@ -165,7 +165,7 @@ export class ProductCardComponent implements OnInit {
 
 
       result = {
-        ...base,
+        ...result,
         set: true,
         defaultProducts: defaults,
         weight: this.defaultsWeight,
@@ -194,7 +194,7 @@ export class ProductCardComponent implements OnInit {
           const allProducts = this.stateService.products();
           for (let index = 0; index < allProducts.length; index++) {
             const element = allProducts[index];
-            if(element.id === updatedProduct.id){
+            if (element.id === updatedProduct.id) {
               allProducts[index] = updatedProduct;
             }
 
