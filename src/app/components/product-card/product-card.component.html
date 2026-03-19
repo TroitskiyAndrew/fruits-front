@@ -41,6 +41,10 @@
     }
     }
 
+    @if(usage === ProductCardPlace.Cart){
+      <ui-button (action)="deleteFromCart()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-trash"> </ui-button>
+    }
+
 
 
   </div>

@@ -286,6 +286,10 @@ export class ProductCardComponent {
     this.isExpanded = true;
   }
 
+  deleteFromCart(){
+    this.stateService.cart.update(products => products.filter((_, index) => index !== this.cartIndex))
+  }
+
   onCancel() {
     this.editing = false;
     this.isExpanded = false;
