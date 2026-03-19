@@ -15,10 +15,6 @@
   @if (isHotel) {
   <ui-toggler [options]="deliveryTypeOptions" formControlName="deliveryType" [value]="deliveryForm.controls.placeType.value"></ui-toggler>
   }
-  <ui-row>
-    <div>Total</div>
-    {{cartTotal() | priceString}} {{currencySymbol()}}
-  </ui-row>
 
   <ui-button (action)="createOrder()">
     Заказать
