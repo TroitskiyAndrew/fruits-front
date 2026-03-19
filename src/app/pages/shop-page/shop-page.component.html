@@ -1,13 +1,20 @@
 <ui-page>
   <div class="title">
-    Shop Sets
+    Магазин
   </div>
+  @let cartTotalPrice = cartTotal();
+  @if(cartTotalPrice){
+  <ui-button link="cart">
+    Корзина: {{cartTotalPrice | priceString}} {{currencySymbol()}}
+  </ui-button>
+  }
   <ui-toggler [options]="currencyOptions" (valueChange)="changeCurrency($event)"></ui-toggler>
   <ui-stack class="w-100">
     @for (set of sets(); track $index) {
-      @if(selectedSet() == null || selectedSet() === set.id){
-        <product-card [product]="set" [usage]="ProductUsage.Browsing" (compactClick)="selectSet(set.id)" (cancel)="cancelSelect()"/>
-      }
+    @if(selectedSet() == null || selectedSet() === set.id){
+    <product-card [product]="set" [usage]="ProductCardPlace.Shop" (accept)="cancelSelect()" (expand)="selectSet(set.id)"
+      (cancel)="cancelSelect()" />
+    }
     }
   </ui-stack>
 </ui-page>

@@ -1,0 +1,9 @@
+<ui-row (click)="toggle()">
+
+  <div class="box" [class.active]="value"></div>
+
+  @if (label) {
+    <div>{{ label }}</div>
+  }
+
+</ui-row>

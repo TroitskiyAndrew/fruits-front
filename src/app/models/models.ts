@@ -70,7 +70,7 @@ export interface ISet extends ProductBase {
   set: true;
 }
 
-export type ProductForm = Omit<ISet, 'set'>  & {
+export type ProductForm = Omit<ISet, 'set' | 'products'>  & {
   set: boolean;
 }
 

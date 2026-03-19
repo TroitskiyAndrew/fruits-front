@@ -1,0 +1,12 @@
+.box {
+  width: 18px;
+  height: 18px;
+
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.box.active {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+}

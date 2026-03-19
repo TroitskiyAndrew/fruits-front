@@ -1,6 +1,6 @@
 <div class="counter">
 
-  <button (click)="decrease()">-</button>
+  <button (click)="decrease()" [disabled]="blockDecrease">-</button>
 
   <div class="value">
     {{ value }}

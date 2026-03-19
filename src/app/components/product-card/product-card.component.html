@@ -2,9 +2,9 @@
 
 
 
-  @if(compactView || usage === ProductUsage.Browsing) {
+  @if(!isExpanded || usage !== ProductCardPlace.AllProducts) {
 
-  <div class="row">
+  <div class="row" (click)="onExpand()">
 
     <div class="col left">
 
@@ -19,7 +19,7 @@
     </div>
 
     @switch (usage) {
-    @case (ProductUsage.Editing) {
+    @case (ProductCardPlace.AllProducts) {
     <ui-grid [columns]="3" alignX="center" [gap]="5">
       <div>₽</div>
       <div>₫</div>
@@ -32,7 +32,7 @@
 
     <ui-button (action)="startEdit()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-pen"> </ui-button>
     }
-    @case (ProductUsage.Browsing) {
+    @default {
     <ui-grid [columns]="1" alignX="center" [gap]="5">
       <div>{{ currencySymbol() }}</div>
       <div>{{ price }}</div>
@@ -46,7 +46,7 @@
   </div>
 
   }
-  @if(!compactView) {
+  @if(isExpanded) {
 
   <ui-stack [formGroup]="form()">
     @if(editing) {
@@ -97,9 +97,9 @@
     }
 
     @if (showSetProducts) {
-    <ui-stack [formGroup]="productsForm">
+    <ui-stack [formGroup]="productsForm()">
 
-      @if (isFixedSet && usage === ProductUsage.Browsing) {
+      @if (isFixedSet && usage !== ProductCardPlace.AllProducts) {
       @for (p of p_productsArray(); track p.id) {
       <ui-row class="product-row">
         <div>
@@ -119,9 +119,11 @@
           {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
         <div class="right">
-          {{p.price[this.currency()]}}{{currencyK()}} {{currencySymbol()}}
+          {{p.price[this.currency()] | priceString}}{{currencySymbol()}}
         </div>
-        <ui-counter [formControlName]="p.id">
+        <ui-counter
+          [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currency()]) < p_dataBasePrice())"
+          [formControlName]="p.id" (valueChange)="changeProducts()">
         </ui-counter>
 
       </ui-row>
@@ -136,31 +138,35 @@
 
     <ui-row class="actions">
       @switch (usage) {
-      @case (ProductUsage.Editing) {
+      @case (ProductCardPlace.AllProducts) {
       <ui-button variant="primary" (action)="saveProduct()">
         Сохранить
       </ui-button>
+      <ui-button variant="primary" (action)="onCancel()">
+          Отмена
+        </ui-button>
       }
-      @case (ProductUsage.Browsing) {
-      @if(price < p_currency_price()) {
-        <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">
-         от {{p_currency_price()}}{{currencyK()}} {{currencySymbol()}}
+      @case (ProductCardPlace.Shop) {
+      @if(price < p_dataBasePrice()) { <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">
+        от {{p_dataBasePrice() | priceString}} {{currencySymbol()}}
         </ui-button>
         } @else {
-        <ui-button variant="primary" (action)="saveProduct()">
+        <ui-button variant="primary" (action)="addToCart()">
           Добавить в корзину
         </ui-button>
         }
-        }
-        }
-
-
-
         <ui-button variant="primary" (action)="onCancel()">
 
           Отмена
 
         </ui-button>
+        }
+
+        }
+
+
+
+
 
     </ui-row>
 

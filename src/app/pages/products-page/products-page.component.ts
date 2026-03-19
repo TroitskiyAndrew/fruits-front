@@ -1,6 +1,6 @@
 import { Component, computed } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ProductCardComponent, ProductUsage } from '../../components/product-card/product-card.component';
+import { ProductCardComponent, ProductCardPlace } from '../../components/product-card/product-card.component';
 import { ISet, Currency, Product } from '../../models/models';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { StackComponent } from '../../ui/stack/stack.component';
@@ -31,7 +31,7 @@ export class ProductsPageComponent {
 
   createType: 'product' | 'set' = 'product';
 
-  ProductUsage = ProductUsage
+  ProductCardPlace = ProductCardPlace
 
   searchControl = new FormControl('');
 

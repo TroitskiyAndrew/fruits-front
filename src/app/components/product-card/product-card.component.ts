@@ -15,10 +15,13 @@ import { TogglerComponent } from '../../ui/toggler/toggler.component'
 import { StateService } from '../../services/state.service'
 import { ApiService } from '../../services/api.service'
 import { GridComponent } from "../../ui/grid/grid.component";
+import { PriceStringPipe } from '../../pipes/price-string.pipe'
+import { toSignal } from '@angular/core/rxjs-interop'
 
-export enum ProductUsage {
-  Editing,
-  Browsing
+export enum ProductCardPlace {
+  AllProducts,
+  Shop,
+  Cart,
 }
 
 @Component({
@@ -35,20 +38,21 @@ export enum ProductUsage {
     SelectComponent,
     CounterComponent,
     TogglerComponent,
-    GridComponent
+    GridComponent,
+    PriceStringPipe
   ],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
 export class ProductCardComponent {
-  @Input() usage: ProductUsage = ProductUsage.Browsing;
-  ProductUsage = ProductUsage;
+  @Input() usage: ProductCardPlace = ProductCardPlace.Shop;
+  ProductCardPlace = ProductCardPlace;
   currency = computed(() => this.stateService.currency());
-  currencyK = computed(() => this.stateService.currency() === Currency.VND ? 'k' : '');
   currencySymbol = computed(() => this.stateService.currencySymbol());
   Currency = Currency;
-  @Input() compactView = true;
+  @Input() isExpanded = false;
   product = input<Product | undefined>();
+  @Input() cartIndex: number = 0;
   p_id = computed(() => {
     return this.product()?.id || crypto.randomUUID();
   })
@@ -76,6 +80,16 @@ export class ProductCardComponent {
       vnd: 0,
       usdt: 0,
     };
+  })
+  p_dataBasePrice = computed<number>(() => {
+    const product = this.product();
+    const dataBaseProduct = product ? this.stateService.productsMap().get(product.id) : null
+    const price = dataBaseProduct?.price || {
+      rub: 0,
+      vnd: 0,
+      usdt: 0,
+    };
+    return price[this.currency()]
   })
   p_currency_price = computed<number>(() => {
     return this.p_price()[this.currency()];
@@ -107,28 +121,39 @@ export class ProductCardComponent {
   })
 
   get price() {
+    return this.productPrice[this.currency()];
+  }
+  get productPrice() {
     switch (this.usage) {
-      case ProductUsage.Editing:
-        return this.form().controls.price.controls[this.currency()].getRawValue()
-      case ProductUsage.Browsing:
+      case ProductCardPlace.AllProducts:
+        return this.form().controls.price.getRawValue()
+      case ProductCardPlace.Shop:
+      case ProductCardPlace.Cart:
         if (this.p_fixedSet()) {
-          return this.p_price()[this.currency()];
+          return this.p_price()
         } else {
-          const productsValue = this.productsForm.getRawValue() as Record<string, number>;
-          return Object.entries(productsValue).reduce((acc: number, [id, count]: [string, number]) => {
-            const product = this.simpleProductsMap().get(id)
-            acc += (product?.price[this.currency()] || 0) * count;
-            return acc;
+          const productsValue = this.productsForm().getRawValue() as Record<string, number>;
+          const prices = {
+            [Currency.Rub]: 0,
+            [Currency.VND]: 0,
+            [Currency.USDT]: 0,
+          }
+          Object.entries(productsValue).forEach(([id, count]: [string, number]) => {
+            const product = this.simpleProductsMap().get(id);
+            prices[Currency.Rub] += (product?.price[Currency.Rub] || 0) * count;
+            prices[Currency.VND] += (product?.price[Currency.VND] || 0) * count;
+            prices[Currency.USDT] += (product?.price[Currency.USDT] || 0) * count;
           }, 0);
+          return prices;
         }
       default:
-        return this.p_price()[this.currency()]
+        return this.p_price()
     }
 
   }
 
   get weight() {
-    const products = this.form().getRawValue().products;
+    const products = this.productsForm().getRawValue();
     const product = this.product();
     if (product && !product.set) {
       return product.weight;
@@ -151,22 +176,9 @@ export class ProductCardComponent {
 
   @Output() accept = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter();
-  @Output() compactClick = new EventEmitter();
+  @Output() expand = new EventEmitter();
 
   form = computed<FormGroup<ControlsOf<ProductForm>>>(() => {
-    const p = this.product()
-
-    const productsControls = new FormGroup<ControlsOf<Record<string, number>>>({})
-
-    this.simpleProducts().forEach(prod => {
-      productsControls.addControl(
-        prod.id,
-        new FormControl(
-          p?.set ? p?.products?.[prod.id]?.count ?? 0 : 0,
-          { nonNullable: true }
-        )
-      )
-    })
     const priceControls = new FormGroup<ControlsOf<Record<Currency, number>>>({
       rub: new FormControl(this.p_priceRUB(), { nonNullable: true }),
       vnd: new FormControl(this.p_priceVND(), { nonNullable: true }),
@@ -182,14 +194,29 @@ export class ProductCardComponent {
       amount: new FormControl(this.p_amount(), { nonNullable: true }),
       price: priceControls,
       fixedSet: new FormControl(this.p_fixedSet(), { nonNullable: true }),
-      set: new FormControl(p?.set ?? false, { nonNullable: true }),
-      products: productsControls
+      set: new FormControl(this.p_set(), { nonNullable: true }),
     })
 
-  })
+  });
+  productsForm = computed<FormGroup<ControlsOf<Record<string, number>>>>(() => {
+    const p = this.product()
+
+    const productsControls = new FormGroup<ControlsOf<Record<string, number>>>({})
+
+    this.simpleProducts().forEach(prod => {
+      productsControls.addControl(
+        prod.id,
+        new FormControl(
+          p?.set ? p?.products?.[prod.id]?.count ?? 0 : 0,
+          { nonNullable: true }
+        )
+      )
+    })
+    return productsControls
+
+  });
+
   editing = false;
-
-
 
   measureOptions = [
     { label: 'шт', value: Measure.Item },
@@ -206,20 +233,19 @@ export class ProductCardComponent {
     { label: 'Минимальная сумма', value: false },
   ]
 
-  @HostListener('click', [])
-  onHostClick() {
-    if (this.compactView && this.usage === ProductUsage.Browsing) {
-      this.compactView = false;
-      this.compactClick.emit();
-    }
-  }
-
-  constructor(private fb: FormBuilder, private stateService: StateService, private apiService: ApiService) {
+  constructor(private stateService: StateService, private apiService: ApiService) {
     effect(() => {
       const product = this.product();
       if (!product) {
         this.editing = true;
       }
+    });
+    effect(() => {
+      // const changes = this.productChanges();
+      // if(this.usage === ProductCardPlace.Cart){
+      //   this.changeCartProduct();
+      // }
+
     })
   }
 
@@ -234,22 +260,19 @@ export class ProductCardComponent {
     if (!this.isSet) {
       return false;
     }
-    if (this.usage === ProductUsage.Editing) {
+    if (this.usage === ProductCardPlace.AllProducts) {
       return this.isFixedSet;
     } else {
       return true;
     }
   }
 
-  get productsForm(): FormGroup {
-    return this.form().get('products') as FormGroup
-  }
   get pricesForm(): FormGroup {
     return this.form().get('price') as FormGroup
   }
 
   get defaultsWeight(): number {
-    const obj = (this.form().get('products') as FormGroup).getRawValue() as Record<string, number>;
+    const obj = this.productsForm().getRawValue() as Record<string, number>;
     return Object.entries(obj).reduce((acc: number, [id, count]: [string, number]) => {
       const product = this.simpleProductsMap().get(id)
       acc += (product?.weight || 0) * count;
@@ -259,16 +282,28 @@ export class ProductCardComponent {
 
   startEdit() {
     this.editing = true;
-    this.compactView = false;
+    this.isExpanded = true;
   }
 
   onCancel() {
     this.editing = false;
-    this.compactView = true;
+    this.isExpanded = false;
     this.cancel.emit()
   }
 
-  async saveProduct() {
+  onExpand() {
+    if (this.usage === ProductCardPlace.AllProducts) {
+      return;
+    }
+    if (!this.isExpanded) {
+      this.isExpanded = true;
+      this.expand.emit();
+    } else if (this.usage === ProductCardPlace.Cart) {
+      this.isExpanded = false;
+    }
+  }
+
+  getProductFromForm() {
     const v = this.form().getRawValue()
     let result: Product = {
       id: this.p_id(),
@@ -278,12 +313,12 @@ export class ProductCardComponent {
       amount: Number(v.amount),
       weight: Number(v.weight),
       deleted: false,
-      price: v.price as Record<Currency, number>,
+      price: this.productPrice,
       set: false
     }
     if (v.set) {
       const products: ISetProducts = {}
-      Object.entries(v.products || {}).forEach(([id, count]: any) => {
+      Object.entries(this.productsForm().getRawValue()).forEach(([id, count]: any) => {
 
         const product = this.simpleProductsMap().get(id)
 
@@ -301,11 +336,16 @@ export class ProductCardComponent {
         ...result,
         set: true,
         fixedSet: v.fixedSet || false,
-        products: v.fixedSet ? products : {},
+        products,
         weight: this.defaultsWeight,
       }
 
     }
+    return result;
+  }
+
+  async saveProduct() {
+    const result = this.getProductFromForm()
 
     this.accept.emit(result)
 
@@ -341,47 +381,25 @@ export class ProductCardComponent {
     this.editing = false;
   }
   async addToCart() {
-    const v = this.form().getRawValue()
-    let result: Product = {
-      id: this.p_id(),
-      name: v.name,
-      description: v.description,
-      measure: v.measure,
-      amount: Number(v.amount),
-      weight: Number(v.weight),
-      deleted: false,
-      price: v.price as Record<Currency, number>,
-      set: false
+    const result = this.getProductFromForm();
+    this.accept.emit(result);
+    this.stateService.cart.update(products => [...products, result])
+
+    this.isExpanded = false
+  }
+
+  changeCartProduct() {
+    const result = this.getProductFromForm();
+    this.stateService.cart.update(cart => {
+      cart[this.cartIndex] = result;
+      return [...cart];
+    })
+
+  }
+  changeProducts(){
+    if(this.usage === ProductCardPlace.Cart){
+      this.changeCartProduct();
     }
-    if (v.set) {
-      const defaults: ISetProducts = {}
-      Object.entries(v.products || {}).forEach(([id, count]: any) => {
-
-        const product = this.simpleProductsMap().get(id)
-
-        if (product && count > 0) {
-          defaults[id] = {
-            ...product,
-            count
-          }
-        }
-
-      })
-
-
-      result = {
-        ...result,
-        set: true,
-        fixedSet: v.fixedSet || false,
-        products: defaults,
-        weight: this.defaultsWeight,
-      }
-
-    }
-
-    this.accept.emit(result)
-
-    this.editing = false;
   }
 
 }

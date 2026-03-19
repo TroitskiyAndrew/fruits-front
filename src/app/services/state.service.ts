@@ -9,12 +9,18 @@ import { CURRENCY_SYMBOLS } from '../constants/constants';
 })
 export class StateService {
   products = signal<Product[]>([]);
-  cart = signal<Product[]>([]);
+  productsMap = computed(() => this.products().reduce((map, product) => {
+    map.set(product.id, product);
+    return map;
+  }, new Map()));
   currency = signal<Currency>(Currency.Rub);
-  currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()])
+  currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
+  cart = signal<Product[]>([]);
+  expressDelivery = signal<boolean>(false);
   cartTotal = computed(() => {
     return this.cart().reduce((acc, product) => acc += product.price[this.currency()], 0)
   })
+
   queryParams: Record<string, any> = {};
   discountEvent = '';
   source = '';
@@ -47,5 +53,9 @@ export class StateService {
     return Array.from(array)
       .map(x => chars[x % chars.length])
       .join('');
+  }
+
+  changeCurrency(currency: Currency){
+    this.currency.set(currency)
   }
 }

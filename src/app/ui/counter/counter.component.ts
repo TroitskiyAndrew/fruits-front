@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -19,6 +19,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class CounterComponent implements ControlValueAccessor {
 
   @Input() min = 0
+  @Output() valueChange = new EventEmitter<any>()
+  @Input() blockDecrease = false
 
   value = 0
 
@@ -39,13 +41,15 @@ export class CounterComponent implements ControlValueAccessor {
 
   increase() {
     this.value++
-    this.onChange(this.value)
+    this.onChange(this.value);
+    this.valueChange.emit(this.value)
   }
 
   decrease() {
-    if (this.value > this.min) {
+    if (this.value > this.min && !this.blockDecrease) {
       this.value--
-      this.onChange(this.value)
+      this.onChange(this.value);
+      this.valueChange.emit(this.value)
     }
   }
 

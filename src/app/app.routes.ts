@@ -7,6 +7,8 @@ import { ProductsPageComponent } from './pages/products-page/products-page.compo
 import { ShopPageComponent } from './pages/shop-page/shop-page.component';
 import { UserProfilePageComponent } from './pages/user-profile-page/user-profile-page.component';
 import { UsersPageComponent } from './pages/users-page/users-page.component';
+import { CartPageComponent } from './pages/cart-page/cart-page.component';
+import { OrderPageComponent } from './pages/order-page/order-page.component';
 
 export const routes: Routes = [
     {
@@ -48,6 +50,14 @@ export const routes: Routes = [
   {
     path: 'admin/shop',
     component: ShopPageComponent
+  },
+  {
+    path: 'cart',
+    component: CartPageComponent
+  },
+  {
+    path: 'order',
+    component: OrderPageComponent
   },
   {
     path: '**',

@@ -17,23 +17,21 @@ import { StateService } from '../../services/state.service';
 import { FormControl } from '@angular/forms';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ProductCardComponent, ProductUsage } from "../../components/product-card/product-card.component";
+import { ProductCardComponent, ProductCardPlace } from "../../components/product-card/product-card.component";
+import { PriceStringPipe } from '../../pipes/price-string.pipe';
+import { CURRENCY_OPTIONS } from '../../constants/constants';
 
 
 @Component({
   selector: 'shop-page',
   standalone: true,
-  imports: [CommonModule, StackComponent, PageComponent, TogglerComponent, ProductCardComponent],
+  imports: [CommonModule, StackComponent, PageComponent, TogglerComponent, ProductCardComponent, PriceStringPipe, ButtonComponent],
   templateUrl: './shop-page.component.html'
 })
 export class ShopPageComponent {
 
-  currencyOptions = [
-    { label: '₽', value: Currency.Rub },
-    { label: '₫', value: Currency.VND },
-    { label: '$', value: Currency.USDT },
-  ]
-  ProductUsage = ProductUsage;
+  currencyOptions = CURRENCY_OPTIONS
+  ProductCardPlace = ProductCardPlace;
   trigger = signal<boolean>(false)
   selectedSet = signal<string | null>(null)
   sets = computed(() => {
@@ -41,12 +39,14 @@ export class ShopPageComponent {
     this.trigger()
     return sets;
   });
+  cartTotal = computed(() => this.stateService.cartTotal());
+  currencySymbol = computed(() => this.stateService.currencySymbol());
 
 
   constructor(private stateService: StateService) { }
 
   changeCurrency(currency: Currency){
-    this.stateService.currency.set(currency)
+    this.stateService.changeCurrency(currency)
   }
 
   selectSet(id: string) {
