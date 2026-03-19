@@ -4,7 +4,7 @@ import { StateService } from '../../services/state.service';
 import { ApiService } from '../../services/api.service';
 
 @Component({
-  selector: 'app-target',
+  selector: 'target',
   imports: [],
   templateUrl: './target.component.html',
   styleUrl: './target.component.scss'

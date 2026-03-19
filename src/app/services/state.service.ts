@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, Product } from '../models/models';
+import { Currency, OrderProduct, Product } from '../models/models';
 import { CURRENCY_SYMBOLS, EXPRESS_DELIVERY } from '../constants/constants';
 
 @Injectable({
@@ -15,7 +15,7 @@ export class StateService {
   }, new Map()));
   currency = signal<Currency>(Currency.Rub);
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
-  cart = signal<Product[]>([]);
+  cart = signal<OrderProduct[]>([]);
   expressDelivery = signal<boolean>(false);
   cartTotal = computed(() => {
     const currency = this.currency();

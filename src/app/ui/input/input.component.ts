@@ -20,7 +20,7 @@ export class InputComponent implements ControlValueAccessor {
 
   @Input() label = ''
   @Input() placeholder = ''
-  @Input() type: 'text' | 'number' = 'text'
+  @Input() type: 'text' | 'number' | 'date' = 'text'
   @Input() clearable = false
 
   value: any = ''

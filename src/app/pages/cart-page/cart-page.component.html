@@ -2,16 +2,7 @@
   <div class="title">
     Корзина
   </div>
-  <ui-toggler [options]="currencyOptions" [value]="currency()" (valueChange)="changeCurrency($event)"></ui-toggler>
-  <div class="title">
-    Общая сумма: {{cartTotal() | priceString}} {{currencySymbol()}}
-  </div>
-  <ui-stack class="w-100">
-    @let products = cart();
-    @for (product of products; track $index) {
-    <product-card [isExpanded]="products.length === 1" [product]="product" [usage]="ProductCardPlace.Cart" [cartIndex]="$index" />
-    }
-  </ui-stack>
-  <ui-toggler [options]="deliveryOptions" [value]="stateService.expressDelivery()" (valueChange)="changeDelivery()"></ui-toggler>
-  <ui-button link="order">Оформить заказ</ui-button>
+  @let orderContent = content();
+  <order-content [content]="orderContent" class="w-100"></order-content>
+  <ui-button link="delivery" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
 </ui-page>

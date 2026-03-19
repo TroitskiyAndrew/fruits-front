@@ -21,22 +21,46 @@ export interface ITelegrammUser {
   username?: string;
 }
 
-export interface Order {
-  userId: number;
-  source: string;
-  total: number;
-  confirmed: boolean;
-  products: IOrderProduct[];
-  deleted: boolean;
-  referral?: number;
+export enum PlaceType {
+  Hotel = 'hotel',
+  Airport = 'airport',
 }
 
-export interface IOrderProduct {
-  product: Product;
-  amount: number;
-  price: number;
+export enum DeliveryType {
+  Reception = 'reception',
+  Hands = 'hands',
+}
+
+export interface IOrderStatus {
+  payed: boolean;
+  confirmed: boolean;
+  packed: boolean;
+  delivered: boolean;
+  deleted: boolean;
+}
+export interface IOrderContent {
+  total: number;
   currency: Currency;
-  contains: IOrderProduct[];
+  products: OrderProduct[];
+  expressDelivery: boolean;
+}
+export interface IOrderDelivery {
+  name: string;
+  contact: string;
+  placeType: PlaceType;
+  place: string;
+  placeAdd: string;
+  date: string;
+  deliveryType: DeliveryType
+}
+export interface IOrder {
+  id: string;
+  userId: number;
+  referral?: number;
+  source: string;
+  state: IOrderStatus;
+  content: IOrderContent;
+  delivery: IOrderDelivery;
 }
 
 export enum Currency {
@@ -61,8 +85,9 @@ interface ProductBase {
   price: Record<Currency, number>;
   set: boolean;
 }
+export type OrderProduct<T = ISet> = T & { count: number };
 
-export type ISetProducts = Record<string, ISimpleProduct & { count: number }>;
+export type ISetProducts = Record<string, OrderProduct<ISimpleProduct>>;
 
 export interface ISet extends ProductBase {
   products: ISetProducts;

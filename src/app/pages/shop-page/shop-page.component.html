@@ -12,7 +12,7 @@
   <ui-stack class="w-100">
     @for (set of sets(); track $index) {
     @if(selectedSet() == null || selectedSet() === set.id){
-    <product-card [product]="set" [usage]="ProductCardPlace.Shop" (accept)="cancelSelect()" (expand)="selectSet(set.id)"
+    <product-card class="w-100" [product]="set" [usage]="ProductCardPlace.Shop" (accept)="cancelSelect()" (expand)="selectSet(set.id)"
       (cancel)="cancelSelect()" />
     }
     }

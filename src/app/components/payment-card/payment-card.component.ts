@@ -9,14 +9,14 @@ import { FilterBarComponent } from '../../ui/filter-bar/filter-bar.component';
 import { InputComponent } from '../../ui/input/input.component';
 import { ListComponent } from '../../ui/list/list.component';
 import { PageComponent } from '../../ui/page/page.component';
-import { PriceComponent } from '../../ui/price/price.component';
+
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
 import { StackComponent } from '../../ui/stack/stack.component';
 
 @Component({
   selector: 'payment-card',
-  imports: [CommonModule, BadgeComponent, CardComponent, PriceComponent, RowComponent],
+  imports: [CommonModule, BadgeComponent, CardComponent, RowComponent],
   standalone: true,
   templateUrl: './payment-card.component.html'
 })

@@ -9,23 +9,23 @@
       </ui-badge>
     </div>
 
-    <ui-price [amount]="order.total" currency="RUB" />
+    <div>{{order.content.total}}</div>
 
   </ui-row>
 
   <div class="subtitle">
 
-    {{order.products.length}}
+    {{order.content.products.length}}
     products
 
   </div>
 
   <ui-stack>
-    @for (p of order.products; track $index) {
+    @for (p of order.content.products; track $index) {
     <ui-row>
 
       <div>
-        {{p.product.name}}
+        {{p.name}}
       </div>
 
       <div class="subtitle">

@@ -178,6 +178,8 @@ export class ProductCardComponent {
   @Output() accept = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter();
   @Output() expand = new EventEmitter();
+  @Output() changeContent = new EventEmitter<ISet>();
+  @Output() deleteContent = new EventEmitter<number>();
 
   form = computed<FormGroup<ControlsOf<ProductForm>>>(() => {
     const priceControls = new FormGroup<ControlsOf<Record<Currency, number>>>({
@@ -241,13 +243,6 @@ export class ProductCardComponent {
         this.editing = true;
       }
     });
-    effect(() => {
-      // const changes = this.productChanges();
-      // if(this.usage === ProductCardPlace.Cart){
-      //   this.changeCartProduct();
-      // }
-
-    })
   }
 
   get isSet() {
@@ -286,8 +281,8 @@ export class ProductCardComponent {
     this.isExpanded = true;
   }
 
-  deleteFromCart(){
-    this.stateService.cart.update(products => products.filter((_, index) => index !== this.cartIndex))
+  deleteFromContent() {
+    this.deleteContent.emit(this.cartIndex)
   }
 
   onCancel() {
@@ -386,29 +381,21 @@ export class ProductCardComponent {
     this.editing = false;
   }
   async addToCart() {
-    const result = this.getProductFromForm();
+    const result = this.getProductFromForm() as ISet;
     this.accept.emit(result);
-    this.stateService.cart.update(products => [...products, result])
+    this.stateService.cart.update(products => [...products, { ...result, count: 1 }])
 
     this.isExpanded = false
   }
 
-  buy(){
+  buy() {
     this.addToCart();
     this.router.navigate(['cart']);
   }
-
-  changeCartProduct() {
-    const result = this.getProductFromForm();
-    this.stateService.cart.update(cart => {
-      cart[this.cartIndex] = result;
-      return [...cart];
-    })
-
-  }
-  changeProducts(){
-    if(this.usage === ProductCardPlace.Cart){
-      this.changeCartProduct();
+  changeProducts() {
+    if (this.usage === ProductCardPlace.Cart) {
+      const product = this.getProductFromForm()  as ISet
+      this.changeContent.emit(product);
     }
   }
 

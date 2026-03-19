@@ -1,0 +1,27 @@
+@let deliveryForm = form();
+<ui-stack [formGroup]="deliveryForm">
+  <ui-input label="Имя" formControlName="name">
+  </ui-input>
+  <ui-input label="Контактная информация" formControlName="contact">
+  </ui-input>
+
+  <ui-toggler [options]="deliveryPlaceOptions" formControlName="place" [value]="deliveryForm.controls.placeType.value"></ui-toggler>
+  @if (isHotel) {
+  <ui-input label="Комната" formControlName="placeAdd">
+  </ui-input>
+  }
+  <ui-input label="Дата доставки" type="date" formControlName="date">
+  </ui-input>
+  @if (isHotel) {
+  <ui-toggler [options]="deliveryTypeOptions" formControlName="deliveryType" [value]="deliveryForm.controls.placeType.value"></ui-toggler>
+  }
+  <ui-row>
+    <div>Total</div>
+    {{cartTotal() | priceString}} {{currencySymbol()}}
+  </ui-row>
+
+  <ui-button (action)="createOrder()">
+    Заказать
+  </ui-button>
+
+</ui-stack>

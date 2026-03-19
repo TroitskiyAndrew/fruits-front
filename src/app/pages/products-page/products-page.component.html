@@ -5,7 +5,7 @@
 
   @if (creating) {
 
-  <product-card [isExpanded]="false" [usage]="ProductCardPlace.AllProducts" (cancel)="creating = false" (accept)="creating = false" />
+  <product-card class="w-100" [isExpanded]="false" [usage]="ProductCardPlace.AllProducts" (cancel)="creating = false" (accept)="creating = false" />
 
   } @else {
 
@@ -16,7 +16,7 @@
 
   <ui-stack>
     @for (item of products(); track $index) {
-    <product-card [product]="item" [usage]="ProductCardPlace.AllProducts" />
+    <product-card class="w-100" [product]="item" [usage]="ProductCardPlace.AllProducts" />
     }
   </ui-stack>
   }
