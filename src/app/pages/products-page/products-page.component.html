@@ -3,16 +3,16 @@
     Товары
   </div>
 
+  @if (creating) {
+
+  <product-card [compactView]="false" [usage]="ProductUsage.Editing" (cancel)="creating = false" (accept)="creating = false" />
+
+  } @else {
+
   <ui-button (action)="creating = true">
     Новый продукт/набор
   </ui-button>
-
-  @if (creating) {
-
-  <product-card (cancelEditing)="creating = false" (save)="creating = false" />
-
-  } @else {
-  <ui-input icon="🔍" placeholder="Search product" [formControl]="searchControl" [clearable]="true" />
+  <ui-input icon="🔍" placeholder="Поиск товара" [formControl]="searchControl" [clearable]="true" />
 
   <ui-stack>
     @for (item of products(); track $index) {

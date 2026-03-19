@@ -9,7 +9,7 @@
     <div class="col left">
 
       <div class="title">
-        {{ p_name() }} (@if(p_set()){{{ p_weight() }} кг} @else {{{ p_amount() }} {{ p_measure() }}})
+        {{ p_name() }} (@if(p_set()){{{ weight }} кг} @else {{{ p_amount() }} {{ p_measure() }}})
       </div>
 
       <div class="subtitle">
@@ -34,17 +34,7 @@
     }
     @case (ProductUsage.Browsing) {
     <ui-grid [columns]="1" alignX="center" [gap]="5">
-      @switch (currency) {
-      @case (Currency.Rub) {
-      <div>₽</div>
-      }
-      @case (Currency.VND) {
-      <div>₫</div>
-      }
-      @case (Currency.USDT) {
-      <div>$</div>
-      }
-      }
+      <div>{{ currencySymbol() }}</div>
       <div>{{ price }}</div>
 
     </ui-grid>
@@ -88,7 +78,10 @@
       }
 
     </ui-row>
-
+    @if(isSet){
+    <ui-toggler [options]="priceOptions" formControlName="fixedSet">
+    </ui-toggler>
+    }
     <ui-row class="row" [formGroup]="pricesForm">
 
       <ui-input label="RUB" type="number" formControlName="rub">
@@ -103,10 +96,21 @@
     </ui-row>
     }
 
-    @if (isSet) {
-
+    @if (showSetProducts) {
     <ui-stack [formGroup]="productsForm">
 
+      @if (isFixedSet && usage === ProductUsage.Browsing) {
+      @for (p of p_productsArray(); track p.id) {
+      <ui-row class="product-row">
+        <div>
+          {{ p.name }} ({{p.amount}} {{p.measure}})
+        </div>
+        <div>
+          {{p_products()[p.id].count}}
+        </div>
+      </ui-row>
+      }
+      } @else {
       @for (p of simpleProducts(); track p.id) {
 
       <ui-row class="product-row">
@@ -114,13 +118,17 @@
         <div>
           {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
-
+        <div class="right">
+          {{p.price[this.currency()]}}{{currencyK()}} {{currencySymbol()}}
+        </div>
         <ui-counter [formControlName]="p.id">
         </ui-counter>
 
       </ui-row>
 
       }
+      }
+
 
     </ui-stack>
 
@@ -134,19 +142,25 @@
       </ui-button>
       }
       @case (ProductUsage.Browsing) {
-      <ui-button variant="primary" (action)="saveProduct()">
-        Добавить в корзину
-      </ui-button>
-      }
-      }
+      @if(price < p_currency_price()) {
+        <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">
+         от {{p_currency_price()}}{{currencyK()}} {{currencySymbol()}}
+        </ui-button>
+        } @else {
+        <ui-button variant="primary" (action)="saveProduct()">
+          Добавить в корзину
+        </ui-button>
+        }
+        }
+        }
 
 
 
-      <ui-button variant="primary" (action)="onCancel()">
+        <ui-button variant="primary" (action)="onCancel()">
 
-        Отмена
+          Отмена
 
-      </ui-button>
+        </ui-button>
 
     </ui-row>
 

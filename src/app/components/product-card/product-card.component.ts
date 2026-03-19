@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostListener } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostListener, effect } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
@@ -43,11 +43,14 @@ export enum ProductUsage {
 export class ProductCardComponent {
   @Input() usage: ProductUsage = ProductUsage.Browsing;
   ProductUsage = ProductUsage;
-  @Input() currency: Currency = Currency.Rub;
+  currency = computed(() => this.stateService.currency());
+  currencyK = computed(() => this.stateService.currency() === Currency.VND ? 'k' : '');
+  currencySymbol = computed(() => this.stateService.currencySymbol());
   Currency = Currency;
+  @Input() compactView = true;
   product = input<Product | undefined>();
   p_id = computed(() => {
-    return this.product()?.name || crypto.randomUUID();
+    return this.product()?.id || crypto.randomUUID();
   })
   p_name = computed(() => {
     return this.product()?.name || '';
@@ -74,6 +77,9 @@ export class ProductCardComponent {
       usdt: 0,
     };
   })
+  p_currency_price = computed<number>(() => {
+    return this.p_price()[this.currency()];
+  })
   p_priceRUB = computed(() => {
     return this.p_price().rub;
   })
@@ -86,29 +92,47 @@ export class ProductCardComponent {
   p_deleted = computed(() => {
     return this.product()?.deleted || false;
   })
-  p_fixedPrice = computed(() => {
+  p_fixedSet = computed(() => {
     const product = this.product();
-    return product?.set ? product.fixedPrice : false;
+    return product?.set ? product.fixedSet : true;
+  })
+  p_products = computed(() => {
+    const product = this.product();
+    return product?.set ? product.products : {};
+  })
+  p_productsArray = computed(() => {
+    const product = this.product();
+    const obj = product?.set ? product.products : {};
+    return Array(...Object.values(obj))
   })
 
   get price() {
     switch (this.usage) {
       case ProductUsage.Editing:
-        return this.form().controls.price.controls[this.currency].getRawValue()
-        break;
+        return this.form().controls.price.controls[this.currency()].getRawValue()
+      case ProductUsage.Browsing:
+        if (this.p_fixedSet()) {
+          return this.p_price()[this.currency()];
+        } else {
+          const productsValue = this.productsForm.getRawValue() as Record<string, number>;
+          return Object.entries(productsValue).reduce((acc: number, [id, count]: [string, number]) => {
+            const product = this.simpleProductsMap().get(id)
+            acc += (product?.price[this.currency()] || 0) * count;
+            return acc;
+          }, 0);
+        }
       default:
-        return this.p_price()[this.currency]
-        break;
+        return this.p_price()[this.currency()]
     }
 
   }
 
   get weight() {
+    const products = this.form().getRawValue().products;
     const product = this.product();
     if (product && !product.set) {
       return product.weight;
     } else {
-      const products = this.form().getRawValue().products;
       return Object.entries(products).reduce((acc: number, [id, count]: [string, number]) => {
         const product = this.simpleProductsMap().get(id)
         acc += (product?.weight || 0) * count;
@@ -157,16 +181,15 @@ export class ProductCardComponent {
       weight: new FormControl(this.p_weight(), { nonNullable: true }),
       amount: new FormControl(this.p_amount(), { nonNullable: true }),
       price: priceControls,
-      fixedPrice: new FormControl(this.p_fixedPrice(), { nonNullable: true }),
+      fixedSet: new FormControl(this.p_fixedSet(), { nonNullable: true }),
       set: new FormControl(p?.set ?? false, { nonNullable: true }),
       products: productsControls
     })
 
   })
   editing = false;
-  browsing = false;
 
-  compactView = true;
+
 
   measureOptions = [
     { label: 'шт', value: Measure.Item },
@@ -179,8 +202,8 @@ export class ProductCardComponent {
   ]
 
   priceOptions = [
-    { label: 'Фиксированная цена', value: true },
-    { label: 'Минимальная цена', value: false },
+    { label: 'Готовый набор', value: true },
+    { label: 'Минимальная сумма', value: false },
   ]
 
   @HostListener('click', [])
@@ -191,10 +214,31 @@ export class ProductCardComponent {
     }
   }
 
-  constructor(private fb: FormBuilder, private stateService: StateService, private apiService: ApiService) { }
+  constructor(private fb: FormBuilder, private stateService: StateService, private apiService: ApiService) {
+    effect(() => {
+      const product = this.product();
+      if (!product) {
+        this.editing = true;
+      }
+    })
+  }
 
   get isSet() {
     return this.form().value.set
+  }
+  get isFixedSet() {
+    return this.form().value.fixedSet
+  }
+
+  get showSetProducts() {
+    if (!this.isSet) {
+      return false;
+    }
+    if (this.usage === ProductUsage.Editing) {
+      return this.isFixedSet;
+    } else {
+      return true;
+    }
   }
 
   get productsForm(): FormGroup {
@@ -238,13 +282,13 @@ export class ProductCardComponent {
       set: false
     }
     if (v.set) {
-      const defaults: ISetProducts = {}
+      const products: ISetProducts = {}
       Object.entries(v.products || {}).forEach(([id, count]: any) => {
 
         const product = this.simpleProductsMap().get(id)
 
         if (product && count > 0) {
-          defaults[id] = {
+          products[id] = {
             ...product,
             count
           }
@@ -256,8 +300,8 @@ export class ProductCardComponent {
       result = {
         ...result,
         set: true,
-        fixedPrice: v.fixedPrice || false,
-        products: defaults,
+        fixedSet: v.fixedSet || false,
+        products: v.fixedSet ? products : {},
         weight: this.defaultsWeight,
       }
 
@@ -328,7 +372,7 @@ export class ProductCardComponent {
       result = {
         ...result,
         set: true,
-        fixedPrice: v.fixedPrice || false,
+        fixedSet: v.fixedSet || false,
         products: defaults,
         weight: this.defaultsWeight,
       }

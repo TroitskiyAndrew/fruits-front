@@ -33,7 +33,6 @@ export class ShopPageComponent {
     { label: '₫', value: Currency.VND },
     { label: '$', value: Currency.USDT },
   ]
-  currency = computed(() => this.stateService.currency())
   ProductUsage = ProductUsage;
   trigger = signal<boolean>(false)
   selectedSet = signal<string | null>(null)

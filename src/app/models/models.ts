@@ -66,7 +66,7 @@ export type ISetProducts = Record<string, ISimpleProduct & { count: number }>;
 
 export interface ISet extends ProductBase {
   products: ISetProducts;
-  fixedPrice: boolean;
+  fixedSet: boolean;
   set: true;
 }
 
