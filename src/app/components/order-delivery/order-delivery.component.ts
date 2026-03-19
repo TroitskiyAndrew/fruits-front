@@ -26,10 +26,10 @@ export class OrderDeliveryComponent {
     return new FormGroup<ControlsOf<IOrderDelivery>>({
       name: new FormControl(delivery?.name || '', { nonNullable: true }),
       contact: new FormControl(delivery?.contact || '', { nonNullable: true }),
-      placeType: new FormControl(delivery?.placeType || PlaceType.Hotel, { nonNullable: true }),
+      placeType: new FormControl(delivery?.placeType ?? PlaceType.Hotel, { nonNullable: true }),
       place: new FormControl(delivery?.place || '', { nonNullable: true }),
       placeAdd: new FormControl(delivery?.placeAdd || '', { nonNullable: true }),
-      date: new FormControl(delivery?.date || '', { nonNullable: true }),
+      date: new FormControl(delivery?.date ?? '', { nonNullable: true }),
       deliveryType: new FormControl(delivery?.deliveryType || DeliveryType.Reception, { nonNullable: true }),
     })
   });

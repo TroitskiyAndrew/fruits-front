@@ -379,6 +379,7 @@ export class ProductCardComponent {
       }
     }
     this.editing = false;
+    this.isExpanded = false;
   }
   async addToCart() {
     const result = this.getProductFromForm() as ISet;

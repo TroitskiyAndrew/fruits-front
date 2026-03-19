@@ -1,4 +1,4 @@
-import { Component, computed, Input, input, signal } from '@angular/core';
+import { Component, computed, effect, Input, input, signal } from '@angular/core';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { StackComponent } from "../../ui/stack/stack.component";
 import { ProductCardComponent, ProductCardPlace } from "../product-card/product-card.component";
@@ -32,7 +32,12 @@ export class OrderContentComponent {
     { label: 'Обычная доставка', value: false },
     { label: 'Экспресс доставка', value: true }
   ]
-  constructor(public stateService: StateService) { }
+  constructor(public stateService: StateService) {
+    effect(() => {
+      this.currency()
+      this.calculateTotal()
+    })
+  }
 
   changeCurrency(currency: Currency) {
     this.stateService.changeCurrency(currency)
