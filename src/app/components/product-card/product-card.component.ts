@@ -17,6 +17,7 @@ import { ApiService } from '../../services/api.service'
 import { GridComponent } from "../../ui/grid/grid.component";
 import { PriceStringPipe } from '../../pipes/price-string.pipe'
 import { toSignal } from '@angular/core/rxjs-interop'
+import { Router } from '@angular/router'
 
 export enum ProductCardPlace {
   AllProducts,
@@ -233,7 +234,7 @@ export class ProductCardComponent {
     { label: 'Минимальная сумма', value: false },
   ]
 
-  constructor(private stateService: StateService, private apiService: ApiService) {
+  constructor(private stateService: StateService, private apiService: ApiService, private router: Router) {
     effect(() => {
       const product = this.product();
       if (!product) {
@@ -386,6 +387,11 @@ export class ProductCardComponent {
     this.stateService.cart.update(products => [...products, result])
 
     this.isExpanded = false
+  }
+
+  buy(){
+    this.addToCart();
+    this.router.navigate(['cart']);
   }
 
   changeCartProduct() {
