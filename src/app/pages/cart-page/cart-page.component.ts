@@ -20,9 +20,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class CartPageComponent {
   currencyOptions = CURRENCY_OPTIONS;
   ProductCardPlace = ProductCardPlace;
-  cartTotal = computed(() => {
-    return this.stateService.cartTotal() + (this.stateService.expressDelivery() ? 100 : 0);
-  });
+  cartTotal = computed(() => this.stateService.cartTotal());
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
   cart = computed(() => this.stateService.cart());

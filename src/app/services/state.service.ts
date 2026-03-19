@@ -2,7 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
 import { Currency, Product } from '../models/models';
-import { CURRENCY_SYMBOLS } from '../constants/constants';
+import { CURRENCY_SYMBOLS, EXPRESS_DELIVERY } from '../constants/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,10 @@ export class StateService {
   cart = signal<Product[]>([]);
   expressDelivery = signal<boolean>(false);
   cartTotal = computed(() => {
-    return this.cart().reduce((acc, product) => acc += product.price[this.currency()], 0)
+    const currency = this.currency();
+    const cartTotal =  this.cart().reduce((acc, product) => acc += product.price[currency], 0);
+    const delivery = this.expressDelivery() ? EXPRESS_DELIVERY[currency] : 0;
+    return cartTotal + delivery;
   })
 
   queryParams: Record<string, any> = {};
