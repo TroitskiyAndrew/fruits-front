@@ -55,6 +55,7 @@ export interface IOrderDelivery {
 }
 export interface IOrder {
   id: string;
+  number: number;
   userId: number;
   referral?: number;
   source: string;

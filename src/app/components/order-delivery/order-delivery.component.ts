@@ -11,7 +11,7 @@ import { PriceStringPipe } from '../../pipes/price-string.pipe';
 
 @Component({
   selector: 'order-delivery',
-  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, ButtonComponent, PriceStringPipe],
+  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent,  ButtonComponent],
   templateUrl: './order-delivery.component.html',
   styleUrl: './order-delivery.component.scss'
 })
@@ -47,7 +47,7 @@ export class OrderDeliveryComponent {
   ]
 
   get isHotel() {
-    return this.form().value.place === PlaceType.Hotel
+    return this.form().value.placeType === PlaceType.Hotel
   }
 
   createOrder() {
