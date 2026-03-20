@@ -1,0 +1,12 @@
+<ui-page>
+  <div class="title">
+    Доставка
+  </div>
+  <order-delivery (deliverValue)="submitDeliveryValue($event)" class="w-100"></order-delivery>
+  <ui-button [disabled]="delivery == null">
+    Оплата наличными
+  </ui-button>
+  <ui-button [disabled]="delivery == null">
+    Оплата картой
+  </ui-button>
+</ui-page>

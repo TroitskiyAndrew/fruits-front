@@ -4,5 +4,5 @@
   </div>
   @let orderContent = content();
   <order-content [content]="orderContent" class="w-100"></order-content>
-  <ui-button link="delivery" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
+  <ui-button link="placing-order" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
 </ui-page>

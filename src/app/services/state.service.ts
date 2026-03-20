@@ -23,7 +23,6 @@ export class StateService {
     const delivery = this.expressDelivery() ? EXPRESS_DELIVERY[currency] : 0;
     return cartTotal + delivery;
   });
-  delivery: IOrderDelivery | null = null;
 
   queryParams: Record<string, any> = {};
   discountEvent = '';

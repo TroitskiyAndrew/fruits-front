@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, signal } from '@angular/core';
+import { Component, computed, effect, EventEmitter, input, Output, signal } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IOrderDelivery, Currency, ControlsOf, PlaceType, DeliveryType } from '../../models/models';
 import { StateService } from '../../services/state.service';
@@ -17,6 +17,7 @@ export class OrderDeliveryComponent {
   cartTotal = computed(() => this.stateService.cartTotal());
   currencySymbol = computed(() => this.stateService.currencySymbol());
   Currency = Currency;
+  @Output() deliverValue = new EventEmitter<IOrderDelivery | null>()
 
   form = new FormGroup<ControlsOf<IOrderDelivery>>({
     name: new FormControl('', { nonNullable: true }),
@@ -39,8 +40,8 @@ export class OrderDeliveryComponent {
     this.form.valueChanges
     .pipe(takeUntilDestroyed())
     .subscribe(value => {
-      // @ts-ignore
-      this.stateService.delivery = this.form.valid ? value : null;
+      //@ts-ignore
+      this.deliverValue.emit(this.form.valid ? value : null);
     });
   }
 
