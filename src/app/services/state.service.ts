@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, OrderProduct, Product } from '../models/models';
+import { Currency, IOrder, IOrderDelivery, OrderProduct, Product } from '../models/models';
 import { CURRENCY_SYMBOLS, EXPRESS_DELIVERY } from '../constants/constants';
 
 @Injectable({
@@ -22,7 +22,8 @@ export class StateService {
     const cartTotal =  this.cart().reduce((acc, product) => acc += product.price[currency], 0);
     const delivery = this.expressDelivery() ? EXPRESS_DELIVERY[currency] : 0;
     return cartTotal + delivery;
-  })
+  });
+  delivery: IOrderDelivery | null = null;
 
   queryParams: Record<string, any> = {};
   discountEvent = '';

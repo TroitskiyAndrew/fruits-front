@@ -104,14 +104,19 @@ export interface ISimpleProduct extends ProductBase { set: false };
 
 export type Product = ISet | ISimpleProduct;
 
+export enum PaymentMethod {
+  Bank = 'bank',
+  Cash = 'cash',
+}
+
 export interface IPayment {
   id: string;
   from: number;
   to: number;
   amount: number;
   currency: Currency;
+  method: PaymentMethod;
   payed: bigint | null;
-  confirmed: boolean,
 }
 
 export enum PaymentType {
