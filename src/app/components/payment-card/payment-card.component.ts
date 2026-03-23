@@ -16,7 +16,7 @@ import { StackComponent } from '../../ui/stack/stack.component';
 
 @Component({
   selector: 'payment-card',
-  imports: [CommonModule, BadgeComponent, CardComponent, RowComponent],
+  imports: [CommonModule,  CardComponent, RowComponent],
   standalone: true,
   templateUrl: './payment-card.component.html'
 })

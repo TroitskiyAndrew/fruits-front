@@ -86,7 +86,7 @@ interface ProductBase {
   price: Record<Currency, number>;
   set: boolean;
 }
-export type OrderProduct<T = ISet> = T & { count: number };
+export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number };
 
 export type ISetProducts = Record<string, OrderProduct<ISimpleProduct>>;
 
@@ -98,6 +98,11 @@ export interface ISet extends ProductBase {
 
 export type ProductForm = Omit<ISet, 'set' | 'products'>  & {
   set: boolean;
+}
+
+export type ProductForm2 = Omit<ISet, 'set'>  & {
+  set: boolean;
+  products: Record<string, number>
 }
 
 export interface ISimpleProduct extends ProductBase { set: false };

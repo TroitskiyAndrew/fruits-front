@@ -9,11 +9,11 @@
     <div class="col left">
 
       <div class="title">
-        {{ p_name() }} (@if(p_set()){{{ weight }} кг} @else {{{ p_amount() }} {{ p_measure() }}})
+        {{ name }} (@if(set){{{ weight }} кг} @else {{{ amount }} {{ measure }}})
       </div>
 
       <div class="subtitle">
-        {{ p_description() }}
+        {{ description }}
       </div>
 
     </div>
@@ -24,9 +24,9 @@
       <div>₽</div>
       <div>₫</div>
       <div>$</div>
-      <div>{{ p_priceRUB() }}</div>
-      <div>{{ p_priceVND() }}k</div>
-      <div>{{ p_priceUSDT() }}</div>
+      <div>{{ priceRUB }}</div>
+      <div>{{ priceVND }}k</div>
+      <div>{{ priceUSDT }}</div>
 
     </ui-grid>
 
@@ -35,7 +35,11 @@
     @default {
     <ui-grid [columns]="1" alignX="center" [gap]="5">
       <div>{{ currencySymbol() }}</div>
-      <div>{{ price }}</div>
+      @if(isExpanded || fixedSet || productPrice === 0){
+        <div>{{ price }}</div>
+      } @else {
+        <div>от {{ productPrice }}</div>
+      }
 
     </ui-grid>
     }
@@ -52,12 +56,12 @@
   }
   @if(isExpanded) {
 
-  <ui-stack [formGroup]="form()">
+  <ui-stack [formGroup]="form2">
     @if(editing) {
     <div class="row">
       <ui-toggler [options]="typeOptions" formControlName="set">
       </ui-toggler>
-      @if(isSet) {
+      @if(set) {
       ({{weight}} кг)
       }
     </div>
@@ -69,7 +73,7 @@
     </ui-input>
 
     <ui-row class="row">
-      @if(form().controls['set'].getRawValue()){
+      @if(set){
       } @else {
       <ui-select label="ед.и." [options]="measureOptions" formControlName="measure">
       </ui-select>
@@ -82,7 +86,7 @@
       }
 
     </ui-row>
-    @if(isSet){
+    @if(set){
     <ui-toggler [options]="priceOptions" formControlName="fixedSet">
     </ui-toggler>
     }
@@ -101,16 +105,16 @@
     }
 
     @if (showSetProducts) {
-    <ui-stack [formGroup]="productsForm()">
+    <ui-stack [formGroup]="productsForm">
 
-      @if (isFixedSet && usage !== ProductCardPlace.AllProducts) {
-      @for (p of p_productsArray(); track p.id) {
+      @if (fixedSet && usage !== ProductCardPlace.AllProducts) {
+      @for (p of productsArray; track p.id) {
       <ui-row class="product-row">
         <div>
           {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
         <div>
-          {{p_products()[p.id].count}}
+          {{products[p.id]}}
         </div>
       </ui-row>
       }
@@ -126,7 +130,7 @@
           {{p.price[this.currency()] | priceString}}{{currencySymbol()}}
         </div>
         <ui-counter
-          [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currency()]) < p_dataBasePrice())"
+          [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currency()]) < productPrice)"
           [formControlName]="p.id" (valueChange)="changeProducts()">
         </ui-counter>
 
@@ -151,8 +155,8 @@
         </ui-button>
       }
       @case (ProductCardPlace.Shop) {
-      @if(price < p_dataBasePrice()) { <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">
-        от {{p_dataBasePrice() | priceString}} {{currencySymbol()}}
+      @if(price < productPrice) { <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">
+        от {{productPrice | priceString}} {{currencySymbol()}}
         </ui-button>
         } @else {
         <ui-button variant="primary" (action)="addToCart()">

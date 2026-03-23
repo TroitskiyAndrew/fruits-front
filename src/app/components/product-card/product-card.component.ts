@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostLi
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import { ControlsOf, Currency, ISet, ISetProducts, ISimpleProduct, Measure, Product, ProductForm } from '../../models/models'
+import { ControlsOf, Currency, ISet, ISetProducts, ISimpleProduct, Measure, Product, ProductForm, ProductForm2 } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -54,107 +54,85 @@ export class ProductCardComponent {
   @Input() isExpanded = false;
   product = input<Product | undefined>();
   @Input() cartIndex: number = 0;
-  p_id = computed(() => {
-    return this.product()?.id || crypto.randomUUID();
-  })
-  p_name = computed(() => {
-    return this.product()?.name || '';
-  })
-  p_description = computed(() => {
-    return this.product()?.description || '';
-  })
-  p_set = computed(() => {
-    return this.product()?.set || false;
-  })
-  p_weight = computed(() => {
-    return this.product()?.weight || 0;
-  })
-  p_amount = computed(() => {
-    return this.product()?.amount || 0;
-  })
-  p_measure = computed(() => {
-    return this.product()?.measure || Measure.KG;
-  })
-  p_price = computed<Record<Currency, number>>(() => {
+
+  get name() {
+    return this.form2.controls.name.value;
+  }
+  get description() {
+    return this.form2.controls.description.value;
+  }
+  get set() {
+    return this.form2.controls.set.value
+  }
+  get amount() {
+    return this.form2.controls.amount.value
+  }
+  get measure() {
+    return this.form2.controls.measure.value
+  }
+  get prices() {
+    let productPrice = this.form2.controls.price.getRawValue();
+    if (!this.set && this.usage === ProductCardPlace.AllProducts) {
+      return productPrice
+    }
+    const product = this.product();
+    if (product?.set) {
+      if (!product.fixedSet) {
+        productPrice[Currency.Rub] = 0;
+        productPrice[Currency.VND] = 0;
+        productPrice[Currency.USDT] = 0;
+      }
+      const products = product.products;
+      const productsFromForm = this.form2.controls.products.getRawValue() as Record<string, number>;
+      Object.entries(productsFromForm).forEach(([id, count]: [string, number]) => {
+        const product = this.simpleProductsMap().get(id);
+        productPrice[Currency.Rub] += (product?.price[Currency.Rub] || 0) * (count - (products[id]?.fixedCount || 0));
+        productPrice[Currency.VND] += (product?.price[Currency.VND] || 0) * (count - (products[id]?.fixedCount || 0));
+        productPrice[Currency.USDT] += (product?.price[Currency.USDT] || 0) * (count - (products[id]?.fixedCount || 0));
+      }, 0);
+    }
+    return productPrice;
+  }
+  get price() {
+    return this.prices[this.currency()];
+  }
+  get productPrices() {
     return this.product()?.price || {
       rub: 0,
       vnd: 0,
       usdt: 0,
-    };
-  })
-  p_dataBasePrice = computed<number>(() => {
-    const product = this.product();
-    const dataBaseProduct = product ? this.stateService.productsMap().get(product.id) : null
-    const price = dataBaseProduct?.price || {
-      rub: 0,
-      vnd: 0,
-      usdt: 0,
-    };
-    return price[this.currency()]
-  })
-  p_currency_price = computed<number>(() => {
-    return this.p_price()[this.currency()];
-  })
-  p_priceRUB = computed(() => {
-    return this.p_price().rub;
-  })
-  p_priceVND = computed(() => {
-    return this.p_price().vnd;
-  })
-  p_priceUSDT = computed(() => {
-    return this.p_price().usdt;
-  })
-  p_deleted = computed(() => {
-    return this.product()?.deleted || false;
-  })
-  p_fixedSet = computed(() => {
-    const product = this.product();
-    return product?.set ? product.fixedSet : true;
-  })
-  p_products = computed(() => {
-    const product = this.product();
-    return product?.set ? product.products : {};
-  })
-  p_productsArray = computed(() => {
-    const product = this.product();
-    const obj = product?.set ? product.products : {};
-    return Array(...Object.values(obj))
-  })
-
-  get price() {
-    return this.productPrice[this.currency()];
+    }
   }
   get productPrice() {
-    switch (this.usage) {
-      case ProductCardPlace.AllProducts:
-        return this.form().controls.price.getRawValue()
-      case ProductCardPlace.Shop:
-      case ProductCardPlace.Cart:
-        if (this.p_fixedSet()) {
-          return this.p_price()
-        } else {
-          const productsValue = this.productsForm().getRawValue() as Record<string, number>;
-          const prices = {
-            [Currency.Rub]: 0,
-            [Currency.VND]: 0,
-            [Currency.USDT]: 0,
-          }
-          Object.entries(productsValue).forEach(([id, count]: [string, number]) => {
-            const product = this.simpleProductsMap().get(id);
-            prices[Currency.Rub] += (product?.price[Currency.Rub] || 0) * count;
-            prices[Currency.VND] += (product?.price[Currency.VND] || 0) * count;
-            prices[Currency.USDT] += (product?.price[Currency.USDT] || 0) * count;
-          }, 0);
-          return prices;
-        }
-      default:
-        return this.p_price()
-    }
+    return this.productPrices[this.currency()];
+  }
 
+  get priceRUB() {
+    return this.prices[Currency.Rub];
+  }
+  get priceVND() {
+    return this.prices[Currency.VND];
+  }
+  get priceUSDT() {
+    return this.prices[Currency.USDT];
+  }
+  get deleted() {
+    return this.form2.controls.deleted.value
+  }
+  get fixedSet() {
+    return this.form2.controls.fixedSet.value
+  }
+  get products() {
+    return this.form2.controls.products.getRawValue()
+  }
+  get productsArray() {
+    const products = this.products as Record<string, number>;
+    const simpleProductsMap = this.simpleProductsMap();
+    return Array(...Object.entries(products)).filter(([_, count]) => count > 0).map(([id]) => simpleProductsMap.get(id)!)
   }
 
   get weight() {
-    const products = this.productsForm().getRawValue();
+    const products = this.productsForm.getRawValue() as Record<string, number>;
     const product = this.product();
     if (product && !product.set) {
       return product.weight;
@@ -181,43 +159,32 @@ export class ProductCardComponent {
   @Output() changeContent = new EventEmitter<ISet>();
   @Output() deleteContent = new EventEmitter<number>();
 
-  form = computed<FormGroup<ControlsOf<ProductForm>>>(() => {
-    const priceControls = new FormGroup<ControlsOf<Record<Currency, number>>>({
-      rub: new FormControl(this.p_priceRUB(), { nonNullable: true }),
-      vnd: new FormControl(this.p_priceVND(), { nonNullable: true }),
-      usdt: new FormControl(this.p_priceUSDT(), { nonNullable: true }),
-    })
-    return new FormGroup<ControlsOf<ProductForm>>({
-      id: new FormControl(this.p_id(), { nonNullable: true }),
-      deleted: new FormControl(this.p_deleted(), { nonNullable: true }),
-      name: new FormControl(this.p_name(), { nonNullable: true }),
-      description: new FormControl(this.p_description(), { nonNullable: true }),
-      measure: new FormControl(this.p_measure(), { nonNullable: true }),
-      weight: new FormControl(this.p_weight(), { nonNullable: true }),
-      amount: new FormControl(this.p_amount(), { nonNullable: true }),
-      price: priceControls,
-      fixedSet: new FormControl(this.p_fixedSet(), { nonNullable: true }),
-      set: new FormControl(this.p_set(), { nonNullable: true }),
-    })
 
+  form2 = new FormGroup<ControlsOf<ProductForm2>>({
+    id: new FormControl('', { nonNullable: true }),
+    deleted: new FormControl(false, { nonNullable: true }),
+    name: new FormControl('', { nonNullable: true }),
+    description: new FormControl('', { nonNullable: true }),
+    measure: new FormControl(Measure.KG, { nonNullable: true }),
+    weight: new FormControl(0, { nonNullable: true }),
+    amount: new FormControl(0, { nonNullable: true }),
+    price: new FormGroup<ControlsOf<Record<Currency, number>>>({
+      rub: new FormControl(0, { nonNullable: true }),
+      vnd: new FormControl(0, { nonNullable: true }),
+      usdt: new FormControl(0, { nonNullable: true }),
+    }),
+    fixedSet: new FormControl(false, { nonNullable: true }),
+    set: new FormControl(false, { nonNullable: true }),
+    products: new FormGroup<ControlsOf<Record<string, number>>>({}),
   });
-  productsForm = computed<FormGroup<ControlsOf<Record<string, number>>>>(() => {
-    const p = this.product()
 
-    const productsControls = new FormGroup<ControlsOf<Record<string, number>>>({})
+  get productsForm(): FormGroup {
+    return this.form2.controls.products as FormGroup
+  }
 
-    this.simpleProducts().forEach(prod => {
-      productsControls.addControl(
-        prod.id,
-        new FormControl(
-          p?.set ? p?.products?.[prod.id]?.count ?? 0 : 0,
-          { nonNullable: true }
-        )
-      )
-    })
-    return productsControls
-
-  });
+  get pricesForm(): FormGroup {
+    return this.form2.controls.price as FormGroup
+  }
 
   editing = false;
 
@@ -241,39 +208,42 @@ export class ProductCardComponent {
       const product = this.product();
       if (!product) {
         this.editing = true;
+      } else {
+        this.patchForm(product)
       }
     });
   }
 
-  get isSet() {
-    return this.form().value.set
-  }
-  get isFixedSet() {
-    return this.form().value.fixedSet
+  patchForm(product: Product) {
+    this.form2.patchValue({ ...product, products: {} }, { emitEvent: false });
+    const productsGroup = this.productsForm;
+    Object.keys(productsGroup.controls).forEach(key => {
+      productsGroup.removeControl(key);
+    });
+    if (product.set) {
+      this.simpleProducts().forEach(prod => {
+        this.form2.controls.products.addControl(
+          prod.id,
+          new FormControl(
+            product.products?.[prod.id]?.count ?? 0,
+            { nonNullable: true }
+          )
+        )
+      })
+    }
   }
 
+
+
   get showSetProducts() {
-    if (!this.isSet) {
+    if (!this.set) {
       return false;
     }
     if (this.usage === ProductCardPlace.AllProducts) {
-      return this.isFixedSet;
+      return this.fixedSet;
     } else {
       return true;
     }
-  }
-
-  get pricesForm(): FormGroup {
-    return this.form().get('price') as FormGroup
-  }
-
-  get defaultsWeight(): number {
-    const obj = this.productsForm().getRawValue() as Record<string, number>;
-    return Object.entries(obj).reduce((acc: number, [id, count]: [string, number]) => {
-      const product = this.simpleProductsMap().get(id)
-      acc += (product?.weight || 0) * count;
-      return acc;
-    }, 0);
   }
 
   startEdit() {
@@ -286,6 +256,10 @@ export class ProductCardComponent {
   }
 
   onCancel() {
+    const product = this.product();
+    if (product) {
+      this.patchForm(product);
+    }
     this.editing = false;
     this.isExpanded = false;
     this.cancel.emit()
@@ -304,21 +278,11 @@ export class ProductCardComponent {
   }
 
   getProductFromForm() {
-    const v = this.form().getRawValue()
-    let result: Product = {
-      id: this.p_id(),
-      name: v.name,
-      description: v.description,
-      measure: v.measure,
-      amount: Number(v.amount),
-      weight: Number(v.weight),
-      deleted: false,
-      price: this.productPrice,
-      set: false
-    }
-    if (v.set) {
+    const v = this.form2.getRawValue()
+    let result = v as Product;
+    if (result.set) {
       const products: ISetProducts = {}
-      Object.entries(this.productsForm().getRawValue()).forEach(([id, count]: any) => {
+      Object.entries(this.productsForm.getRawValue() as Record<string, number>).forEach(([id, count]: [string, number]) => {
 
         const product = this.simpleProductsMap().get(id)
 
@@ -327,6 +291,9 @@ export class ProductCardComponent {
             ...product,
             count
           }
+          if (v.fixedSet) {
+            products[id].fixedCount = count;
+          }
         }
 
       })
@@ -334,12 +301,14 @@ export class ProductCardComponent {
 
       result = {
         ...result,
-        set: true,
-        fixedSet: v.fixedSet || false,
         products,
-        weight: this.defaultsWeight,
+        weight: this.weight,
       }
 
+    }
+    for (const currency of Object.keys(result.price)) {
+      const curr = currency as Currency;
+      result.price[curr] = Number(result.price[curr])
     }
     return result;
   }
@@ -395,7 +364,7 @@ export class ProductCardComponent {
   }
   changeProducts() {
     if (this.usage === ProductCardPlace.Cart) {
-      const product = this.getProductFromForm()  as ISet
+      const product = this.getProductFromForm() as ISet
       this.changeContent.emit(product);
     }
   }
