@@ -28,5 +28,7 @@ export class PlacingOrderPageComponent {
 
   createOrder(method: PaymentMethod){
     const order = this.stateService.order();
+    this.apiService.createOrder(order, method);
+    this.stateService.updateCart([])
   }
 }
