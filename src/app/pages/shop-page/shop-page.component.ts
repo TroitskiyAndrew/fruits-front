@@ -62,8 +62,7 @@ export class ShopPageComponent {
     this.selectedSet.set(null);
   }
   addToCart(product: ISet){
-    this.stateService.cart.set([...this.stateService.cart(), {...product, count: 1}]);
-
+    this.stateService.updateCart([...this.stateService.cart(), {...product, count: 1}]);
   }
 
 }

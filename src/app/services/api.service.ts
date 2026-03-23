@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { Product, ISet } from '../models/models';
+import { Product, ISet, IUser, IOrder, PaymentMethod } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class ApiService {
       })
   }
 
-  async getUser(userId: number): Promise<any | null> {
+  async getUser(userId: number): Promise<IUser | null> {
     const url = `${environment.backendUrl}/users/${userId}`;
     return this.http
       .get<any>(url)
@@ -110,6 +110,17 @@ export class ApiService {
     const url = `${environment.backendUrl}/products/${product.id}`;
     return this.http
       .put<Product | null>(url, {product})
+      .toPromise()
+      .then(res => res || null)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return null
+      })
+  }
+  async createOrder( order: IOrder, method: PaymentMethod): Promise<Product | null> {
+    const url = `${environment.backendUrl}/orders`;
+    return this.http
+      .post<Product>(url, {order, method})
       .toPromise()
       .then(res => res || null)
       .catch(() => {

@@ -3,10 +3,10 @@
     Доставка
   </div>
   <order-delivery (deliverValue)="submitDeliveryValue($event)" class="w-100"></order-delivery>
-  <ui-button [disabled]="delivery == null">
+  <ui-button [disabled]="delivery == null || delivery().deliveryType === DeliveryType.Reception" (action)="createOrder(PaymentMethod.Cash)">
     Оплата наличными
   </ui-button>
-  <ui-button [disabled]="delivery == null">
+  <ui-button [disabled]="delivery == null" (action)="createOrder(PaymentMethod.Bank)">
     Оплата картой
   </ui-button>
 </ui-page>

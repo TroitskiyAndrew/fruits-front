@@ -35,7 +35,7 @@
     @default {
     <ui-grid [columns]="1" alignX="center" [gap]="5">
       <div>{{ currencySymbol() }}</div>
-      @if(isExpanded || fixedSet || productPrice === 0){
+      @if(isExpanded || fixedSet || productPrice === 0 || usage === ProductCardPlace.Cart){
         <div>{{ price }}</div>
       } @else {
         <div>от {{ productPrice }}</div>
@@ -56,7 +56,7 @@
   }
   @if(isExpanded) {
 
-  <ui-stack [formGroup]="form2">
+  <ui-stack [formGroup]="form">
     @if(editing) {
     <div class="row">
       <ui-toggler [options]="typeOptions" formControlName="set">

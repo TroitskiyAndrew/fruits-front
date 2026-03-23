@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostLi
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import { ControlsOf, Currency, ISet, ISetProducts, ISimpleProduct, Measure, Product, ProductForm, ProductForm2 } from '../../models/models'
+import { ControlsOf, Currency, ISet, ISetProducts, ISimpleProduct, Measure, Product, ProductForm } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -56,23 +56,23 @@ export class ProductCardComponent {
   @Input() cartIndex: number = 0;
 
   get name() {
-    return this.form2.controls.name.value;
+    return this.form.controls.name.value;
   }
   get description() {
-    return this.form2.controls.description.value;
+    return this.form.controls.description.value;
   }
   get set() {
-    return this.form2.controls.set.value
+    return this.form.controls.set.value
   }
   get amount() {
-    return this.form2.controls.amount.value
+    return this.form.controls.amount.value
   }
   get measure() {
-    return this.form2.controls.measure.value
+    return this.form.controls.measure.value
   }
   get prices() {
-    let productPrice = this.form2.controls.price.getRawValue();
-    if (!this.set && this.usage === ProductCardPlace.AllProducts) {
+    let productPrice = this.form.controls.price.getRawValue();
+    if (!this.set || this.usage === ProductCardPlace.AllProducts) {
       return productPrice
     }
     const product = this.product();
@@ -83,7 +83,7 @@ export class ProductCardComponent {
         productPrice[Currency.USDT] = 0;
       }
       const products = product.products;
-      const productsFromForm = this.form2.controls.products.getRawValue() as Record<string, number>;
+      const productsFromForm = this.form.controls.products.getRawValue() as Record<string, number>;
       Object.entries(productsFromForm).forEach(([id, count]: [string, number]) => {
         const product = this.simpleProductsMap().get(id);
         productPrice[Currency.Rub] += (product?.price[Currency.Rub] || 0) * (count - (products[id]?.fixedCount || 0));
@@ -117,13 +117,13 @@ export class ProductCardComponent {
     return this.prices[Currency.USDT];
   }
   get deleted() {
-    return this.form2.controls.deleted.value
+    return this.form.controls.deleted.value
   }
   get fixedSet() {
-    return this.form2.controls.fixedSet.value
+    return this.form.controls.fixedSet.value
   }
   get products() {
-    return this.form2.controls.products.getRawValue()
+    return this.form.controls.products.getRawValue()
   }
   get productsArray() {
     const products = this.products as Record<string, number>;
@@ -160,7 +160,7 @@ export class ProductCardComponent {
   @Output() deleteContent = new EventEmitter<number>();
 
 
-  form2 = new FormGroup<ControlsOf<ProductForm2>>({
+  form = new FormGroup<ControlsOf<ProductForm>>({
     id: new FormControl('', { nonNullable: true }),
     deleted: new FormControl(false, { nonNullable: true }),
     name: new FormControl('', { nonNullable: true }),
@@ -179,11 +179,11 @@ export class ProductCardComponent {
   });
 
   get productsForm(): FormGroup {
-    return this.form2.controls.products as FormGroup
+    return this.form.controls.products as FormGroup
   }
 
   get pricesForm(): FormGroup {
-    return this.form2.controls.price as FormGroup
+    return this.form.controls.price as FormGroup
   }
 
   editing = false;
@@ -215,14 +215,14 @@ export class ProductCardComponent {
   }
 
   patchForm(product: Product) {
-    this.form2.patchValue({ ...product, products: {} }, { emitEvent: false });
+    this.form.patchValue({ ...product, products: {} }, { emitEvent: false });
     const productsGroup = this.productsForm;
     Object.keys(productsGroup.controls).forEach(key => {
       productsGroup.removeControl(key);
     });
     if (product.set) {
       this.simpleProducts().forEach(prod => {
-        this.form2.controls.products.addControl(
+        this.form.controls.products.addControl(
           prod.id,
           new FormControl(
             product.products?.[prod.id]?.count ?? 0,
@@ -278,7 +278,7 @@ export class ProductCardComponent {
   }
 
   getProductFromForm() {
-    const v = this.form2.getRawValue()
+    const v = this.form.getRawValue()
     let result = v as Product;
     if (result.set) {
       const products: ISetProducts = {}
@@ -353,7 +353,7 @@ export class ProductCardComponent {
   async addToCart() {
     const result = this.getProductFromForm() as ISet;
     this.accept.emit(result);
-    this.stateService.cart.update(products => [...products, { ...result, count: 1 }])
+    this.stateService.updateCart([...this.stateService.cart(), { ...result, count: 1 }])
 
     this.isExpanded = false
   }

@@ -1,8 +1,9 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, IOrder, IOrderDelivery, OrderProduct, Product } from '../models/models';
+import { Currency, DeliveryType, IOrder, IOrderDelivery, OrderProduct, PlaceType, Product } from '../models/models';
 import { CURRENCY_SYMBOLS, EXPRESS_DELIVERY } from '../constants/constants';
+import { getTotal } from './utils';
 
 @Injectable({
   providedIn: 'root'
@@ -15,14 +16,49 @@ export class StateService {
   }, new Map()));
   currency = signal<Currency>(Currency.Rub);
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
-  cart = signal<OrderProduct[]>([]);
   expressDelivery = signal<boolean>(false);
-  cartTotal = computed(() => {
-    const currency = this.currency();
-    const cartTotal =  this.cart().reduce((acc, product) => acc += product.price[currency], 0);
-    const delivery = this.expressDelivery() ? EXPRESS_DELIVERY[currency] : 0;
-    return cartTotal + delivery;
+  order = signal<IOrder>({
+    id: '',
+    number: 0,
+    userId: 0,
+    source: '',
+    lastSource: '',
+    state: {
+      payed: false,
+      confirmed: false,
+      packed: false,
+      delivered: false,
+      deleted: false,
+      sent: false,
+    },
+    content: {
+      currency: this.currency(),
+      products: [],
+      expressDelivery: false,
+      prices: {
+        [Currency.Rub]: 0,
+        [Currency.VND]: 0,
+        [Currency.USDT]: 0,
+      }
+    },
+    delivery: {
+      name: '',
+      contact: '',
+      placeType: PlaceType.Hotel,
+      place: '',
+      placeAdd: '',
+      date: '',
+      deliveryType: DeliveryType.Reception
+    }
   });
+  orderContent = computed(() => this.order().content);
+  cart = computed(() => {
+    return this.order().content.products
+  });
+  cartTotal = computed(() => {
+    return this.order().content.prices[this.currency()]
+  });
+  orderDelivery = computed(() => this.order().delivery);
 
   queryParams: Record<string, any> = {};
   discountEvent = '';
@@ -38,11 +74,21 @@ export class StateService {
   constructor(private apiService: ApiService, private telegrammService: TelegrammService) { }
 
 
-
   async init() {
     if (this.telegrammService.initData) {
       const user = await this.apiService.getUser(this.telegrammService.user?.id || 0);
       this.user.set(user || {});
+      if (user) {
+        this.order.update(order => {
+          order.userId = user.userId;
+          order.source = user.source;
+          order.lastSource = user.sources[user.sources.length - 1];
+          if (user.referral) {
+            order.referral = user.referral;
+          }
+          return order;
+        })
+      }
     }
     const products = await this.apiService.getAllProducts();
     console.log('products', products)
@@ -58,7 +104,25 @@ export class StateService {
       .join('');
   }
 
-  changeCurrency(currency: Currency){
-    this.currency.set(currency)
+  changeCurrency(currency: Currency) {
+    this.currency.set(currency);
+  }
+  updateCart(products: OrderProduct[]) {
+    this.order.update(order => {
+      order.content.products = products;
+      order.content.prices = getTotal(order.content);
+      return {
+        ...order,
+        state: order.state,
+        content: order.content,
+        delivery: order.delivery,
+      }
+    });
+  }
+  updateDelivery(delivery: IOrderDelivery) {
+    this.order.update(order => {
+      order.delivery = delivery;
+      return order
+    })
   }
 }

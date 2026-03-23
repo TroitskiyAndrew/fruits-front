@@ -14,17 +14,24 @@ import { OrderContentComponent } from "../../components/order-content/order-cont
 
 @Component({
   selector: 'cart-page',
-  imports: [ReactiveFormsModule, PageComponent, ButtonComponent, OrderContentComponent],
+  imports: [ReactiveFormsModule, PageComponent, ButtonComponent, OrderContentComponent, PriceStringPipe, TogglerComponent],
   templateUrl: './cart-page.component.html',
   styleUrl: './cart-page.component.scss'
 })
 export class CartPageComponent {
 
-  content = computed<IOrderContent>(() => ({
-    total: this.stateService.cartTotal(),
-    products: this.stateService.cart(),
-    currency: this.stateService.currency(),
-    expressDelivery: false,
-  }))
-  constructor(private stateService: StateService) {}
+  content = computed<IOrderContent>(() => this.stateService.orderContent())
+  total = computed(() => this.stateService.cartTotal())
+  currency = computed(() => this.stateService.currency());
+  currencySymbol = computed(() => this.stateService.currencySymbol());
+  currencyOptions = CURRENCY_OPTIONS;
+  constructor(private stateService: StateService) { }
+
+  updateCart(content: IOrderContent) {
+    this.stateService.updateCart(content.products)
+  }
+
+  changeCurrency(currency: Currency) {
+    this.stateService.changeCurrency(currency)
+  }
 }

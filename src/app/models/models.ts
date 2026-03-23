@@ -37,9 +37,10 @@ export interface IOrderStatus {
   packed: boolean;
   delivered: boolean;
   deleted: boolean;
+  sent: boolean;
 }
 export interface IOrderContent {
-  total: number;
+  prices: IPrices,
   currency: Currency;
   products: OrderProduct[];
   expressDelivery: boolean;
@@ -59,6 +60,7 @@ export interface IOrder {
   userId: number;
   referral?: number;
   source: string;
+  lastSource: string;
   state: IOrderStatus;
   content: IOrderContent;
   delivery: IOrderDelivery;
@@ -75,6 +77,8 @@ export enum Measure {
   Item = 'шт'
 }
 
+export type IPrices = Record<Currency, number>;
+
 interface ProductBase {
   id: string;
   name: string;
@@ -83,7 +87,7 @@ interface ProductBase {
   amount: number;
   weight: number;
   deleted: boolean;
-  price: Record<Currency, number>;
+  price: IPrices;
   set: boolean;
 }
 export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number };
@@ -96,11 +100,7 @@ export interface ISet extends ProductBase {
   set: true;
 }
 
-export type ProductForm = Omit<ISet, 'set' | 'products'>  & {
-  set: boolean;
-}
-
-export type ProductForm2 = Omit<ISet, 'set'>  & {
+export type ProductForm = Omit<ISet, 'set'>  & {
   set: boolean;
   products: Record<string, number>
 }
@@ -120,8 +120,10 @@ export interface IPayment {
   to: number;
   amount: number;
   currency: Currency;
+  amounts: IPrices;
   method: PaymentMethod;
   payed: bigint | null;
+  confirmed: bigint | null;
 }
 
 export enum PaymentType {
@@ -135,10 +137,7 @@ export interface Share {
   id: string;
   paymentId: string;
   orderId: string;
-  amount: number;
-  currency: Currency;
-  payed: bigint | null;
-  confirmed: boolean,
+  amounts: IPrices;
   type: PaymentType;
 }
 
