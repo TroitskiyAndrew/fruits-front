@@ -122,7 +122,12 @@ export class StateService {
   updateDelivery(delivery: IOrderDelivery) {
     this.order.update(order => {
       order.delivery = delivery;
-      return order
+      return {
+        ...order,
+        state: order.state,
+        content: order.content,
+        delivery: order.delivery,
+      }
     })
   }
 }

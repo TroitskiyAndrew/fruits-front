@@ -135,10 +135,13 @@ export enum PaymentType {
 
 export interface Share {
   id: string;
+  from: number;
+  to: number;
   paymentId: string;
   orderId: string;
   amounts: IPrices;
   type: PaymentType;
+  payed: bigint | null;
 }
 
 export type ControlsOf<T> = {

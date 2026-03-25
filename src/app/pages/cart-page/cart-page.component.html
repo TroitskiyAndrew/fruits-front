@@ -2,10 +2,11 @@
   <div class="title">
     Корзина
   </div>
-  <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()" (valueChange)="changeCurrency($event)"></ui-toggler>
+  <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
+    (valueChange)="changeCurrency($event)"></ui-toggler>
   <div class="title">
-      Общая сумма: {{total() | priceString}} {{currencySymbol()}}
-    </div>
+    Общая сумма: {{total() | priceString}} {{currencySymbol()}}
+  </div>
   @let orderContent = content();
   <order-content [content]="orderContent" (updateContent)="updateCart($event)" class="w-100"></order-content>
   <ui-button link="placing-order" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
