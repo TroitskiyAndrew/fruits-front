@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
@@ -8,13 +8,16 @@ import { Product, ISet, IUser, IOrder, PaymentMethod } from '../models/models';
   providedIn: 'root'
 })
 export class ApiService {
+  private externalHttpClient: HttpClient;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private httpBackend: HttpBackend) {
+    this.externalHttpClient = new HttpClient(this.httpBackend);
+  }
 
   async getAllProducts(): Promise<Product[]> {
     const url = `${environment.backendUrl}/all-products`;
     return this.http
-      .post<Product[]>(url, {query: {}})
+      .post<Product[]>(url, { query: {} })
       .toPromise()
       .then(res => res || [])
       .catch(() => {
@@ -95,10 +98,10 @@ export class ApiService {
       );
   }
 
-  async createProduct( product: Omit<Product, 'id'>): Promise<Product | null> {
+  async createProduct(product: Omit<Product, 'id'>): Promise<Product | null> {
     const url = `${environment.backendUrl}/products`;
     return this.http
-      .post<Product>(url, {product})
+      .post<Product>(url, { product })
       .toPromise()
       .then(res => res || null)
       .catch(() => {
@@ -106,10 +109,10 @@ export class ApiService {
         return null
       })
   }
-  async updateProduct( product: Product): Promise<Product | null> {
+  async updateProduct(product: Product): Promise<Product | null> {
     const url = `${environment.backendUrl}/products/${product.id}`;
     return this.http
-      .put<Product | null>(url, {product})
+      .put<Product | null>(url, { product })
       .toPromise()
       .then(res => res || null)
       .catch(() => {
@@ -117,15 +120,36 @@ export class ApiService {
         return null
       })
   }
-  async createOrder( order: IOrder, method: PaymentMethod): Promise<Product | null> {
+  async createOrder(order: IOrder, method: PaymentMethod): Promise<Product | null> {
     const url = `${environment.backendUrl}/orders`;
     return this.http
-      .post<Product>(url, {order, method})
+      .post<Product>(url, { order, method })
       .toPromise()
       .then(res => res || null)
       .catch(() => {
         alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
         return null
+      })
+  }
+
+  uploadPhoto(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.externalHttpClient.post(environment.uploadImageUrl, formData).toPromise().then((response: any) => response.data.url).catch((error) => {
+      console.log(error);
+      return '';
+    })
+  }
+
+  pay(formData: FormData): Promise<boolean> {
+    const url = `${environment.backendUrl}/orders`;
+    return this.http
+      .post<boolean>(url, formData)
+      .toPromise()
+      .then(res => res || false)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return false
       })
   }
 }

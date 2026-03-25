@@ -51,6 +51,7 @@ export class StateService {
       deliveryType: DeliveryType.Reception
     }
   });
+  paymentId = '';
   orderContent = computed(() => this.order().content);
   cart = computed(() => {
     return this.order().content.products

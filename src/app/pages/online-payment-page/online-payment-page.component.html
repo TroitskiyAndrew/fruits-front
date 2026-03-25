@@ -6,9 +6,12 @@
   <div class="title">
     Общая сумма: {{total() | priceString}} {{currencySymbol()}}
   </div>
+  <div class="title">
+    Произведите оплату и отправьте скрин квитанции с помощью кнопки ниже:
+  </div>
   <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
   <ui-button (action)="fileInput.click()">
-    Мои заказы
+    Отправить квитанцию
   </ui-button>
 
 </ui-page>

@@ -35,11 +35,14 @@ export class OnlinePaymentPageComponent {
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
+    const image = await this.apiService.uploadPhoto(file);
     const formData = new FormData();
-    formData.append('image', file);
     formData.append('currency', this.currency());
+    formData.append('image', image);
     formData.append('when', Date.now().toString());
     formData.append('amount', this.stateService.cartTotal().toString());
+    formData.append('paymentId', this.stateService.paymentId);
+    const isPayed = await this.apiService.pay(formData)
     this.router.navigate(['order-placed']);
   }
 

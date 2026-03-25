@@ -124,9 +124,11 @@ export interface IPayment {
   method: PaymentMethod;
   payed: bigint | null;
   confirmed: bigint | null;
+  image: string;
 }
 
 export enum PaymentType {
+  Unknown,
   Client,
   Supplier,
   Referral,
