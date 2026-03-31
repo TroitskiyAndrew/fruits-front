@@ -1,4 +1,3 @@
-import { EXPRESS_DELIVERY } from "../constants/constants";
 import { Currency, IOrderContent, ISimpleProduct, OrderProduct } from "../models/models";
 
 export function getTotal(orderContent: IOrderContent){
@@ -21,10 +20,6 @@ const newTotal = {
         })
       }
     });
-    if (orderContent.expressDelivery) {
-      newTotal[Currency.Rub] += EXPRESS_DELIVERY[Currency.Rub];
-      newTotal[Currency.VND] += EXPRESS_DELIVERY[Currency.VND];
-      newTotal[Currency.USDT] += EXPRESS_DELIVERY[Currency.USDT];
-    }
+
     return newTotal;
 }

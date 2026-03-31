@@ -1,11 +1,16 @@
   <ui-stack>
     <ui-stack class="w-100">
-      @for (product of content.products; track $index) {
-      <product-card class="w-100" [isExpanded]="content.products.length === 1" [product]="product" [usage]="ProductCardPlace.Cart" [cartIndex]="$index" (changeContent)="changeContent($event, $index)" (deleteContent)="deleteContent($event)" />
+      @for (product of products; track $index) {
+      <product-card class="w-100" [isExpanded]="products.length === 1" [product]="product" [usage]="ProductCardPlace.Cart" [cartIndex]="$index" (changeContent)="changeContent($event, $index)" (deleteContent)="deleteContent($event)" />
       }
     </ui-stack>
-    @if(content.products.length){
-      <ui-toggler class="center-self" [options]="deliveryOptions" [value]="stateService.expressDelivery()" (valueChange)="changeDelivery()"></ui-toggler>
+    @if(products.length){
+      <ui-stack [formGroup]="addonsForm">
+        @for (key of orderAddonsKeys; track key) {
+          <ui-checkbox [label]="orderAddonsNamesMap().get(key)" [formControlName]="key"></ui-checkbox>
+        }
+
+      </ui-stack>
     }
 
   </ui-stack>

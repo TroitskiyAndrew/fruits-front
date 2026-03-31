@@ -52,7 +52,6 @@ export interface IOrderContent {
   prices: IPrices,
   currency: Currency;
   products: OrderProduct[];
-  expressDelivery: boolean;
 }
 export interface IOrderDelivery {
   name: string;
@@ -99,7 +98,7 @@ interface ProductBase {
   price: IPrices;
   set: boolean;
 }
-export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number };
+export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number, orderAddon?: boolean };
 
 export type ISetProducts = Record<string, OrderProduct<ISimpleProduct>>;
 
@@ -109,12 +108,13 @@ export interface ISet extends ProductBase {
   set: true;
 }
 
-export type ProductForm = Omit<ISet, 'set'>  & {
+export type ProductForm = Omit<ISet, 'set' | 'products'>  & {
   set: boolean;
-  products: Record<string, number>
+  products: Record<string, number>;
+  orderAddon: boolean
 }
 
-export interface ISimpleProduct extends ProductBase { set: false };
+export interface ISimpleProduct extends ProductBase { set: false, orderAddon: boolean };
 
 export type Product = ISet | ISimpleProduct;
 

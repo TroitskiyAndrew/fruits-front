@@ -1,7 +1,4 @@
 <ui-card>
-
-
-
   @if(!isExpanded || usage !== ProductCardPlace.AllProducts) {
 
   <div class="row" (click)="onExpand()">
@@ -9,7 +6,7 @@
     <div class="col left">
 
       <div class="title">
-        {{ name }} (@if(set){{{ weight }} кг} @else {{{ amount }} {{ measure }}})
+        {{ name }} {{titleMeasure}}
       </div>
 
       <div class="subtitle">
@@ -36,9 +33,9 @@
     <ui-grid [columns]="1" alignX="center" [gap]="5">
       <div>{{ currencySymbol() }}</div>
       @if(isExpanded || fixedSet || productPrice === 0 || usage === ProductCardPlace.Cart){
-        <div>{{ price }}</div>
+      <div>{{ price }}</div>
       } @else {
-        <div>от {{ productPrice }}</div>
+      <div>от {{ productPrice }}</div>
       }
 
     </ui-grid>
@@ -46,7 +43,8 @@
     }
 
     @if(usage === ProductCardPlace.Cart){
-      <ui-button (action)="deleteFromContent()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-trash"> </ui-button>
+    <ui-button (action)="deleteFromContent()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-trash">
+    </ui-button>
     }
 
 
@@ -71,10 +69,14 @@
 
     <ui-input label="Описание" formControlName="description" [clearable]="true">
     </ui-input>
+    @if(set){
+    <ui-toggler [options]="priceOptions" formControlName="fixedSet">
+    </ui-toggler>
+    } @else {
+    <ui-checkbox label="Модификатор заказа" formControlName="orderAddon"></ui-checkbox>
 
+    @if (!orderAddon) {
     <ui-row class="row">
-      @if(set){
-      } @else {
       <ui-select label="ед.и." [options]="measureOptions" formControlName="measure">
       </ui-select>
 
@@ -83,13 +85,12 @@
 
       <ui-input label="Кол-во" type="number" formControlName="amount">
       </ui-input>
-      }
 
     </ui-row>
-    @if(set){
-    <ui-toggler [options]="priceOptions" formControlName="fixedSet">
-    </ui-toggler>
     }
+    }
+
+
     <ui-row class="row" [formGroup]="pricesForm">
 
       <ui-input label="RUB" type="number" formControlName="rub">
@@ -129,8 +130,7 @@
         <div class="right">
           {{p.price[this.currency()] | priceString}}{{currencySymbol()}}
         </div>
-        <ui-counter
-          [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currency()]) < productPrice)"
+        <ui-counter [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currency()]) < productPrice)"
           [formControlName]="p.id" (valueChange)="changeProducts()">
         </ui-counter>
 
@@ -151,8 +151,8 @@
         Сохранить
       </ui-button>
       <ui-button variant="primary" (action)="onCancel()">
-          Отмена
-        </ui-button>
+        Отмена
+      </ui-button>
       }
       @case (ProductCardPlace.Shop) {
       @if(price < productPrice) { <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">

@@ -18,6 +18,7 @@ import { GridComponent } from "../../ui/grid/grid.component";
 import { PriceStringPipe } from '../../pipes/price-string.pipe'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { Router } from '@angular/router'
+import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 
 export enum ProductCardPlace {
   AllProducts,
@@ -40,8 +41,9 @@ export enum ProductCardPlace {
     CounterComponent,
     TogglerComponent,
     GridComponent,
-    PriceStringPipe
-  ],
+    PriceStringPipe,
+    CheckboxComponent
+],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
@@ -64,6 +66,9 @@ export class ProductCardComponent {
   get set() {
     return this.form.controls.set.value
   }
+  get orderAddon() {
+    return this.form.controls.orderAddon.value
+  }
   get amount() {
     return this.form.controls.amount.value
   }
@@ -85,7 +90,7 @@ export class ProductCardComponent {
       const products = product.products;
       const productsFromForm = this.form.controls.products.getRawValue() as Record<string, number>;
       Object.entries(productsFromForm).forEach(([id, count]: [string, number]) => {
-        const product = this.simpleProductsMap().get(id);
+        const product = this.stateService.simpleProductsMap().get(id);
         productPrice[Currency.Rub] += (product?.price[Currency.Rub] || 0) * (count - (products[id]?.fixedCount || 0));
         productPrice[Currency.VND] += (product?.price[Currency.VND] || 0) * (count - (products[id]?.fixedCount || 0));
         productPrice[Currency.USDT] += (product?.price[Currency.USDT] || 0) * (count - (products[id]?.fixedCount || 0));
@@ -127,7 +132,7 @@ export class ProductCardComponent {
   }
   get productsArray() {
     const products = this.products as Record<string, number>;
-    const simpleProductsMap = this.simpleProductsMap();
+    const simpleProductsMap = this.stateService.simpleProductsMap();
     return Array(...Object.entries(products)).filter(([_, count]) => count > 0).map(([id]) => simpleProductsMap.get(id)!)
   }
 
@@ -138,20 +143,29 @@ export class ProductCardComponent {
       return product.weight;
     } else {
       return Object.entries(products).reduce((acc: number, [id, count]: [string, number]) => {
-        const product = this.simpleProductsMap().get(id)
+        const product = this.stateService.simpleProductsMap().get(id)
         acc += (product?.weight || 0) * count;
         return acc;
       }, 0);
     }
   }
 
-  simpleProducts = computed(() => {
-    return this.stateService.products().filter(p => !p.set)
-  })
-  simpleProductsMap = computed<Map<string, ISimpleProduct>>(() => this.simpleProducts().reduce((map, product) => {
-    map.set(product.id, product);
-    return map;
-  }, new Map()));
+  get titleMeasure(){
+    if(this.orderAddon){
+      return ''
+    } else {
+      if(this.set) {
+        return `(${this.weight} кг)`
+      } else {
+         return`(${this.amount} ${this.measure})`
+      }
+    }
+  }
+
+simpleProducts = computed(() => {
+  return this.stateService.simpleProducts()
+})
+
 
   @Output() accept = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter();
@@ -176,6 +190,7 @@ export class ProductCardComponent {
     fixedSet: new FormControl(false, { nonNullable: true }),
     set: new FormControl(false, { nonNullable: true }),
     products: new FormGroup<ControlsOf<Record<string, number>>>({}),
+    orderAddon: new FormControl(false, { nonNullable: true }),
   });
 
   get productsForm(): FormGroup {
@@ -277,14 +292,19 @@ export class ProductCardComponent {
     }
   }
 
-  getProductFromForm() {
+  getProductFromForm(): Product {
     const v = this.form.getRawValue()
-    let result = v as Product;
+    let result = v as ProductForm;
+
+    for (const currency of Object.keys(result.price)) {
+      const curr = currency as Currency;
+      result.price[curr] = Number(result.price[curr])
+    }
     if (result.set) {
       const products: ISetProducts = {}
       Object.entries(this.productsForm.getRawValue() as Record<string, number>).forEach(([id, count]: [string, number]) => {
 
-        const product = this.simpleProductsMap().get(id)
+        const product = this.stateService.simpleProductsMap().get(id)
 
         if (product && count > 0) {
           products[id] = {
@@ -301,16 +321,21 @@ export class ProductCardComponent {
 
       result = {
         ...result,
-        products,
         weight: this.weight,
       }
 
+      const product: Product = {
+        ...result,
+        weight: this.weight,
+        products
+      }
+
+      return product;
+
+    } else {
+      const {products, fixedSet, ...base} = result;
+      return {...base, set: false};
     }
-    for (const currency of Object.keys(result.price)) {
-      const curr = currency as Currency;
-      result.price[curr] = Number(result.price[curr])
-    }
-    return result;
   }
 
   async saveProduct() {

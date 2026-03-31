@@ -2,7 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
 import { Currency, DeliveryType, IOrder, IOrderDelivery, IPayment, OrderProduct, PlaceType, Product } from '../models/models';
-import { CURRENCY_SYMBOLS, EXPRESS_DELIVERY } from '../constants/constants';
+import { CURRENCY_SYMBOLS } from '../constants/constants';
 import { getTotal } from './utils';
 
 @Injectable({
@@ -14,9 +14,18 @@ export class StateService {
     map.set(product.id, product);
     return map;
   }, new Map()));
+  simpleProducts = computed(() => {
+    return this.products().filter(p => !p.set && !p.orderAddon)
+  })
+  simpleProductsMap = computed(() => this.simpleProducts().reduce((map, product) => {
+    map.set(product.id, product);
+    return map;
+  }, new Map()));
+  orderAddons = computed(() => {
+    return this.products().filter(p => !p.set && p.orderAddon)
+  })
   currency = signal<Currency>(Currency.Rub);
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
-  expressDelivery = signal<boolean>(false);
   order = signal<IOrder>({
     id: '',
     number: 0,
@@ -34,7 +43,6 @@ export class StateService {
     content: {
       currency: this.currency(),
       products: [],
-      expressDelivery: false,
       prices: {
         [Currency.Rub]: 0,
         [Currency.VND]: 0,
@@ -58,6 +66,9 @@ export class StateService {
   });
   cartTotal = computed(() => {
     return this.order().content.prices[this.currency()]
+  });
+  cartAddons = computed(() => {
+    return this.order().content.products.filter(p => p.orderAddon)
   });
   orderDelivery = computed(() => this.order().delivery);
   orders = signal<IOrder[]>([]);
@@ -120,6 +131,7 @@ export class StateService {
   changeCurrency(currency: Currency) {
     this.currency.set(currency);
   }
+
   updateCart(products: OrderProduct[]) {
     this.order.update(order => {
       order.content.products = products;
@@ -132,6 +144,7 @@ export class StateService {
       }
     });
   }
+
   updateDelivery(delivery: IOrderDelivery) {
     this.order.update(order => {
       order.delivery = delivery;
