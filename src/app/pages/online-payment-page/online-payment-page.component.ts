@@ -8,22 +8,18 @@ import { Currency, IPayment } from '../../models/models';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { ApiService } from '../../services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PaymentCardComponent, PaymentCardPlace } from "../../components/payment-card/payment-card.component";
 
 @Component({
   selector: 'app-online-payment-page',
-  imports: [PageComponent, ButtonComponent, TogglerComponent, PriceStringPipe],
+  imports: [PageComponent, PaymentCardComponent],
   templateUrl: './online-payment-page.component.html',
   styleUrl: './online-payment-page.component.scss'
 })
 export class OnlinePaymentPageComponent {
 
-  payment = signal<IPayment | null>(null)
-
-  currencyOptions = CURRENCY_OPTIONS;
-
-  currency = computed(() => this.stateService.currency());
-  currencySymbol = computed(() => this.stateService.currencySymbol());
-  total = computed(() => this.payment()?.amounts[this.currency()] || 0);
+  paymentSignal = signal<IPayment | null>(null);
+  PaymentCardPlace = PaymentCardPlace;
 
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router,  private route: ActivatedRoute) { }
 
@@ -31,29 +27,15 @@ export class OnlinePaymentPageComponent {
     const id = this.route.snapshot.paramMap.get('paymentId');
     const payment = this.stateService.paymentsMap().get(id || '');
     if (payment) {
-      this.payment.set(payment);
+      this.paymentSignal.set(payment);
     }
   }
 
-  changeCurrency(currency: Currency) {
-    this.stateService.changeCurrency(currency)
+  paid(success: boolean){
+    console.log('paid', success);
+    if (success) {
+      this.stateService.dropOrder();
+      this.router.navigate(['/order-placed']);
+    }
   }
-
-  async onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) return;
-
-    const file = input.files[0];
-    const image = await this.apiService.uploadPhoto(file);
-    const formData = new FormData();
-    formData.append('currency', this.currency());
-    formData.append('image', image);
-    formData.append('when', Date.now().toString());
-    formData.append('amount', this.stateService.cartTotal().toString());
-    formData.append('paymentId', this.stateService.paymentId);
-    const isPayed = await this.apiService.pay(formData)
-    this.router.navigate(['order-placed']);
-  }
-
 }

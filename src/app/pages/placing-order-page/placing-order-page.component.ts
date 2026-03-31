@@ -37,7 +37,12 @@ export class PlacingOrderPageComponent {
       const {order, payment} = newOrderInfo;
       this.stateService.orders.update((orders) => [...orders, order]);
       this.stateService.payments.update((payments) => [...payments, payment]);
-      this.router.navigate(method === PaymentMethod.Bank ? ['online-payment', payment.id] : ['order-placed']);
+      if(method === PaymentMethod.Bank) {
+        this.router.navigate(['online-payment', payment.id]);
+      } else {
+        this.stateService.dropOrder();
+        this.router.navigate(['order-placed']);
+      }
 
     }
   }

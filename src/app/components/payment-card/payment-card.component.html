@@ -1,17 +1,19 @@
 <ui-card>
-
-  <ui-row>
-
-    <div>
-      {{payment.from}}
-      →
-      {{payment.to}}
-    </div>
-
-    <div>{{payment.amount}}</div>
-
-  </ui-row>
-
-
+  @switch (usage) {
+  @case (PaymentCardPlace.OnlinePayment) {
+  <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
+    (valueChange)="changeCurrency($event)"></ui-toggler>
+  <div class="title">
+    Общая сумма: {{total() | priceString}} {{currencySymbol()}}
+  </div>
+  <div class="title">
+    Произведите оплату и отправьте скрин квитанции с помощью кнопки ниже:
+  </div>
+  <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
+  <ui-button (action)="fileInput.click()">
+    Отправить квитанцию
+  </ui-button>
+  }
+  }
 
 </ui-card>

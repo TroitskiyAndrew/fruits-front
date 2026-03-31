@@ -2,7 +2,7 @@ import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { Product, ISet, IUser, IOrder, PaymentMethod, INewOrderInfo } from '../models/models';
+import { Product, ISet, IUser, IOrder, PaymentMethod, INewOrderInfo, IPayOptions } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -141,10 +141,10 @@ export class ApiService {
     })
   }
 
-  pay(formData: FormData): Promise<boolean> {
+  pay(options: IPayOptions): Promise<boolean> {
     const url = `${environment.backendUrl}/pay`;
     return this.http
-      .post<boolean>(url, formData)
+      .post<boolean>(url, options)
       .toPromise()
       .then(res => res || false)
       .catch(() => {

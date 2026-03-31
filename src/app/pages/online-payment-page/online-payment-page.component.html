@@ -1,16 +1,10 @@
 <ui-page>
-  <div class="title">
-    Онлайн оплата
-  </div>
-  <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()" (valueChange)="changeCurrency($event)"></ui-toggler>
-  <div class="title">
-    Общая сумма: {{total() | priceString}} {{currencySymbol()}}
-  </div>
-  <div class="title">
-    Произведите оплату и отправьте скрин квитанции с помощью кнопки ниже:
-  </div>
-  <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
-  <ui-button (action)="fileInput.click()">
-    Отправить квитанцию
-  </ui-button>
+  @let payment = paymentSignal();
+  @if (payment) {
+    <div class="title">
+      Онлайн оплата
+    </div>
+    <payment-card [payment]="payment" [usage]="PaymentCardPlace.OnlinePayment" (payed)="paid($event)"></payment-card>
+  }
+
 </ui-page>

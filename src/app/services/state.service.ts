@@ -9,6 +9,7 @@ import { getTotal } from './utils';
   providedIn: 'root'
 })
 export class StateService {
+  user = signal<any>({ userId: 480144364, pressedStart: true, admin: true });
   products = signal<Product[]>([]);
   productsMap = computed(() => this.products().reduce((map, product) => {
     map.set(product.id, product);
@@ -26,40 +27,7 @@ export class StateService {
   })
   currency = signal<Currency>(Currency.Rub);
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
-  order = signal<IOrder>({
-    id: '',
-    number: 0,
-    userId: 0,
-    source: '',
-    lastSource: '',
-    state: {
-      payed: false,
-      confirmed: false,
-      packed: false,
-      delivered: false,
-      deleted: false,
-      sent: false,
-    },
-    content: {
-      currency: this.currency(),
-      products: [],
-      prices: {
-        [Currency.Rub]: 0,
-        [Currency.VND]: 0,
-        [Currency.USDT]: 0,
-      }
-    },
-    delivery: {
-      name: '',
-      contact: '',
-      placeType: PlaceType.Hotel,
-      place: '',
-      placeAdd: '',
-      date: '',
-      deliveryType: DeliveryType.Reception
-    }
-  });
-  paymentId = '';
+  order = signal<IOrder>(this.getEmptyOrder());
   orderContent = computed(() => this.order().content);
   cart = computed(() => {
     return this.order().content.products
@@ -91,7 +59,7 @@ export class StateService {
 
   sessionId = this.generateSecureId();
 
-  user = signal<any>({ userId: 480144364, pressedStart: true, admin: true });
+
   isStartPressed = computed(() => this.user().pressedStart);
   isAdmin = computed(() => this.user().admin || false);
 
@@ -155,5 +123,44 @@ export class StateService {
         delivery: order.delivery,
       }
     })
+  }
+
+  getEmptyOrder(): IOrder {
+    return {
+      id: '',
+      number: 0,
+      userId: this.user().userId,
+      source: '',
+      lastSource: '',
+      state: {
+        payed: null,
+        confirmed: null,
+        packed: null,
+        delivered: null,
+        deleted: false,
+      },
+      content: {
+        currency: this.currency(),
+        products: [],
+        prices: {
+          [Currency.Rub]: 0,
+          [Currency.VND]: 0,
+          [Currency.USDT]: 0,
+        }
+      },
+      delivery: {
+        name: '',
+        contact: '',
+        placeType: PlaceType.Hotel,
+        place: '',
+        placeAdd: '',
+        date: '',
+        deliveryType: DeliveryType.Reception
+      }
+    }
+  }
+
+  dropOrder() {
+    this.order.set(this.getEmptyOrder());
   }
 }

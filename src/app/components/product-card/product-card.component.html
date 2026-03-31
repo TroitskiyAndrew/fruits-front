@@ -1,5 +1,5 @@
 <ui-card>
-  @if(!isExpanded || usage !== ProductCardPlace.AllProducts) {
+  @if(showCardTitle) {
 
   <div class="row" (click)="onExpand()">
 

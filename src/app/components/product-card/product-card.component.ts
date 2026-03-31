@@ -43,7 +43,7 @@ export enum ProductCardPlace {
     GridComponent,
     PriceStringPipe,
     CheckboxComponent
-],
+  ],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
@@ -150,21 +150,21 @@ export class ProductCardComponent {
     }
   }
 
-  get titleMeasure(){
-    if(this.orderAddon){
+  get titleMeasure() {
+    if (this.orderAddon) {
       return ''
     } else {
-      if(this.set) {
+      if (this.set) {
         return `(${this.weight} кг)`
       } else {
-         return`(${this.amount} ${this.measure})`
+        return `(${this.amount} ${this.measure})`
       }
     }
   }
 
-simpleProducts = computed(() => {
-  return this.stateService.simpleProducts()
-})
+  simpleProducts = computed(() => {
+    return this.stateService.simpleProducts()
+  })
 
 
   @Output() accept = new EventEmitter<Product>();
@@ -218,6 +218,21 @@ simpleProducts = computed(() => {
     { label: 'Минимальная сумма', value: false },
   ]
 
+  get showCardTitle() {
+    return !this.isExpanded || this.usage !== ProductCardPlace.AllProducts
+  }
+
+  get showSetProducts() {
+    if (!this.set) {
+      return false;
+    }
+    if (this.usage === ProductCardPlace.AllProducts) {
+      return this.fixedSet;
+    } else {
+      return true;
+    }
+  }
+
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router) {
     effect(() => {
       const product = this.product();
@@ -245,19 +260,6 @@ simpleProducts = computed(() => {
           )
         )
       })
-    }
-  }
-
-
-
-  get showSetProducts() {
-    if (!this.set) {
-      return false;
-    }
-    if (this.usage === ProductCardPlace.AllProducts) {
-      return this.fixedSet;
-    } else {
-      return true;
     }
   }
 
@@ -333,8 +335,8 @@ simpleProducts = computed(() => {
       return product;
 
     } else {
-      const {products, fixedSet, ...base} = result;
-      return {...base, set: false};
+      const { products, fixedSet, ...base } = result;
+      return { ...base, set: false };
     }
   }
 

@@ -10,7 +10,7 @@ export interface IUser {
   referral?: number;
   sources: string[];
   path: string[];
-  _created: bigint;
+  _created: number;
   sessionId: string;
   paymentMethods: IPaymentMethods;
 }
@@ -41,12 +41,11 @@ export enum DeliveryType {
 }
 
 export interface IOrderStatus {
-  payed: boolean;
-  confirmed: boolean;
-  packed: boolean;
-  delivered: boolean;
+  payed: number | null;
+  confirmed: number | null;
+  packed: number | null;
+  delivered: number | null;
   deleted: boolean;
-  sent: boolean;
 }
 export interface IOrderContent {
   prices: IPrices,
@@ -131,8 +130,8 @@ export interface IPayment {
   currency: Currency;
   amounts: IPrices;
   method: PaymentMethod;
-  payed: bigint | null;
-  confirmed: bigint | null;
+  payed: number | null;
+  confirmed: number | null;
   image: string;
 }
 
@@ -144,6 +143,14 @@ export enum PaymentType {
   Service,
 }
 
+export interface IPayOptions {
+  currency: Currency;
+  image?: string;
+  when: number;
+  amount: number;
+  method: PaymentMethod;
+  paymentId: string;
+}
 export interface Share {
   id: string;
   from: number;
@@ -152,7 +159,7 @@ export interface Share {
   orderId: string;
   amounts: IPrices;
   type: PaymentType;
-  payed: bigint | null;
+  payed: number | null;
 }
 
 export type ControlsOf<T> = {
@@ -166,3 +173,4 @@ export interface INewOrderInfo {
   order: IOrder,
   payment: IPayment,
 }
+
