@@ -7,7 +7,7 @@
 
   <ui-stack>
     @for (user of users; track $index) {
-    <user-card [user]="user" (click)="openUser(user)" />
+    <user-card class="w-100" [user]="user" (click)="openUser(user)" />
 
     }
 

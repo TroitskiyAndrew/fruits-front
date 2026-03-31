@@ -39,6 +39,10 @@ export function getEmptyUser(): IUser {
     path: [],
     _created: 0,
     sessionId: '',
-    paymentMethods: {}
+    paymentMethods: {
+      [Currency.Rub]: null,
+      [Currency.VND]: null,
+      [Currency.USDT]: null,
+    }
   }
 }

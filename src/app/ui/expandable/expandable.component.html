@@ -1,0 +1,30 @@
+<ui-card>
+
+  <ui-row>
+
+    <div>
+      {{ title }}
+    </div>
+
+    <ui-button
+      variant="ghost"
+      size="s"
+      [icon]="true"
+      (action)="toggle()"
+    >
+      <i class="fa-solid" [ngClass]="opened ? 'fa-chevron-down' : 'fa-chevron-left'"></i>
+    </ui-button>
+
+  </ui-row>
+
+  @if (opened) {
+
+    <ui-stack>
+
+      <ng-content></ng-content>
+
+    </ui-stack>
+
+  }
+
+</ui-card>

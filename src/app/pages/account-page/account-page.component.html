@@ -1,0 +1,9 @@
+<ui-page>
+  <div class="title">
+    Аккаунт
+  </div>
+  @let user = userSignal();
+  @if(user){
+    <user-card class="w-100"[user]="user" />
+  }
+</ui-page>

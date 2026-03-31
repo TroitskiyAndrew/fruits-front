@@ -1,6 +1,8 @@
 import {
   Component,
+  EventEmitter,
   Input,
+  Output,
   forwardRef
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
@@ -31,9 +33,9 @@ import { RowComponent } from '../row/row.component'
 export class CheckboxComponent implements ControlValueAccessor {
 
   @Input() label = ''
-
-  value = false
-  disabled = false
+  @Input() value = false
+  @Input() disabled = false
+  @Output() valueChange = new EventEmitter<boolean>()
 
   onChange = (v: boolean) => {}
   onTouched = () => {}
@@ -60,6 +62,7 @@ export class CheckboxComponent implements ControlValueAccessor {
     this.value = !this.value
     this.onChange(this.value)
     this.onTouched()
+    this.valueChange.emit(this.value)
   }
 
 }

@@ -1,15 +1,16 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, DeliveryType, IOrder, IOrderDelivery, IPayment, OrderProduct, PlaceType, Product } from '../models/models';
+import { Currency, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product } from '../models/models';
 import { CURRENCY_SYMBOLS } from '../constants/constants';
-import { getTotal } from './utils';
+import { getEmptyUser, getTotal } from './utils';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
-  user = signal<any>({ userId: 480144364, pressedStart: true, admin: true });
+  user = signal<IUser>(getEmptyUser());
   products = signal<Product[]>([]);
   productsMap = computed(() => this.products().reduce((map, product) => {
     map.set(product.id, product);
@@ -62,15 +63,24 @@ export class StateService {
 
   isStartPressed = computed(() => this.user().pressedStart);
   isAdmin = computed(() => this.user().admin || false);
+  config = signal<IConfig>({
+    cashierId: 0,
+    referralUrlBase: ''
+  })
 
   constructor(private apiService: ApiService, private telegrammService: TelegrammService) { }
 
 
   async init() {
-    if (this.telegrammService.initData) {
-      const user = await this.apiService.getUser(this.telegrammService.user?.id || 0);
-      this.user.set(user || {});
+    const config = await this.apiService.getConfig();
+    if (config) {
+      this.config.set(config);
+    }
+    const userId = environment.production ? this.telegrammService.user?.id : 480144364;
+    if (userId) {
+      const user = await this.apiService.getUser(userId);
       if (user) {
+        this.user.set(user);
         this.order.update(order => {
           order.userId = user.userId;
           order.source = user.source;
@@ -82,6 +92,7 @@ export class StateService {
         })
       }
     }
+
     const products = await this.apiService.getAllProducts();
     console.log('products', products)
     this.products.set(products);

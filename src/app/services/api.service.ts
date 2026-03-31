@@ -2,7 +2,7 @@ import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { Product, ISet, IUser, IOrder, PaymentMethod, INewOrderInfo, IPayOptions } from '../models/models';
+import { Product, ISet, IUser, IOrder, PaymentMethod, INewOrderInfo, IPayOptions, IConfig } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,7 @@ export class ApiService {
       })
   }
 
-  async getUser(userId: number): Promise<IUser | null> {
+  async getUser(userId: number | string): Promise<IUser | null> {
     const url = `${environment.backendUrl}/users/${userId}`;
     return this.http
       .get<any>(url)
@@ -72,7 +72,17 @@ export class ApiService {
       });
   }
 
-
+  async updateUser(user: {id: string} & Partial<IUser>): Promise<boolean> {
+    const url = `${environment.backendUrl}/users/${user.id}`;
+    return this.http
+      .put<any>(url, user)
+      .toPromise()
+      .then(res => res || false)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return false
+      })
+  }
 
   findUsers(query: string): Observable<any[]> {
     const url = `${environment.backendUrl}/find/${query}`;
@@ -150,6 +160,18 @@ export class ApiService {
       .catch(() => {
         alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
         return false
+      })
+  }
+
+  getConfig(): Promise<IConfig | null> {
+    const url = `${environment.backendUrl}/config`;
+    return this.http
+      .get<IConfig>(url)
+      .toPromise()
+      .then(res => res || null)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return null
       })
   }
 }

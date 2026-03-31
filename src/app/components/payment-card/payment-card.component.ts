@@ -1,5 +1,5 @@
 import { Component, computed, effect, EventEmitter, input, Input, Output, signal } from '@angular/core';
-import { Currency, IPayment, IPayOptions, IUser, PaymentMethod } from '../../models/models';
+import { Currency, IPayment, IPayOptions, IUser, OnlinePaymentOption, PaymentMethod } from '../../models/models';
 import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '../../ui/avatar/avatar.component';
 import { BadgeComponent } from '../../ui/badge/badge.component';
@@ -32,7 +32,7 @@ export enum PaymentCardPlace {
 })
 export class PaymentCardComponent {
 
-  payment = input<IPayment>({
+  @Input() payment: IPayment = {
     id: '',
     from: 0,
     to: 0,
@@ -47,9 +47,10 @@ export class PaymentCardComponent {
     payed: null,
     confirmed: null,
     image: ''
-  });
+  };
   @Input() usage: PaymentCardPlace = PaymentCardPlace.OnlinePayment;
   PaymentCardPlace = PaymentCardPlace;
+  OnlinePaymentOption = OnlinePaymentOption;
   currencyOptions = CURRENCY_OPTIONS;
 
   @Output() payed = new EventEmitter<boolean>()
@@ -57,14 +58,18 @@ export class PaymentCardComponent {
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
 
-  total = computed(() => this.payment().amounts[this.currency()] || 0);
+  total = computed(() => this.payment.amounts[this.currency()] || 0);
   from = signal<IUser>(getEmptyUser());
   to = signal<IUser>(getEmptyUser());
   paymentMethod = computed(() => this.to().paymentMethods[this.currency()] || null);
 
   constructor(private stateService: StateService, private apiService: ApiService) {
-    effect(async () => {
-      const payment = this.payment();
+
+
+  }
+
+  async ngOnInit() {
+    const payment = this.payment;
       const [from, to] = await Promise.all([
         this.apiService.getUser(payment.from),
         this.apiService.getUser(payment.to)
@@ -75,8 +80,6 @@ export class PaymentCardComponent {
       if (to) {
         this.to.set(to);
       }
-    });
-
   }
 
   changeCurrency(currency: Currency) {
@@ -112,9 +115,9 @@ export class PaymentCardComponent {
       currency: this.currency(),
       image,
       when: Date.now(),
-      amount: this.payment().amount,
+      amount: this.payment.amount,
       method: PaymentMethod.Bank,
-      paymentId: this.payment().id
+      paymentId: this.payment.id
     }
     const isPayed = await this.apiService.pay(options);
     this.payed.emit(isPayed)

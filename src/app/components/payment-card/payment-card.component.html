@@ -9,20 +9,22 @@
     </div>
     @let method = paymentMethod();
     @if(method) {
-      <div>
-        {{method.comment}}
-      </div>
-    @if(method.qr) {
-    <img [src]="method.qr" alt="QR code for payment" class="qr">
-    <ui-button (action)="downloadQR(method.qr)">
+
+    @if(method.paymentOption === OnlinePaymentOption.QR) {
+    <img [src]="method.account" alt="QR code for payment" class="qr">
+    <ui-button (action)="downloadQR(method.account)">
       Скачать QR-код
     </ui-button>
-    } @else if(method.account) {
+    } @else {
+    <div>
+      {{method.comment || 'Реквизиты для оплаты:'}}:
+    </div>
     <ui-row>
       <div>
         {{method.account}}
       </div>
-      <ui-button (action)="copyToClipboard(method.account)" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-copy"> </ui-button>
+      <ui-button (action)="copyToClipboard(method.account!)" size="s" [icon]="true" variant="ghost"
+        fa="fa-solid fa-copy"> </ui-button>
     </ui-row>
 
     }

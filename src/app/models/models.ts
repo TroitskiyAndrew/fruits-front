@@ -15,13 +15,25 @@ export interface IUser {
   paymentMethods: IPaymentMethods;
 }
 
-export interface IAccount {
-  qr?: string;
-  account?: string;
-  comment: string;
+export type UserForm = Pick<IUser, 'admin' | 'paymentMethods'>
+
+export enum OnlinePaymentOption {
+  QR = 'qr',
+  Account = 'account',
 }
 
-export type IPaymentMethods = Partial<Record<Currency, IAccount>>;
+export type IAccount = {
+  paymentOption: OnlinePaymentOption;
+  account: string;
+  comment?: string
+}
+
+export type AccountForm = Pick<IAccount, 'paymentOption' | 'comment'> & {
+  accountInfo?: string
+  qrUrl?: string
+}
+
+export type IPaymentMethods = Record<Currency, IAccount | null>;
 
 export interface ITelegrammUser {
   id: number;
@@ -107,7 +119,7 @@ export interface ISet extends ProductBase {
   set: true;
 }
 
-export type ProductForm = Omit<ISet, 'set' | 'products'>  & {
+export type ProductForm = Omit<ISet, 'set' | 'products'> & {
   set: boolean;
   products: Record<string, number>;
   orderAddon: boolean
@@ -174,3 +186,7 @@ export interface INewOrderInfo {
   payment: IPayment,
 }
 
+export interface IConfig {
+  cashierId: number;
+  referralUrlBase: string;
+}

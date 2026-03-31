@@ -5,12 +5,12 @@ import { OrdersPageComponent } from './pages/orders-page/orders-page.component';
 import { PaymentsPageComponent } from './pages/payments-page/payments-page.component';
 import { ProductsPageComponent } from './pages/products-page/products-page.component';
 import { ShopPageComponent } from './pages/shop-page/shop-page.component';
-import { UserProfilePageComponent } from './pages/user-profile-page/user-profile-page.component';
 import { UsersPageComponent } from './pages/users-page/users-page.component';
 import { CartPageComponent } from './pages/cart-page/cart-page.component';
 import { PlacingOrderPageComponent } from './pages/placing-order-page/placing-order-page.component';
 import { OnlinePaymentPageComponent } from './pages/online-payment-page/online-payment-page.component';
 import { OrderPlacedPageComponent } from './pages/order-placed-page/order-placed-page.component';
+import { AccountPageComponent } from './pages/account-page/account-page.component';
 
 export const routes: Routes = [
     {
@@ -32,11 +32,6 @@ export const routes: Routes = [
   {
     path: 'admin/users',
     component: UsersPageComponent
-  },
-
-  {
-    path: 'admin/users/:userId',
-    component: UserProfilePageComponent
   },
 
   {
@@ -69,9 +64,13 @@ export const routes: Routes = [
     path: 'order-placed',
     component: OrderPlacedPageComponent
   },
-    {
+  {
     path: 'orders',
     component: OrdersPageComponent
+  },
+  {
+    path: 'account/:userId',
+    component: AccountPageComponent
   },
   {
     path: '**',
