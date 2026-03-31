@@ -2,7 +2,7 @@ import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { Product, ISet, IUser, IOrder, PaymentMethod } from '../models/models';
+import { Product, ISet, IUser, IOrder, PaymentMethod, INewOrderInfo } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -120,10 +120,10 @@ export class ApiService {
         return null
       })
   }
-  async createOrder(order: IOrder, method: PaymentMethod): Promise<Product | null> {
+  async createOrder(order: IOrder, method: PaymentMethod): Promise<INewOrderInfo | null> {
     const url = `${environment.backendUrl}/orders`;
     return this.http
-      .post<Product>(url, { order, method })
+      .post<INewOrderInfo>(url, { order, method })
       .toPromise()
       .then(res => res || null)
       .catch(() => {
@@ -142,7 +142,7 @@ export class ApiService {
   }
 
   pay(formData: FormData): Promise<boolean> {
-    const url = `${environment.backendUrl}/orders`;
+    const url = `${environment.backendUrl}/pay`;
     return this.http
       .post<boolean>(url, formData)
       .toPromise()

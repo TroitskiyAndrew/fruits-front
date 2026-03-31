@@ -1,13 +1,13 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { PageComponent } from "../../ui/page/page.component";
 import { ButtonComponent } from "../../ui/button/button.component";
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { CURRENCY_OPTIONS } from '../../constants/constants';
 import { StateService } from '../../services/state.service';
-import { Currency } from '../../models/models';
+import { Currency, IPayment } from '../../models/models';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { ApiService } from '../../services/api.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-online-payment-page',
@@ -17,13 +17,23 @@ import { Router } from '@angular/router';
 })
 export class OnlinePaymentPageComponent {
 
+  payment = signal<IPayment | null>(null)
+
   currencyOptions = CURRENCY_OPTIONS;
 
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
-  total = computed(() => this.stateService.cartTotal());
+  total = computed(() => this.payment()?.amounts[this.currency()] || 0);
 
-  constructor(private stateService: StateService, private apiService: ApiService, private router: Router) { }
+  constructor(private stateService: StateService, private apiService: ApiService, private router: Router,  private route: ActivatedRoute) { }
+
+  async ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('paymentId');
+    const payment = this.stateService.paymentsMap().get(id || '');
+    if (payment) {
+      this.payment.set(payment);
+    }
+  }
 
   changeCurrency(currency: Currency) {
     this.stateService.changeCurrency(currency)

@@ -30,9 +30,15 @@ export class PlacingOrderPageComponent {
     }
   }
 
-  createOrder(method: PaymentMethod){
+  async createOrder(method: PaymentMethod){
     const order = this.stateService.order();
-    // this.apiService.createOrder(order, method);
-    this.router.navigate(method === PaymentMethod.Bank ? ['online-payment'] : ['order-placed'])
+    const newOrderInfo = await this.apiService.createOrder(order, method);
+    if(newOrderInfo){
+      const {order, payment} = newOrderInfo;
+      this.stateService.orders.update((orders) => [...orders, order]);
+      this.stateService.payments.update((payments) => [...payments, payment]);
+      this.router.navigate(method === PaymentMethod.Bank ? ['online-payment', payment.id] : ['order-placed']);
+
+    }
   }
 }

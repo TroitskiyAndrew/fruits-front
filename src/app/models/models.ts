@@ -12,7 +12,16 @@ export interface IUser {
   path: string[];
   _created: bigint;
   sessionId: string;
+  paymentMethods: IPaymentMethods;
 }
+
+export interface IAccount {
+  qr?: string;
+  account?: string;
+  comment: string;
+}
+
+export type IPaymentMethods = Partial<Record<Currency, IAccount>>;
 
 export interface ITelegrammUser {
   id: number;
@@ -153,3 +162,7 @@ export type ControlsOf<T> = {
   : FormControl<T[K]>
 }
 
+export interface INewOrderInfo {
+  order: IOrder,
+  payment: IPayment,
+}

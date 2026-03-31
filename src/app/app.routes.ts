@@ -62,7 +62,7 @@ export const routes: Routes = [
     component: PlacingOrderPageComponent
   },
   {
-    path: 'online-payment',
+    path: 'online-payment/:paymentId',
     component: OnlinePaymentPageComponent
   },
   {

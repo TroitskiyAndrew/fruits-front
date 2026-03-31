@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, DeliveryType, IOrder, IOrderDelivery, OrderProduct, PlaceType, Product } from '../models/models';
+import { Currency, DeliveryType, IOrder, IOrderDelivery, IPayment, OrderProduct, PlaceType, Product } from '../models/models';
 import { CURRENCY_SYMBOLS, EXPRESS_DELIVERY } from '../constants/constants';
 import { getTotal } from './utils';
 
@@ -60,6 +60,18 @@ export class StateService {
     return this.order().content.prices[this.currency()]
   });
   orderDelivery = computed(() => this.order().delivery);
+  orders = signal<IOrder[]>([]);
+  ordersMap = computed(() => this.orders().reduce((map: Map<string, IOrder>, order: IOrder) => {
+    map.set(order.id, order);
+    return map;
+  }, new Map()))
+  payments = signal<IPayment[]>([]);
+  paymentsMap = computed(() => this.payments().reduce((map: Map<string, IPayment>, payment: IPayment) => {
+    map.set(payment.id, payment);
+    return map;
+  }, new Map()));
+
+
 
   queryParams: Record<string, any> = {};
   discountEvent = '';
