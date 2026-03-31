@@ -1,5 +1,5 @@
-import { Component, computed, EventEmitter, Input, Output } from '@angular/core';
-import { Currency, IPayment, IPayOptions, PaymentMethod } from '../../models/models';
+import { Component, computed, effect, EventEmitter, input, Input, Output, signal } from '@angular/core';
+import { Currency, IPayment, IPayOptions, IUser, PaymentMethod } from '../../models/models';
 import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '../../ui/avatar/avatar.component';
 import { BadgeComponent } from '../../ui/badge/badge.component';
@@ -18,6 +18,7 @@ import { StateService } from '../../services/state.service';
 import { ApiService } from '../../services/api.service';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
+import { getEmptyUser } from '../../services/utils';
 
 export enum PaymentCardPlace {
   OnlinePayment
@@ -25,13 +26,28 @@ export enum PaymentCardPlace {
 
 @Component({
   selector: 'payment-card',
-  imports: [CommonModule, CardComponent, TogglerComponent, ButtonComponent, PriceStringPipe],
+  imports: [CommonModule, CardComponent, TogglerComponent, ButtonComponent, PriceStringPipe, StackComponent, RowComponent],
   standalone: true,
   templateUrl: './payment-card.component.html'
 })
 export class PaymentCardComponent {
 
-  @Input() payment!: IPayment;
+  payment = input<IPayment>({
+    id: '',
+    from: 0,
+    to: 0,
+    amount: 0,
+    currency: Currency.Rub,
+    amounts: {
+      rub: 0,
+      vnd: 0,
+      usdt: 0
+    },
+    method: PaymentMethod.Bank,
+    payed: null,
+    confirmed: null,
+    image: ''
+  });
   @Input() usage: PaymentCardPlace = PaymentCardPlace.OnlinePayment;
   PaymentCardPlace = PaymentCardPlace;
   currencyOptions = CURRENCY_OPTIONS;
@@ -41,31 +57,67 @@ export class PaymentCardComponent {
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
 
-  total = computed(() => this.payment.amounts[this.currency()] || 0);
+  total = computed(() => this.payment().amounts[this.currency()] || 0);
+  from = signal<IUser>(getEmptyUser());
+  to = signal<IUser>(getEmptyUser());
+  paymentMethod = computed(() => this.to().paymentMethods[this.currency()] || null);
 
-  constructor(private stateService: StateService, private apiService: ApiService){}
+  constructor(private stateService: StateService, private apiService: ApiService) {
+    effect(async () => {
+      const payment = this.payment();
+      const [from, to] = await Promise.all([
+        this.apiService.getUser(payment.from),
+        this.apiService.getUser(payment.to)
+      ])
+      if (from) {
+        this.from.set(from);
+      }
+      if (to) {
+        this.to.set(to);
+      }
+    });
+
+  }
 
   changeCurrency(currency: Currency) {
-      this.stateService.changeCurrency(currency)
+    this.stateService.changeCurrency(currency)
+  }
+
+  async downloadQR(qr: string) {
+    const response = await fetch(qr);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'qr.png';
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+  }
+
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text)
+  }
+
+  async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const image = await this.apiService.uploadPhoto(file);
+    const options: IPayOptions = {
+      currency: this.currency(),
+      image,
+      when: Date.now(),
+      amount: this.payment().amount,
+      method: PaymentMethod.Bank,
+      paymentId: this.payment().id
     }
-
-    async onFileSelected(event: Event) {
-      const input = event.target as HTMLInputElement;
-
-      if (!input.files || input.files.length === 0) return;
-
-      const file = input.files[0];
-      const image = await this.apiService.uploadPhoto(file);
-      const options: IPayOptions = {
-        currency: this.currency(),
-        image,
-        when: Date.now(),
-        amount: this.payment.amount,
-        method: PaymentMethod.Bank,
-        paymentId: this.payment.id
-      }
-      const isPayed = await this.apiService.pay(options);
-      this.payed.emit(isPayed)
-    }
+    const isPayed = await this.apiService.pay(options);
+    this.payed.emit(isPayed)
+  }
 
 }

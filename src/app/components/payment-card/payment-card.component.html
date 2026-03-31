@@ -1,18 +1,47 @@
 <ui-card>
   @switch (usage) {
   @case (PaymentCardPlace.OnlinePayment) {
-  <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
-    (valueChange)="changeCurrency($event)"></ui-toggler>
-  <div class="title">
-    Общая сумма: {{total() | priceString}} {{currencySymbol()}}
-  </div>
-  <div class="title">
-    Произведите оплату и отправьте скрин квитанции с помощью кнопки ниже:
-  </div>
-  <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
-  <ui-button (action)="fileInput.click()">
-    Отправить квитанцию
-  </ui-button>
+  <ui-stack>
+    <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
+      (valueChange)="changeCurrency($event)"></ui-toggler>
+    <div class="title">
+      Общая сумма: {{total() | priceString}} {{currencySymbol()}}
+    </div>
+    @let method = paymentMethod();
+    @if(method) {
+      <div>
+        {{method.comment}}
+      </div>
+    @if(method.qr) {
+    <img [src]="method.qr" alt="QR code for payment" class="qr">
+    <ui-button (action)="downloadQR(method.qr)">
+      Скачать QR-код
+    </ui-button>
+    } @else if(method.account) {
+    <ui-row>
+      <div>
+        {{method.account}}
+      </div>
+      <ui-button (action)="copyToClipboard(method.account)" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-copy"> </ui-button>
+    </ui-row>
+
+    }
+
+    <div class="title">
+      Произведите оплату и отправьте скрин квитанции с помощью кнопки ниже:
+    </div>
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
+    <ui-button (action)="fileInput.click()">
+      Отправить квитанцию
+    </ui-button>
+    } @else {
+    <div class="title">
+      Онлайн оплата в этой валюте недоступна
+    </div>
+    }
+
+  </ui-stack>
+
   }
   }
 
