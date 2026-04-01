@@ -23,6 +23,7 @@ import { ApiService } from '../../services/api.service';
 import { ExpandableComponent } from "../../ui/expandable/expandable.component";
 import { environment } from '../../../environments/environment';
 import { StateService } from '../../services/state.service';
+import { LoaderDirective } from '../../ui/loader/loader.directive';
 
 export enum UserCardPlace {
   MyAccount
@@ -95,6 +96,8 @@ export class UserCardComponent {
     return `${environment.backendUrl}/qr/${this.user.userId}`
   }
 
+
+
   constructor(private apiService: ApiService, private stateService: StateService) {
     effect(() => {
       const user = this.user;
@@ -131,8 +134,10 @@ export class UserCardComponent {
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
+    this.stateService.load(true);
     const image = await this.apiService.uploadPhoto(file);
     this.currencyMethodForm.controls['qrUrl'].setValue(image);
+      this.stateService.load(false);
   }
 
   getPaymentMethod(formValue: AccountForm): IAccount {
@@ -151,6 +156,7 @@ export class UserCardComponent {
       ...user.paymentMethods,
       [this.currency()]: newMethod,
     }
+    this.stateService.load(true);
     await this.apiService.updateUser({
       id: user.id,
       paymentMethods: newPaymentMethods
@@ -163,6 +169,8 @@ export class UserCardComponent {
         alert('Способ оплаты сохранен');
         this.canSavePaymentMethodTrigger.update(v => !v);
       }
+    }).finally(() => {
+      this.stateService.load(false);
     })
   }
 

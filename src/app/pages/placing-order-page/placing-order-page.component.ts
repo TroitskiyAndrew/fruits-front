@@ -6,6 +6,7 @@ import { ButtonComponent } from '../../ui/button/button.component';
 import { StateService } from '../../services/state.service';
 import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
+import { LoaderDirective } from '../../ui/loader/loader.directive';
 
 @Component({
   selector: 'placing-order-page',
@@ -18,6 +19,7 @@ export class PlacingOrderPageComponent {
   DeliveryType = DeliveryType;
   PaymentMethod = PaymentMethod;
   canCreateOrder = false;
+
 
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router){}
 
@@ -32,7 +34,9 @@ export class PlacingOrderPageComponent {
 
   async createOrder(method: PaymentMethod){
     const order = this.stateService.order();
+    this.stateService.load(true);
     const newOrderInfo = await this.apiService.createOrder(order, method);
+    this.stateService.load(false);
     if(newOrderInfo){
       const {order, payment} = newOrderInfo;
       this.stateService.orders.update((orders) => [...orders, order]);

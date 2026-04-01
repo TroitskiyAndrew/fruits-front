@@ -19,6 +19,7 @@ import { ApiService } from '../../services/api.service';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { getEmptyUser } from '../../services/utils';
+import { LoaderDirective } from '../../ui/loader/loader.directive';
 
 export enum PaymentCardPlace {
   OnlinePayment
@@ -109,6 +110,7 @@ export class PaymentCardComponent {
 
     if (!input.files || input.files.length === 0) return;
 
+    this.stateService.load(true);
     const file = input.files[0];
     const image = await this.apiService.uploadPhoto(file);
     const options: IPayOptions = {
@@ -120,6 +122,7 @@ export class PaymentCardComponent {
       paymentId: this.payment.id
     }
     const isPayed = await this.apiService.pay(options);
+    this.stateService.load(false);
     this.payed.emit(isPayed)
   }
 

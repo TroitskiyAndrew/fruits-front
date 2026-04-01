@@ -4,6 +4,8 @@ import { UserCardComponent } from "../../components/user-card/user-card.componen
 import { IUser } from '../../models/models';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { LoaderDirective } from '../../ui/loader/loader.directive';
+import { StateService } from '../../services/state.service';
 
 @Component({
   selector: 'app-account-page',
@@ -15,14 +17,17 @@ export class AccountPageComponent {
 
   userSignal = signal<IUser | null>(null);
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService) { }
+
+  constructor(private route: ActivatedRoute, private apiService: ApiService, private stateService: StateService) { }
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('userId') || '';
+    this.stateService.load(true);
     const user = await this.apiService.getUser(id);
     if (user) {
       this.userSignal.set(user);
     }
+    this.stateService.load(false);
   }
 
 }

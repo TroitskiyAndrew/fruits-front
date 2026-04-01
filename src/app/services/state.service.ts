@@ -68,10 +68,18 @@ export class StateService {
     referralUrlBase: ''
   })
 
+  loading = signal(false);
+
   constructor(private apiService: ApiService, private telegrammService: TelegrammService) { }
 
 
   async init() {
+    this.load(true);
+    try {
+
+    } catch (error) {
+
+    }
     const config = await this.apiService.getConfig();
     if (config) {
       this.config.set(config);
@@ -94,9 +102,16 @@ export class StateService {
     }
 
     const products = await this.apiService.getAllProducts();
-    console.log('products', products)
+    console.log('products', products);
+    this.load(false);
     this.products.set(products);
   }
+
+  load(value: boolean) {
+    console.log('loading', value);
+    this.loading.set(value);
+  }
+
   generateSecureId(length: number = 10): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const array = new Uint8Array(length);

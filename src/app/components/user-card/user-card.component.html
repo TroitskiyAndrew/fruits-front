@@ -13,7 +13,7 @@
     @switch (usage) {
     @case (UserCardPlace.MyAccount) {
       <ui-expandable title="Методы оплаты">
-        <ui-stack [formGroup]="form">
+        <ui-stack [formGroup]="form" >
           <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
             (valueChange)="currency.set($event)"></ui-toggler>
           @let accept = acceptCurrency();

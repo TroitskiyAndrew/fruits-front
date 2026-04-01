@@ -1,7 +1,7 @@
 <ui-card>
   @switch (usage) {
   @case (PaymentCardPlace.OnlinePayment) {
-  <ui-stack>
+  <ui-stack >
     <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
       (valueChange)="changeCurrency($event)"></ui-toggler>
     <div class="title">

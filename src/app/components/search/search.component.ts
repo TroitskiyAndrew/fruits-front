@@ -11,6 +11,7 @@ import {
 } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { StateService } from '../../services/state.service';
 
 @Component({
   selector: 'app-search',
@@ -24,12 +25,11 @@ export class SearchComponent implements OnInit, OnDestroy {
   searchControl = new FormControl('');
   @Output() userSelected = new EventEmitter<any>();
   results: any[] = [];
-  loading = false;
   error429 = false;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService, private stateService: StateService) { }
 
   ngOnInit(): void {
 
@@ -46,11 +46,11 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.results = [];
           return of([]);
         }
-        this.loading = true;
+        this.stateService.load(true);
         this.error429 = false;
 
         return this.apiService.findUsers(value).pipe(
-          finalize(() => this.loading = false)
+          finalize(() => this.stateService.load(false))
         );
       }),
 

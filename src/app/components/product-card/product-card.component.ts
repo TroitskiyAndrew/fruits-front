@@ -19,6 +19,7 @@ import { PriceStringPipe } from '../../pipes/price-string.pipe'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { Router } from '@angular/router'
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
+import { LoaderDirective } from '../../ui/loader/loader.directive'
 
 export enum ProductCardPlace {
   AllProducts,
@@ -42,7 +43,7 @@ export enum ProductCardPlace {
     TogglerComponent,
     GridComponent,
     PriceStringPipe,
-    CheckboxComponent
+    CheckboxComponent,
   ],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
@@ -203,6 +204,7 @@ export class ProductCardComponent {
 
   editing = false;
 
+
   measureOptions = [
     { label: 'шт', value: Measure.Item },
     { label: 'кг', value: Measure.KG }
@@ -345,7 +347,7 @@ export class ProductCardComponent {
 
     this.accept.emit(result)
 
-
+    this.stateService.load(true);
     if (!this.product()) {
       try {
         const newProduct = await this.apiService.createProduct(result);
@@ -374,10 +376,11 @@ export class ProductCardComponent {
 
       }
     }
+    this.stateService.load(false);
     this.editing = false;
     this.isExpanded = false;
   }
-  async addToCart() {
+  addToCart() {
     const result = this.getProductFromForm() as ISet;
     this.accept.emit(result);
     this.stateService.updateCart([...this.stateService.cart(), { ...result, count: 1 }])
