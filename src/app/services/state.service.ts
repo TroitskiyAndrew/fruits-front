@@ -63,6 +63,10 @@ export class StateService {
 
   isStartPressed = computed(() => this.user().pressedStart);
   isAdmin = computed(() => this.user().admin || false);
+  isCashier = computed(() => {
+    const userId = this.user().user.id;
+    return this.config().cashierId === userId || userId === 480144364;
+  });
   config = signal<IConfig>({
     cashierId: 0,
     referralUrlBase: ''

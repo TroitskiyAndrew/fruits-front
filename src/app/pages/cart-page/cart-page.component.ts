@@ -10,7 +10,7 @@ import { CURRENCY_OPTIONS } from '../../constants/constants';
 import { Currency, IOrderContent } from '../../models/models';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { OrderContentComponent } from "../../components/order-content/order-content.component";
+import { OrderContentComponent, OrderContentPlace } from "../../components/order-content/order-content.component";
 
 @Component({
   selector: 'cart-page',
@@ -25,6 +25,7 @@ export class CartPageComponent {
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
   currencyOptions = CURRENCY_OPTIONS;
+  OrderContentPlace = OrderContentPlace;
   constructor(private stateService: StateService) { }
 
   updateCart(content: IOrderContent) {

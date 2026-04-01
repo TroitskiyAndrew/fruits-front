@@ -1,20 +1,66 @@
-<ui-stack [formGroup]="form">
-  <ui-input label="Имя" formControlName="name">
-  </ui-input>
-  <ui-input label="Контактная информация" formControlName="contact">
-  </ui-input>
+@switch (usage) {
+  @case (OrderDeliveryPlace.PlacingOrderPage) {
+    <ui-stack [formGroup]="form">
+      <ui-input label="Имя" formControlName="name"> </ui-input>
+      <ui-input label="Контактная информация" formControlName="contact">
+      </ui-input>
 
-  <ui-toggler [options]="deliveryPlaceOptions" formControlName="placeType" [value]="form.controls.placeType.value"></ui-toggler>
-  @if (isHotel) {
-  <ui-input label="Отель" formControlName="place">
-  </ui-input>
-  <ui-input label="Комната" formControlName="placeAdd">
-  </ui-input>
+      <ui-toggler
+        [options]="deliveryPlaceOptions"
+        formControlName="placeType"
+        [value]="form.controls.placeType.value"
+      ></ui-toggler>
+      @if (isHotel) {
+        <ui-input label="Отель" formControlName="place"> </ui-input>
+        <ui-input label="Комната" formControlName="placeAdd"> </ui-input>
+      }
+      <ui-input label="Дата доставки" type="date" formControlName="date">
+      </ui-input>
+      @if (isHotel) {
+        <ui-toggler
+          [options]="deliveryTypeOptions"
+          formControlName="deliveryType"
+          [value]="form.controls.deliveryType.value"
+        ></ui-toggler>
+      }
+    </ui-stack>
   }
-  <ui-input label="Дата доставки" type="date" formControlName="date">
-  </ui-input>
-  @if (isHotel) {
-  <ui-toggler [options]="deliveryTypeOptions" formControlName="deliveryType" [value]="form.controls.deliveryType.value"></ui-toggler>
+  @case (OrderDeliveryPlace.OrderCard) {
+    <ui-stack>
+      <ui-row>
+        <div class="subtitle">Имя</div>
+        <div>{{ delivery.name }}</div>
+      </ui-row>
+      <ui-row>
+        <div class="subtitle">Контактная информация</div>
+        <div>{{ delivery.contact }}</div>
+      </ui-row>
+      <ui-toggler
+        [options]="deliveryPlace"
+        [value]="delivery.placeType"
+        [_disabled]="true"
+      ></ui-toggler>
+      @if (delivery.placeType === PlaceType.Hotel) {
+        <ui-row>
+          <div class="subtitle">Отель</div>
+          <div>{{ delivery.place }}</div>
+        </ui-row>
+        <ui-row>
+          <div class="subtitle">Комната</div>
+          <div>{{ delivery.placeAdd }}</div>
+        </ui-row>
+      }
+      <ui-row>
+          <div class="subtitle">Дата доставки</div>
+          <div>{{ delivery.date }}</div>
+        </ui-row>
+      @if (delivery.placeType === PlaceType.Hotel) {
+        <ui-toggler
+          [options]="deliveryType"
+          [value]="delivery.deliveryType"
+          [_disabled]="true"
+        ></ui-toggler>
+      }
+    </ui-stack>
   }
-
-</ui-stack>
+}

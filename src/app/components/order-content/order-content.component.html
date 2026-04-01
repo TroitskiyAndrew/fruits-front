@@ -5,7 +5,7 @@
         class="w-100"
         [isExpanded]="products.length === 1"
         [product]="product"
-        [usage]="ProductCardPlace.Cart"
+        [usage]="ProductCardPlace.OrderPage"
         [cartIndex]="$index"
         [_currency]="content.currency"
         (changeContent)="changeContent($event, $index)"
@@ -16,10 +16,28 @@
   @if (products.length) {
     <ui-stack [formGroup]="addonsForm">
       @for (key of orderAddonsKeys; track key) {
-        <ui-checkbox
-          [label]="orderAddonsNamesMap().get(key)"
-          [formControlName]="key"
-        ></ui-checkbox>
+        <ui-row>
+          @switch (usage) {
+            @case (OrderContentPlace.CartPage) {
+              <ui-checkbox
+                [label]="orderAddonsNamesMap().get(key)"
+                [formControlName]="key"
+              ></ui-checkbox>
+
+            }
+            @case (OrderContentPlace.OrderPage) {
+              <ui-checkbox
+                [label]="orderAddonsNamesMap().get(key)"
+                [value]="addonsForm.get(key)?.value || false"
+                [disabled]="true"
+              ></ui-checkbox>
+
+            }
+          }
+        <div>
+          {{orderAddonsPriceMap().get(key)[content.currency] | priceString : content.currency}}
+        </div>
+        </ui-row>
       }
     </ui-stack>
   }

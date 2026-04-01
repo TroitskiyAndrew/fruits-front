@@ -24,6 +24,7 @@ export interface TogglerOption {
 export class TogglerComponent implements ControlValueAccessor {
 
   @Input() options: TogglerOption[] = []
+  @Input() _disabled = false
 
   // 👉 теперь value можно передавать извне
   @Input() set value(v: any) {
@@ -42,6 +43,7 @@ export class TogglerComponent implements ControlValueAccessor {
   onTouched = () => {}
 
   select(v: any) {
+    if(this._disabled) return
     if (this._value === v) return
 
     this._value = v

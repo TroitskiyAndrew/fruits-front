@@ -18,7 +18,9 @@ import { CURRENCY_SYMBOLS } from '../../constants/constants';
 import { getEmptyUser, getUserName } from '../../services/utils';
 import { ApiService } from '../../services/api.service';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
-import { OrderStatusComponent } from "../order-status/order-status.component";
+import { OrderStatusComponent, OrderStatusPlace } from "../order-status/order-status.component";
+import { OrderDeliveryComponent, OrderDeliveryPlace } from '../order-delivery/order-delivery.component';
+import { OrderContentComponent, OrderContentPlace } from "../order-content/order-content.component";
 
 export enum OrderCardPlace {
   OrderPage,
@@ -33,7 +35,9 @@ export enum OrderCardPlace {
     RowComponent,
     StackComponent,
     PriceStringPipe,
-    OrderStatusComponent
+    OrderStatusComponent,
+    OrderDeliveryComponent,
+    OrderContentComponent
 ],
   templateUrl: './order-card.component.html',
 })
@@ -41,6 +45,9 @@ export class OrderCardComponent {
   @Input() order!: IOrder;
   @Input() usage: OrderCardPlace = OrderCardPlace.OrderPage;
   OrderCardPlace = OrderCardPlace;
+  OrderDeliveryPlace = OrderDeliveryPlace;
+  OrderContentPlace = OrderContentPlace;
+  OrderStatusPlace = OrderStatusPlace;
 
   _currency = input(Currency.VND);
   currency = signal(Currency.VND);
@@ -59,6 +66,8 @@ export class OrderCardComponent {
   get status() {
     return this.order.status;
   }
+
+
 
   constructor(private stateService: StateService, private apiService: ApiService) {
     effect(() => this.currency.set(this._currency()));

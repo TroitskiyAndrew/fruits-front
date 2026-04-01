@@ -1,3 +1,55 @@
+@switch (usage) {
+  @case (OrderStatusPlace.OrderPage) {
 <ui-stack>
-
+  <ui-row>
+    <div>
+      Оплачен
+    </div>
+    <div>
+      @if (status.payed){
+        {{ status.payed | date: 'dd.MM.yyyy HH:mm' }}
+      } @else {
+        ❌
+      }
+    </div>
+  </ui-row>
+  <ui-row>
+    <div>
+      Подтвержден
+    </div>
+    <div>
+      @if (status.confirmed){
+        {{ status.confirmed | date: 'dd.MM.yyyy HH:mm' }}
+      } @else {
+        ❌
+      }
+    </div>
+  </ui-row>
+  <ui-row>
+    <div>
+      Собран
+    </div>
+    <div>
+      @if (status.packed){
+        {{ status.packed | date: 'dd.MM.yyyy HH:mm' }}
+      } @else {
+        ❌
+      }
+    </div>
+  </ui-row>
+  <ui-row>
+    <div>
+      Доставлен
+    </div>
+    <div>
+      @if (status.delivered){
+        {{ status.delivered | date: 'dd.MM.yyyy HH:mm' }}
+      } @else {
+        ❌
+      }
+    </div>
+  </ui-row>
 </ui-stack>
+
+  }
+}

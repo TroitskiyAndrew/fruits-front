@@ -16,11 +16,9 @@
             {{totalPrice() | priceString : currency() }} {{currencySymbol()}}
           </div>
         </ui-row>
-        <order-status [status]="status"></order-status>
-        <div class="subtitle">
-          {{ order.content.products.length }}
-          products
-        </div>
+        <order-status [usage]="OrderStatusPlace.OrderPage" [status]="status"></order-status>
+        <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [delivery]="delivery"></order-delivery>
+        <order-content [usage]="OrderContentPlace.OrderPage" [content]="content"></order-content>
       </ui-stack>
     }
   }

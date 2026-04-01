@@ -26,6 +26,7 @@ export enum ProductCardPlace {
   AllProducts,
   Shop,
   Cart,
+  OrderPage
 }
 
 @Component({
@@ -294,7 +295,7 @@ export class ProductCardComponent {
     if (!this.isExpanded) {
       this.isExpanded = true;
       this.expand.emit();
-    } else if (this.usage === ProductCardPlace.Cart) {
+    } else if (this.usage === ProductCardPlace.Cart || this.usage === ProductCardPlace.OrderPage) {
       this.isExpanded = false;
     }
   }

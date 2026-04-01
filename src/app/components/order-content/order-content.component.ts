@@ -3,24 +3,33 @@ import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { StackComponent } from "../../ui/stack/stack.component";
 import { ProductCardComponent, ProductCardPlace } from "../product-card/product-card.component";
 import { CURRENCY_OPTIONS } from '../../constants/constants';
-import { ControlsOf, Currency, IOrderContent, ISet, ISetProducts, ISimpleProduct, OrderProduct, Product, ProductForm } from '../../models/models';
+import { ControlsOf, Currency, IOrderContent, IPrices, ISet, ISetProducts, ISimpleProduct, OrderProduct, Product, ProductForm } from '../../models/models';
 import { StateService } from '../../services/state.service';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { getTotal } from '../../services/utils';
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 import { toSignal } from '@angular/core/rxjs-interop';
+import { RowComponent } from "../../ui/row/row.component";
+
+export enum OrderContentPlace {
+  CartPage,
+  OrderPage,
+}
 
 @Component({
   selector: 'order-content',
-  imports: [ReactiveFormsModule, StackComponent, ProductCardComponent, CheckboxComponent],
+  imports: [ReactiveFormsModule, StackComponent, ProductCardComponent, CheckboxComponent, RowComponent, PriceStringPipe],
   templateUrl: './order-content.component.html',
   styleUrl: './order-content.component.scss'
 })
 export class OrderContentComponent {
 
   @Input() content!: IOrderContent;
+  @Input() usage: OrderContentPlace = OrderContentPlace.CartPage;
   @Output() updateContent = new EventEmitter<IOrderContent>();
+  OrderContentPlace = OrderContentPlace;
+
 
   currencyOptions = CURRENCY_OPTIONS;
   ProductCardPlace = ProductCardPlace;
@@ -29,19 +38,23 @@ export class OrderContentComponent {
     map.set(product.id, product.name);
     return map;
   }, new Map()));
+  orderAddonsPriceMap = computed(() => this.stateService.orderAddons().reduce((map: Map<string, IPrices>, product: Product) => {
+    map.set(product.id, product.price);
+    return map;
+  }, new Map()));
   addonsForm = new FormGroup<ControlsOf<Record<string, boolean>>>({})
   triggerAddonsForm = signal(false);
-  get orderAddonsKeys(){
+  get orderAddonsKeys() {
     return Array(...Object.keys(this.addonsForm.controls))
   }
-  addonsFormChange = toSignal(this.addonsForm.valueChanges, { initialValue: {} });
+  addonsFormChange = toSignal(this.addonsForm.valueChanges);
 
   deliveryOptions = [
     { label: 'Обычная доставка', value: false },
     { label: 'Экспресс доставка', value: true }
   ]
 
-  get products (){
+  get products() {
     return this.content.products.filter(p => !p.orderAddon)
   }
   constructor(public stateService: StateService) {
@@ -49,7 +62,7 @@ export class OrderContentComponent {
       this.triggerAddonsForm();
       const addonsGroup = this.addonsForm as FormGroup;
       Object.keys(addonsGroup.controls).forEach(key => {
-        addonsGroup.removeControl(key);
+        addonsGroup.removeControl(key, { emitEvent: false });
       });
       this.stateService.orderAddons().forEach(prod => {
         addonsGroup.addControl(
@@ -58,17 +71,20 @@ export class OrderContentComponent {
             this.content.products.map(p => p.id).includes(prod.id),
             { nonNullable: true }
           )
-        )
+          , { emitEvent: false });
       })
     });
     effect(() => {
       const addons = this.addonsFormChange();
-      const includedAddons = [...Object.entries(addons)].map(([id, state]: [string, boolean| undefined]) => {
+      if (!addons) {
+        return;
+      }
+      const includedAddons = [...Object.entries(addons)].map(([id, state]: [string, boolean | undefined]) => {
         return state ? id : null;
       }).filter(Boolean) as string[];
       const products = this.content.products.filter(p => !p.orderAddon);
       const addonProducts = this.orderAddons().filter(p => includedAddons.includes(p.id))
-      this.content.products = [...products, ...addonProducts.map(addon => ({...addon, count: 1}))];
+      this.content.products = [...products, ...addonProducts.map(addon => ({ ...addon, count: 1 }))];
       this.calculateTotal()
     });
   }

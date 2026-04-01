@@ -2,7 +2,7 @@
   <div class="title">
     Доставка
   </div>
-  <order-delivery (deliverValue)="submitDeliveryValue($event)" class="w-100"></order-delivery>
+  <order-delivery [usage]="OrderDeliveryPlace.PlacingOrderPage" (deliverValue)="submitDeliveryValue($event)" class="w-100"></order-delivery>
   <ui-button [disabled]="!canCreateOrder || delivery().deliveryType === DeliveryType.Reception" (action)="createOrder(PaymentMethod.Cash)">
     Оплата наличными
   </ui-button>
