@@ -5,7 +5,7 @@
   <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
     (valueChange)="changeCurrency($event)"></ui-toggler>
   <div class="title">
-    Общая сумма: {{total() | priceString}} {{currencySymbol()}}
+    Общая сумма: {{total() | priceString : currency()}} {{currencySymbol()}}
   </div>
   @let orderContent = content();
   <order-content [content]="orderContent" (updateContent)="updateCart($event)" class="w-100"></order-content>

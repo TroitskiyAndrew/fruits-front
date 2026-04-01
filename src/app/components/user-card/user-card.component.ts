@@ -13,7 +13,7 @@ import { PageComponent } from '../../ui/page/page.component';
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
 import { StackComponent } from '../../ui/stack/stack.component';
-import { getEmptyUser } from '../../services/utils';
+import { getEmptyUser, getUserName } from '../../services/utils';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS } from '../../constants/constants';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
@@ -94,6 +94,10 @@ export class UserCardComponent {
 
   get qrLink() {
     return `${environment.backendUrl}/qr/${this.user.userId}`
+  }
+
+  get name() {
+    return getUserName(this.user);
   }
 
 

@@ -1,4 +1,5 @@
 <ui-card>
+  @let currentCurrency = currency();
   @if(showCardTitle) {
 
   <div class="row" (click)="onExpand()">
@@ -128,9 +129,10 @@
           {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
         <div class="right">
-          {{p.price[this.currency()] | priceString}}{{currencySymbol()}}
+
+          {{p.price[currentCurrency] | priceString : currentCurrency}}{{currencySymbol()}}
         </div>
-        <ui-counter [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currency()]) < productPrice)"
+        <ui-counter [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currentCurrency]) < productPrice)"
           [formControlName]="p.id" (valueChange)="changeProducts()">
         </ui-counter>
 

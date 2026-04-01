@@ -1,17 +1,26 @@
-  <ui-stack>
-    <ui-stack class="w-100">
-      @for (product of products; track $index) {
-      <product-card class="w-100" [isExpanded]="products.length === 1" [product]="product" [usage]="ProductCardPlace.Cart" [cartIndex]="$index" (changeContent)="changeContent($event, $index)" (deleteContent)="deleteContent($event)" />
+<ui-stack>
+  <ui-stack class="w-100">
+    @for (product of products; track $index) {
+      <product-card
+        class="w-100"
+        [isExpanded]="products.length === 1"
+        [product]="product"
+        [usage]="ProductCardPlace.Cart"
+        [cartIndex]="$index"
+        [_currency]="content.currency"
+        (changeContent)="changeContent($event, $index)"
+        (deleteContent)="deleteContent($event)"
+      />
+    }
+  </ui-stack>
+  @if (products.length) {
+    <ui-stack [formGroup]="addonsForm">
+      @for (key of orderAddonsKeys; track key) {
+        <ui-checkbox
+          [label]="orderAddonsNamesMap().get(key)"
+          [formControlName]="key"
+        ></ui-checkbox>
       }
     </ui-stack>
-    @if(products.length){
-      <ui-stack [formGroup]="addonsForm">
-        @for (key of orderAddonsKeys; track key) {
-          <ui-checkbox [label]="orderAddonsNamesMap().get(key)" [formControlName]="key"></ui-checkbox>
-        }
-
-      </ui-stack>
-    }
-
-  </ui-stack>
-
+  }
+</ui-stack>

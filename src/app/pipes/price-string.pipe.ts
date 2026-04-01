@@ -9,8 +9,8 @@ export class PriceStringPipe implements PipeTransform {
 
   constructor(private stateService: StateService){}
 
-  transform(value: number ): string {
-    return value + (this.stateService.currency() === Currency.VND ? 'k' : '')
+  transform(value: number, currency = this.stateService.currency() ): string {
+    return value + (currency === Currency.VND ? 'k' : '')
   }
 
 }

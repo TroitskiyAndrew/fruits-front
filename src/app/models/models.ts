@@ -80,7 +80,7 @@ export interface IOrder {
   referral?: number;
   source: string;
   lastSource: string;
-  state: IOrderStatus;
+  status: IOrderStatus;
   content: IOrderContent;
   delivery: IOrderDelivery;
 }

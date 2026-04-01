@@ -46,3 +46,9 @@ export function getEmptyUser(): IUser {
     }
   }
 }
+
+
+export function getUserName(user: IUser): string {
+  const tgUser = user.user;
+  return `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`;
+}

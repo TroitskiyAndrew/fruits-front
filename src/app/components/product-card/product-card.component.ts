@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostListener, effect } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostListener, effect, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
@@ -20,6 +20,7 @@ import { toSignal } from '@angular/core/rxjs-interop'
 import { Router } from '@angular/router'
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 import { LoaderDirective } from '../../ui/loader/loader.directive'
+import { CURRENCY_SYMBOLS } from '../../constants/constants'
 
 export enum ProductCardPlace {
   AllProducts,
@@ -51,8 +52,9 @@ export enum ProductCardPlace {
 export class ProductCardComponent {
   @Input() usage: ProductCardPlace = ProductCardPlace.Shop;
   ProductCardPlace = ProductCardPlace;
-  currency = computed(() => this.stateService.currency());
-  currencySymbol = computed(() => this.stateService.currencySymbol());
+  _currency = input(Currency.VND);
+  currency = signal(Currency.VND);
+  currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
   Currency = Currency;
   @Input() isExpanded = false;
   product = input<Product | undefined>();
@@ -244,6 +246,7 @@ export class ProductCardComponent {
         this.patchForm(product)
       }
     });
+    effect(() => this.currency.set(this._currency()));
   }
 
   patchForm(product: Product) {
@@ -338,7 +341,7 @@ export class ProductCardComponent {
 
     } else {
       const { products, fixedSet, ...base } = result;
-      return { ...base, set: false };
+      return { ...base, set: false, amount: base.orderAddon ? 1 : base.amount } as Product;
     }
   }
 

@@ -1,40 +1,27 @@
 <ui-card>
-
-  <ui-row>
-
-    <div>
-      Order
-      <ui-badge>
-        {{order.userId}}
-      </ui-badge>
-    </div>
-
-
-  </ui-row>
-
-  <div class="subtitle">
-
-    {{order.content.products.length}}
-    products
-
-  </div>
-
-  <ui-stack>
-    @for (p of order.content.products; track $index) {
-    <ui-row>
-
-      <div>
-        {{p.name}}
-      </div>
-
-      <div class="subtitle">
-        x{{p.amount}}
-      </div>
-
-    </ui-row>
-
+  @switch (usage) {
+    @case (OrderCardPlace.OrderPage) {
+      <ui-stack>
+        <ui-row>
+          <div>
+            № {{order.number}}
+          </div>
+          <ui-row>
+            {{name()}}
+            <div class="subtitle">
+              ({{username()}})
+            </div>
+          </ui-row>
+          <div>
+            {{totalPrice() | priceString : currency() }} {{currencySymbol()}}
+          </div>
+        </ui-row>
+        <order-status [status]="status"></order-status>
+        <div class="subtitle">
+          {{ order.content.products.length }}
+          products
+        </div>
+      </ui-stack>
     }
-
-  </ui-stack>
-
+  }
 </ui-card>

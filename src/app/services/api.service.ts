@@ -185,4 +185,15 @@ export class ApiService {
         return null
       })
   }
+  getOrder(id: string): Promise<IOrder | null> {
+    const url = `${environment.backendUrl}/orders/${id}`;
+    return this.http
+      .get<IOrder>(url)
+      .toPromise()
+      .then(res => res || null)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return null
+      })
+  }
 }

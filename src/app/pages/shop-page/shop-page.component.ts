@@ -41,6 +41,7 @@ export class ShopPageComponent {
   });
   cartTotal = computed(() => this.stateService.cartTotal());
   currencySymbol = computed(() => this.stateService.currencySymbol());
+  currency = computed(() => this.stateService.currency());
 
 
   constructor(private stateService: StateService) { }

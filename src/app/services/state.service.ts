@@ -130,7 +130,7 @@ export class StateService {
       order.content.prices = getTotal(order.content);
       return {
         ...order,
-        state: order.state,
+        status: order.status,
         content: order.content,
         delivery: order.delivery,
       }
@@ -142,7 +142,7 @@ export class StateService {
       order.delivery = delivery;
       return {
         ...order,
-        state: order.state,
+        status: order.status,
         content: order.content,
         delivery: order.delivery,
       }
@@ -156,7 +156,7 @@ export class StateService {
       userId: this.user().userId,
       source: '',
       lastSource: '',
-      state: {
+      status: {
         payed: null,
         confirmed: null,
         packed: null,

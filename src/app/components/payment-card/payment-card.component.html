@@ -2,10 +2,8 @@
   @switch (usage) {
   @case (PaymentCardPlace.OnlinePayment) {
   <ui-stack >
-    <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
-      (valueChange)="changeCurrency($event)"></ui-toggler>
     <div class="title">
-      Общая сумма: {{total() | priceString}} {{currencySymbol()}}
+      Общая сумма: {{total() | priceString : currency()}} {{currencySymbol()}}
     </div>
     @let method = paymentMethod();
     @if(method) {

@@ -12,7 +12,7 @@ import { PaymentCardComponent, PaymentCardPlace } from "../../components/payment
 
 @Component({
   selector: 'app-online-payment-page',
-  imports: [PageComponent, PaymentCardComponent],
+  imports: [PageComponent, PaymentCardComponent, TogglerComponent],
   templateUrl: './online-payment-page.component.html',
   styleUrl: './online-payment-page.component.scss'
 })
@@ -20,6 +20,8 @@ export class OnlinePaymentPageComponent {
 
   paymentSignal = signal<IPayment | null>(null);
   PaymentCardPlace = PaymentCardPlace;
+  currencyOptions = CURRENCY_OPTIONS;
+  currency = signal(Currency.VND);
 
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router,  private route: ActivatedRoute) { }
 
@@ -28,7 +30,12 @@ export class OnlinePaymentPageComponent {
     const payment = await this.apiService.getPayment(id);
     if (payment) {
       this.paymentSignal.set(payment);
+      this.currency.set(payment.currency);
     }
+  }
+
+  changeCurrency(currency: Currency) {
+    this.currency.set(currency);
   }
 
   paid(success: boolean){

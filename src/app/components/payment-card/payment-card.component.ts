@@ -13,7 +13,7 @@ import { PageComponent } from '../../ui/page/page.component';
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
 import { StackComponent } from '../../ui/stack/stack.component';
-import { CURRENCY_OPTIONS } from '../../constants/constants';
+import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS } from '../../constants/constants';
 import { StateService } from '../../services/state.service';
 import { ApiService } from '../../services/api.service';
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
@@ -27,28 +27,13 @@ export enum PaymentCardPlace {
 
 @Component({
   selector: 'payment-card',
-  imports: [CommonModule, CardComponent, TogglerComponent, ButtonComponent, PriceStringPipe, StackComponent, RowComponent],
+  imports: [CommonModule, CardComponent, ButtonComponent, PriceStringPipe, StackComponent, RowComponent],
   standalone: true,
   templateUrl: './payment-card.component.html'
 })
 export class PaymentCardComponent {
 
-  @Input() payment: IPayment = {
-    id: '',
-    from: 0,
-    to: 0,
-    amount: 0,
-    currency: Currency.Rub,
-    amounts: {
-      rub: 0,
-      vnd: 0,
-      usdt: 0
-    },
-    method: PaymentMethod.Bank,
-    payed: null,
-    confirmed: null,
-    image: ''
-  };
+  @Input() payment!: IPayment;;
   @Input() usage: PaymentCardPlace = PaymentCardPlace.OnlinePayment;
   PaymentCardPlace = PaymentCardPlace;
   OnlinePaymentOption = OnlinePaymentOption;
@@ -56,8 +41,9 @@ export class PaymentCardComponent {
 
   @Output() payed = new EventEmitter<boolean>()
 
-  currency = computed(() => this.stateService.currency());
-  currencySymbol = computed(() => this.stateService.currencySymbol());
+  _currency = input(Currency.VND);
+  currency = signal(Currency.VND);
+  currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
 
   total = computed(() => this.payment.amounts[this.currency()] || 0);
   from = signal<IUser>(getEmptyUser());
@@ -65,26 +51,26 @@ export class PaymentCardComponent {
   paymentMethod = computed(() => this.to().paymentMethods[this.currency()] || null);
 
   constructor(private stateService: StateService, private apiService: ApiService) {
-
+    effect(() => this.currency.set(this._currency()));
 
   }
 
   async ngOnInit() {
     const payment = this.payment;
-      const [from, to] = await Promise.all([
-        this.apiService.getUser(payment.from),
-        this.apiService.getUser(payment.to)
-      ])
-      if (from) {
-        this.from.set(from);
-      }
-      if (to) {
-        this.to.set(to);
-      }
+    const [from, to] = await Promise.all([
+      this.apiService.getUser(payment.from),
+      this.apiService.getUser(payment.to)
+    ])
+    if (from) {
+      this.from.set(from);
+    }
+    if (to) {
+      this.to.set(to);
+    }
   }
 
   changeCurrency(currency: Currency) {
-    this.stateService.changeCurrency(currency)
+    this.currency.set(currency)
   }
 
   async downloadQR(qr: string) {
