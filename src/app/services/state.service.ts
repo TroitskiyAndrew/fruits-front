@@ -161,7 +161,7 @@ export class StateService {
         confirmed: null,
         packed: null,
         delivered: null,
-        deleted: false,
+        deleted: null,
       },
       content: {
         currency: this.currency(),

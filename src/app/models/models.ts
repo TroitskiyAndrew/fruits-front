@@ -57,7 +57,7 @@ export interface IOrderStatus {
   confirmed: number | null;
   packed: number | null;
   delivered: number | null;
-  deleted: boolean;
+  deleted: number | null;
 }
 export interface IOrderContent {
   prices: IPrices,
