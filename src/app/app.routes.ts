@@ -11,6 +11,7 @@ import { PlacingOrderPageComponent } from './pages/placing-order-page/placing-or
 import { OnlinePaymentPageComponent } from './pages/online-payment-page/online-payment-page.component';
 import { OrderPlacedPageComponent } from './pages/order-placed-page/order-placed-page.component';
 import { AccountPageComponent } from './pages/account-page/account-page.component';
+import { OrderPageComponent } from './pages/order-page/order-page.component';
 
 export const routes: Routes = [
     {
@@ -71,6 +72,10 @@ export const routes: Routes = [
   {
     path: 'account/:userId',
     component: AccountPageComponent
+  },
+  {
+    path: 'order/:orderId',
+    component: OrderPageComponent
   },
   {
     path: '**',
