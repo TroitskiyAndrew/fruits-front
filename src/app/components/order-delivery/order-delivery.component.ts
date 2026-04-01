@@ -7,6 +7,7 @@ import { InputComponent } from "../../ui/input/input.component";
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RowComponent } from "../../ui/row/row.component";
+import { CommonModule } from '@angular/common';
 
 export enum OrderDeliveryPlace {
   PlacingOrderPage,
@@ -14,7 +15,7 @@ export enum OrderDeliveryPlace {
 }
 @Component({
   selector: 'order-delivery',
-  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent],
+  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule],
   templateUrl: './order-delivery.component.html',
   styleUrl: './order-delivery.component.scss'
 })

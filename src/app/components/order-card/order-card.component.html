@@ -18,7 +18,7 @@
         </ui-row>
         <order-status [usage]="OrderStatusPlace.OrderPage" [status]="status"></order-status>
         <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [delivery]="delivery"></order-delivery>
-        <order-content [usage]="OrderContentPlace.OrderPage" [content]="content"></order-content>
+        <order-content [usage]="OrderContentPlace.OrderPage" [content]="content" [_currency]="currency()"></order-content>
       </ui-stack>
     }
   }

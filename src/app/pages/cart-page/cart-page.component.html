@@ -8,6 +8,6 @@
     Общая сумма: {{total() | priceString : currency()}} {{currencySymbol()}}
   </div>
   @let orderContent = content();
-  <order-content [usage]="OrderContentPlace.CartPage" [content]="orderContent" (updateContent)="updateCart($event)" class="w-100"></order-content>
+  <order-content [_currency]="currency()" [usage]="OrderContentPlace.CartPage" [content]="orderContent" (updateContent)="updateCart($event)" class="w-100"></order-content>
   <ui-button link="placing-order" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
 </ui-page>

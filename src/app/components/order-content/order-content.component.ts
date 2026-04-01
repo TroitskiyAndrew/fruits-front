@@ -2,7 +2,7 @@ import { Component, computed, effect, EventEmitter, Input, input, Output, signal
 import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { StackComponent } from "../../ui/stack/stack.component";
 import { ProductCardComponent, ProductCardPlace } from "../product-card/product-card.component";
-import { CURRENCY_OPTIONS } from '../../constants/constants';
+import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS } from '../../constants/constants';
 import { ControlsOf, Currency, IOrderContent, IPrices, ISet, ISetProducts, ISimpleProduct, OrderProduct, Product, ProductForm } from '../../models/models';
 import { StateService } from '../../services/state.service';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
@@ -29,9 +29,9 @@ export class OrderContentComponent {
   @Input() usage: OrderContentPlace = OrderContentPlace.CartPage;
   @Output() updateContent = new EventEmitter<IOrderContent>();
   OrderContentPlace = OrderContentPlace;
-
-
-  currencyOptions = CURRENCY_OPTIONS;
+  _currency = input(Currency.VND);
+  currency = signal(Currency.VND)
+  currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
   ProductCardPlace = ProductCardPlace;
   orderAddons = computed(() => this.stateService.orderAddons());
   orderAddonsNamesMap = computed(() => this.stateService.orderAddons().reduce((map: Map<string, string>, product: Product) => {
@@ -87,6 +87,7 @@ export class OrderContentComponent {
       this.content.products = [...products, ...addonProducts.map(addon => ({ ...addon, count: 1 }))];
       this.calculateTotal()
     });
+    effect(() => this.currency.set(this._currency()));
   }
 
   ngOnInit() {

@@ -6,7 +6,7 @@
     </div>
         <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
       (valueChange)="changeCurrency($event)"></ui-toggler>
-    <payment-card class="w-100" [payment]="payment" [usage]="PaymentCardPlace.OnlinePayment" (payed)="paid($event)"></payment-card>
+    <payment-card class="w-100" [payment]="payment" [usage]="PaymentCardPlace.OnlinePayment" (payed)="paid($event)" [_currency]="currency()"></payment-card>
   }
 
 </ui-page>

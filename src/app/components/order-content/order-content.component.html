@@ -7,7 +7,7 @@
         [product]="product"
         [usage]="ProductCardPlace.OrderPage"
         [cartIndex]="$index"
-        [_currency]="content.currency"
+        [_currency]="currency()"
         (changeContent)="changeContent($event, $index)"
         (deleteContent)="deleteContent($event)"
       />
@@ -35,7 +35,7 @@
             }
           }
         <div>
-          {{orderAddonsPriceMap().get(key)[content.currency] | priceString : content.currency}}
+          {{orderAddonsPriceMap().get(key)[this.currency()] | priceString : this.currency()}} {{currencySymbol()}}
         </div>
         </ui-row>
       }

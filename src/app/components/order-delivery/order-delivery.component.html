@@ -52,7 +52,7 @@
       }
       <ui-row>
           <div class="subtitle">Дата доставки</div>
-          <div>{{ delivery.date }}</div>
+          <div>{{ delivery.date | date : 'dd.MM.yyyy' }}</div>
         </ui-row>
       @if (delivery.placeType === PlaceType.Hotel) {
         <ui-toggler
