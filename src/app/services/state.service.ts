@@ -102,13 +102,11 @@ export class StateService {
     }
 
     const products = await this.apiService.getAllProducts();
-    console.log('products', products);
     this.load(false);
     this.products.set(products);
   }
 
   load(value: boolean) {
-    console.log('loading', value);
     this.loading.set(value);
   }
 

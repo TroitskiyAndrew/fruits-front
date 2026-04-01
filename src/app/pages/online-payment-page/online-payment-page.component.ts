@@ -32,7 +32,6 @@ export class OnlinePaymentPageComponent {
   }
 
   paid(success: boolean){
-    console.log('paid', success);
     if (success) {
       this.stateService.dropOrder();
       this.router.navigate(['/order-placed']);

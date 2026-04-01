@@ -113,7 +113,6 @@ export class UserCardComponent {
           qrUrl: new FormControl(account.paymentOption === OnlinePaymentOption.QR ? account.account : '', { nonNullable: true }),
         }) : new FormControl(null));
       })
-      console.log('user form', this.form.getRawValue());
     });
   }
 
