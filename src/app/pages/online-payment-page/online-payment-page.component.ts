@@ -24,8 +24,8 @@ export class OnlinePaymentPageComponent {
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router,  private route: ActivatedRoute) { }
 
   async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('paymentId');
-    const payment = this.stateService.paymentsMap().get(id || '');
+    const id = this.route.snapshot.paramMap.get('paymentId') || '';
+    const payment = await this.apiService.getPayment(id);
     if (payment) {
       this.paymentSignal.set(payment);
     }

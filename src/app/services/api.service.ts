@@ -2,7 +2,7 @@ import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable, retryWhen, scan, mergeMap, timer, catchError, throwError } from 'rxjs';
-import { Product, ISet, IUser, IOrder, PaymentMethod, INewOrderInfo, IPayOptions, IConfig } from '../models/models';
+import { Product, IPayment, IUser, IOrder, PaymentMethod, INewOrderInfo, IPayOptions, IConfig } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -167,6 +167,17 @@ export class ApiService {
     const url = `${environment.backendUrl}/config`;
     return this.http
       .get<IConfig>(url)
+      .toPromise()
+      .then(res => res || null)
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return null
+      })
+  }
+  getPayment(id: string): Promise<IPayment | null> {
+    const url = `${environment.backendUrl}/payments/${id}`;
+    return this.http
+      .get<IPayment>(url)
       .toPromise()
       .then(res => res || null)
       .catch(() => {
