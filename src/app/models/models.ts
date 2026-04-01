@@ -145,6 +145,7 @@ export interface IPayment {
   payed: number | null;
   confirmed: number | null;
   image: string;
+  deleted: number | null;
 }
 
 export enum PaymentType {
@@ -172,6 +173,7 @@ export interface Share {
   amounts: IPrices;
   type: PaymentType;
   payed: number | null;
+  deleted: number | null;
 }
 
 export type ControlsOf<T> = {
