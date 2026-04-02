@@ -196,4 +196,15 @@ export class ApiService {
         return null
       })
   }
+  getOrders(query: Record<string, any>): Promise<IOrder[]> {
+    const url = `${environment.backendUrl}/all-orders`;
+    return this.http
+      .post<IOrder[]>(url, {query})
+      .toPromise()
+      .then(res => res || [])
+      .catch(() => {
+        alert('Что-то пошло не так. Напишите в чат с ботом. Напишите в чат с ботом, мы разберемся');
+        return []
+      })
+  }
 }

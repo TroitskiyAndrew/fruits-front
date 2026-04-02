@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { OrderCardComponent } from '../../components/order-card/order-card.component';
+import { OrderCardComponent, OrderCardPlace } from '../../components/order-card/order-card.component';
 import { IOrder } from '../../models/models';
 import { InputComponent } from '../../ui/input/input.component';
 import { StackComponent } from '../../ui/stack/stack.component';
@@ -15,20 +15,30 @@ import { PageComponent } from '../../ui/page/page.component';
 
 import { RowComponent } from '../../ui/row/row.component';
 import { SectionComponent } from '../../ui/section/section.component';
+import { ApiService } from '../../services/api.service';
+import { StateService } from '../../services/state.service';
 
 
 
 @Component({
   selector: 'orders-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, InputComponent, StackComponent, OrderCardComponent, PageComponent],
+  imports: [CommonModule, ReactiveFormsModule, StackComponent, OrderCardComponent, PageComponent],
   templateUrl: './orders-page.component.html'
 })
 export class OrdersPageComponent {
 
-  userFilter = new FormControl('');
-  priceFilter = new FormControl('');
-
   orders: IOrder[] = [];
+
+  OrderCardPlace = OrderCardPlace;
+
+  constructor(private stateService: StateService, private apiService: ApiService) {}
+
+  async ngOnInit(){
+    this.stateService.load(true);
+    this.orders = await this.apiService.getOrders({});
+    console.log(this.orders);
+    this.stateService.load(false);
+  }
 
 }

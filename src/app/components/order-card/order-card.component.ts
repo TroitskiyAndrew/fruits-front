@@ -21,9 +21,11 @@ import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { OrderStatusComponent, OrderStatusPlace } from "../order-status/order-status.component";
 import { OrderDeliveryComponent, OrderDeliveryPlace } from '../order-delivery/order-delivery.component';
 import { OrderContentComponent, OrderContentPlace } from "../order-content/order-content.component";
+import { Router } from '@angular/router';
 
 export enum OrderCardPlace {
   OrderPage,
+  AllOrdersPage
 }
 
 @Component({
@@ -69,7 +71,7 @@ export class OrderCardComponent {
 
 
 
-  constructor(private stateService: StateService, private apiService: ApiService) {
+  constructor(private stateService: StateService, private apiService: ApiService, private router: Router) {
     effect(() => this.currency.set(this._currency()));
   }
 
@@ -77,6 +79,16 @@ export class OrderCardComponent {
     const user = await this.apiService.getUser(this.order.userId);
     if (user) {
       this.user.set(user);
+    }
+  }
+
+  get myOrder() {
+    return this.order.userId === this.stateService.user().userId
+  }
+
+  onTitleClick(){
+    if(this.usage === OrderCardPlace.AllOrdersPage){
+      this.router.navigate(['order', this.order.id])
     }
   }
 }

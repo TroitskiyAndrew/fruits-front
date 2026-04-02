@@ -1,18 +1,9 @@
 <ui-page>
-  <div class="title">
-    Orders
-  </div>
+  <div class="title">Заказы</div>
+  <ui-stack class="w-100">
 
-  <ui-input placeholder="User id" [formControl]="userFilter" />
-
-  <ui-input placeholder="Min price" type="number" [formControl]="priceFilter" />
-
-  <ui-stack>
     @for (order of orders; track $index) {
-    <order-card [order]="order" />
-
+      <order-card class="w-100" [order]="order" [usage]="OrderCardPlace.AllOrdersPage" />
     }
-
   </ui-stack>
-
 </ui-page>

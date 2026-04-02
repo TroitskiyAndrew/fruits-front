@@ -31,15 +31,15 @@
     <ui-button (action)="startEdit()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-pen"> </ui-button>
     }
     @default {
-    <ui-grid [columns]="1" alignX="center" [gap]="5">
-      <div>{{ currencySymbol() }}</div>
-      @if(isExpanded || fixedSet || productPrice === 0 || usage === ProductCardPlace.Cart){
-      <div>{{ price }}</div>
-      } @else {
-      <div>от {{ productPrice }}</div>
-      }
+      <ui-row>
+        @if(isExpanded || fixedSet || productPrice === 0 || usage === ProductCardPlace.Cart){
+        <div>{{ price | priceString : currency()}}</div>
+        } @else {
+        <div>от {{ productPrice | priceString : currency() }}</div>
+        }
+        <div>{{ currencySymbol() }}</div>
 
-    </ui-grid>
+      </ui-row>
     }
     }
 

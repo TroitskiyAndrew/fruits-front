@@ -1,25 +1,25 @@
 <ui-card>
-  @switch (usage) {
+  <ui-stack>
+    <ui-row (click)="onTitleClick()">
+      <div>№ {{ order.number }}</div>
+      @if (!myOrder) {
+      <ui-row>
+        {{ name() }}
+        <div class="subtitle">({{ username() }})</div>
+      </ui-row>
+      }
+      <div>
+        {{ totalPrice() | priceString: currency() }} {{ currencySymbol() }}
+      </div>
+    </ui-row>
+    @switch (usage) {
     @case (OrderCardPlace.OrderPage) {
-      <ui-stack>
-        <ui-row>
-          <div>
-            № {{order.number}}
-          </div>
-          <ui-row>
-            {{name()}}
-            <div class="subtitle">
-              ({{username()}})
-            </div>
-          </ui-row>
-          <div>
-            {{totalPrice() | priceString : currency() }} {{currencySymbol()}}
-          </div>
-        </ui-row>
-        <order-status [usage]="OrderStatusPlace.OrderPage" [status]="status"></order-status>
-        <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [delivery]="delivery"></order-delivery>
-        <order-content [usage]="OrderContentPlace.OrderPage" [content]="content" [_currency]="currency()"></order-content>
-      </ui-stack>
+    <order-status [usage]="OrderStatusPlace.OrderPage" [status]="status"></order-status>
+    <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [delivery]="delivery"></order-delivery>
+    <order-content [usage]="OrderContentPlace.OrderPage" [content]="content" [_currency]="currency()"></order-content>
     }
-  }
+    }
+
+  </ui-stack>
+
 </ui-card>
