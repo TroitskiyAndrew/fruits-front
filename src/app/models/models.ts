@@ -56,7 +56,9 @@ export interface IOrderStatus {
   payed: number | null;
   confirmed: number | null;
   packed: number | null;
+  packingPhotos: string[];
   delivered: number | null;
+  deliveringPhotos: string[];
   deleted: number | null;
 }
 export interface IOrderContent {

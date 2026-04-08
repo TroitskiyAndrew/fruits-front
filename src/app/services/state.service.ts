@@ -164,7 +164,9 @@ export class StateService {
         payed: null,
         confirmed: null,
         packed: null,
+        packingPhotos: [],
         delivered: null,
+        deliveringPhotos: [],
         deleted: null,
       },
       content: {
