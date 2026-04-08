@@ -31,7 +31,7 @@ export class SelectComponent implements ControlValueAccessor {
   @Input() label = '';
   @Input() options: { label: string; value: any }[] = [];
 
-  value: any = null;
+  @Input() value: any = null;
   disabled = false;
 
   onChange: (value: any) => void = () => {};

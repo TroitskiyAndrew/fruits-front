@@ -13,6 +13,7 @@ export interface IUser {
   _created: number;
   sessionId: string;
   paymentMethods: IPaymentMethods;
+  currency: Currency;
 }
 
 export type UserForm = Pick<IUser, 'admin' | 'paymentMethods'>
@@ -54,6 +55,7 @@ export enum DeliveryType {
 
 export interface IOrderStatus {
   payed: number | null;
+  paymentConfirmed: number | null;
   confirmed: number | null;
   packed: number | null;
   packingPhotos: string[];
@@ -72,7 +74,7 @@ export interface IOrderDelivery {
   placeType: PlaceType;
   place: string;
   placeAdd: string;
-  date: string;
+  date: number;
   deliveryType: DeliveryType
 }
 export interface IOrder {

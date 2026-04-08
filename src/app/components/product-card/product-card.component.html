@@ -2,19 +2,19 @@
   @let currentCurrency = currency();
   @if(showCardTitle) {
 
-  <div class="row" (click)="onExpand()">
+  <ui-row class="row" (click)="onExpand()" rowClass="w-100">
 
-    <div class="col left">
+    <ui-stack class="left">
 
       <div class="title">
         {{ name }} {{titleMeasure}}
       </div>
 
-      <div class="subtitle">
+      <div class="green-text">
         {{ description }}
       </div>
 
-    </div>
+    </ui-stack>
 
     @switch (usage) {
     @case (ProductCardPlace.AllProducts) {
@@ -31,15 +31,15 @@
     <ui-button (action)="startEdit()" size="s" [icon]="true" variant="ghost" fa="fa-solid fa-pen"> </ui-button>
     }
     @default {
-      <ui-row>
-        @if(isExpanded || fixedSet || productPrice === 0 || usage === ProductCardPlace.Cart){
-        <div>{{ price | priceString : currency()}}</div>
-        } @else {
-        <div>от {{ productPrice | priceString : currency() }}</div>
-        }
-        <div>{{ currencySymbol() }}</div>
+    <div class="bold">
+      @if(isExpanded || fixedSet || productPrice === 0 || usage === ProductCardPlace.Cart){
+      {{ price | priceString : currency()}}
+      } @else {
+      от {{ productPrice | priceString : currency() }}
+      }
+      {{ currencySymbol() }}
 
-      </ui-row>
+    </div>
     }
     }
 
@@ -50,12 +50,12 @@
 
 
 
-  </div>
+  </ui-row>
 
   }
   @if(isExpanded) {
 
-  <ui-stack [formGroup]="form" >
+  <ui-stack [formGroup]="form">
     @if(editing) {
     <div class="row">
       <ui-toggler [options]="typeOptions" formControlName="set">
@@ -111,7 +111,7 @@
 
       @if (fixedSet && usage !== ProductCardPlace.AllProducts) {
       @for (p of productsArray; track p.id) {
-      <ui-row class="product-row">
+      <ui-row class="w-100">
         <div>
           {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
@@ -123,16 +123,17 @@
       } @else {
       @for (p of simpleProducts(); track p.id) {
 
-      <ui-row class="product-row">
+      <ui-row class="w-100">
 
         <div>
           {{ p.name }} ({{p.amount}} {{p.measure}})
         </div>
         <div class="right">
 
-          {{p.price[currentCurrency] | priceString : currentCurrency}}{{currencySymbol()}}
+          {{p.price[currentCurrency] | priceString : currentCurrency}} {{currencySymbol()}}
         </div>
-        <ui-counter [blockDecrease]="usage === ProductCardPlace.Cart && ((price - p.price[currentCurrency]) < productPrice)"
+        <ui-counter
+          [blockDecrease]="changeCounter(p)"
           [formControlName]="p.id" (valueChange)="changeProducts()">
         </ui-counter>
 
@@ -145,30 +146,30 @@
     </ui-stack>
 
     }
-
-    <ui-row class="actions">
+    <ui-stack>
       @switch (usage) {
       @case (ProductCardPlace.AllProducts) {
-      <ui-button variant="primary" (action)="saveProduct()">
+      <ui-button variant="primary" (action)="saveProduct()" btnClass="w-100">
         Сохранить
       </ui-button>
-      <ui-button variant="primary" (action)="onCancel()">
+      <ui-button variant="primary" (action)="onCancel()" btnClass="w-100">
         Отмена
       </ui-button>
       }
       @case (ProductCardPlace.Shop) {
-      @if(price < productPrice) { <ui-button variant="primary" (action)="saveProduct()" [disabled]="true">
+      @if(price < productPrice) { <ui-button btnClass="w-100" variant="primary" (action)="saveProduct()"
+        [disabled]="true">
         от {{productPrice | priceString}} {{currencySymbol()}}
         </ui-button>
         } @else {
-        <ui-button variant="primary" (action)="addToCart()">
+        <ui-button btnClass="w-100" variant="primary" (action)="buy()">
+          Заказать
+        </ui-button>
+        <ui-button btnClass="w-100" variant="primary" (action)="addToCart()">
           Добавить в корзину
         </ui-button>
-        <ui-button variant="primary" (action)="buy()">
-          Купить
-        </ui-button>
         }
-        <ui-button variant="primary" (action)="onCancel()">
+        <ui-button btnClass="w-100" variant="primary" (action)="onCancel()">
 
           Отмена
 
@@ -178,10 +179,8 @@
         }
 
 
+    </ui-stack>
 
-
-
-    </ui-row>
 
   </ui-stack>
   }

@@ -1,11 +1,13 @@
 import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { RowComponent } from "../row/row.component";
+import { ButtonComponent } from "../button/button.component";
 
 @Component({
   selector: 'ui-counter',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RowComponent, ButtonComponent],
   templateUrl: './counter.component.html',
   styleUrl: './counter.component.scss',
   providers: [

@@ -1,15 +1,4 @@
-<ui-page>
-  <div class="title">Магазин</div>
-  @let cartTotalPrice = cartTotal();
-  @if (cartTotalPrice) {
-    <ui-button link="cart">
-      Корзина: {{ cartTotalPrice | priceString : currency() }} {{ currencySymbol() }}
-    </ui-button>
-  }
-  <ui-toggler
-    [options]="currencyOptions"
-    (valueChange)="changeCurrency($event)"
-  ></ui-toggler>
+<ui-page [showBack]="false" [showCurrency]="true">
   <ui-stack class="w-100">
     @for (set of sets(); track $index) {
       @if (selectedSet() == null || selectedSet() === set.id) {

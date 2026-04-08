@@ -1,9 +1,9 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
 import { Currency, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product } from '../models/models';
-import { CURRENCY_SYMBOLS } from '../constants/constants';
-import { getEmptyUser, getTotal } from './utils';
+import { CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../constants/constants';
+import { getEmptyUser, getTotal, getUserName } from './utils';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -26,7 +26,11 @@ export class StateService {
   orderAddons = computed(() => {
     return this.products().filter(p => !p.set && p.orderAddon)
   })
-  currency = signal<Currency>(Currency.Rub);
+  orderAddonsMap = computed(() => this.orderAddons().reduce((map, addon) => {
+    map.set(addon.id, addon);
+    return map;
+  }, new Map()));
+  currency = signal<Currency>(DEFAULT_CURRENCY);
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
   order = signal<IOrder>(this.getEmptyOrder());
   orderContent = computed(() => this.order().content);
@@ -74,7 +78,17 @@ export class StateService {
 
   loading = signal(false);
 
-  constructor(private apiService: ApiService, private telegrammService: TelegrammService) { }
+  constructor(private apiService: ApiService, private telegrammService: TelegrammService) {
+    effect(() => {
+      const user = this.user();
+      this.currency.set(user.currency);
+      const tgUsername = user.user.username;
+      this.updateDelivery({
+        name: getUserName(user),
+        contact: tgUsername ? 'В личные сообщения или через бот' : '',
+      })
+    })
+  }
 
 
   async init() {
@@ -126,6 +140,10 @@ export class StateService {
 
   changeCurrency(currency: Currency) {
     this.currency.set(currency);
+    this.apiService.updateUser({
+      id: this.user().id,
+      currency: currency,
+    })
   }
 
   updateCart(products: OrderProduct[]) {
@@ -141,9 +159,9 @@ export class StateService {
     });
   }
 
-  updateDelivery(delivery: IOrderDelivery) {
+  updateDelivery(delivery: Partial<IOrderDelivery>) {
     this.order.update(order => {
-      order.delivery = delivery;
+      order.delivery = { ...order.delivery, ...delivery };
       return {
         ...order,
         status: order.status,
@@ -154,6 +172,12 @@ export class StateService {
   }
 
   getEmptyOrder(): IOrder {
+    const date = new Date();
+
+    date.setDate(date.getDate() + 1);
+    date.setHours(15, 0, 0, 0);
+
+    const timestamp = date.getTime();
     return {
       id: '',
       number: 0,
@@ -162,6 +186,7 @@ export class StateService {
       lastSource: '',
       status: {
         payed: null,
+        paymentConfirmed: null,
         confirmed: null,
         packed: null,
         packingPhotos: [],
@@ -184,7 +209,7 @@ export class StateService {
         placeType: PlaceType.Hotel,
         place: '',
         placeAdd: '',
-        date: '',
+        date: timestamp,
         deliveryType: DeliveryType.Reception
       }
     }

@@ -11,6 +11,7 @@ import { getTotal } from '../../services/utils';
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RowComponent } from "../../ui/row/row.component";
+import { AddonCardComponent, AddonCardPlace } from "../addon-card/addon-card.component";
 
 export enum OrderContentPlace {
   CartPage,
@@ -19,7 +20,7 @@ export enum OrderContentPlace {
 
 @Component({
   selector: 'order-content',
-  imports: [ReactiveFormsModule, StackComponent, ProductCardComponent, CheckboxComponent, RowComponent, PriceStringPipe],
+  imports: [ReactiveFormsModule, StackComponent, ProductCardComponent, AddonCardComponent],
   templateUrl: './order-content.component.html',
   styleUrl: './order-content.component.scss'
 })
@@ -29,25 +30,13 @@ export class OrderContentComponent {
   @Input() usage: OrderContentPlace = OrderContentPlace.CartPage;
   @Output() updateContent = new EventEmitter<IOrderContent>();
   OrderContentPlace = OrderContentPlace;
+  AddonCardPlace = AddonCardPlace;
   _currency = input(Currency.VND);
   currency = signal(Currency.VND)
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
   ProductCardPlace = ProductCardPlace;
   orderAddons = computed(() => this.stateService.orderAddons());
-  orderAddonsNamesMap = computed(() => this.stateService.orderAddons().reduce((map: Map<string, string>, product: Product) => {
-    map.set(product.id, product.name);
-    return map;
-  }, new Map()));
-  orderAddonsPriceMap = computed(() => this.stateService.orderAddons().reduce((map: Map<string, IPrices>, product: Product) => {
-    map.set(product.id, product.price);
-    return map;
-  }, new Map()));
-  addonsForm = new FormGroup<ControlsOf<Record<string, boolean>>>({})
-  triggerAddonsForm = signal(false);
-  get orderAddonsKeys() {
-    return Array(...Object.keys(this.addonsForm.controls))
-  }
-  addonsFormChange = toSignal(this.addonsForm.valueChanges);
+  orderAddonsMap = computed(() => this.stateService.orderAddonsMap());
 
   deliveryOptions = [
     { label: 'Обычная доставка', value: false },
@@ -57,41 +46,12 @@ export class OrderContentComponent {
   get products() {
     return this.content.products.filter(p => !p.orderAddon)
   }
-  constructor(public stateService: StateService) {
-    effect(() => {
-      this.triggerAddonsForm();
-      const addonsGroup = this.addonsForm as FormGroup;
-      Object.keys(addonsGroup.controls).forEach(key => {
-        addonsGroup.removeControl(key, { emitEvent: false });
-      });
-      this.stateService.orderAddons().forEach(prod => {
-        addonsGroup.addControl(
-          prod.id,
-          new FormControl(
-            this.content.products.map(p => p.id).includes(prod.id),
-            { nonNullable: true }
-          )
-          , { emitEvent: false });
-      })
-    });
-    effect(() => {
-      const addons = this.addonsFormChange();
-      if (!addons) {
-        return;
-      }
-      const includedAddons = [...Object.entries(addons)].map(([id, state]: [string, boolean | undefined]) => {
-        return state ? id : null;
-      }).filter(Boolean) as string[];
-      const products = this.content.products.filter(p => !p.orderAddon);
-      const addonProducts = this.orderAddons().filter(p => includedAddons.includes(p.id))
-      this.content.products = [...products, ...addonProducts.map(addon => ({ ...addon, count: 1 }))];
-      this.calculateTotal()
-    });
-    effect(() => this.currency.set(this._currency()));
-  }
 
-  ngOnInit() {
-    // this.triggerAddonsForm.update(val => !val);
+  get productCardUsage () {
+    return this.usage === OrderContentPlace.CartPage ? ProductCardPlace.Cart : ProductCardPlace.OrderPage
+  }
+  constructor(public stateService: StateService) {
+    effect(() => this.currency.set(this._currency()));
   }
 
   calculateTotal() {
@@ -106,6 +66,16 @@ export class OrderContentComponent {
   deleteContent(index: number) {
     this.content.products = this.content.products.filter((_, i) => i !== index);
     this.calculateTotal()
+  }
+
+  selectAddon(id: string){
+      const addonIds = this.content.products.filter(p => p.orderAddon).map(a => a.id);
+      if (addonIds.includes(id)){
+        this.content.products = this.content.products.filter(p => p.id !== id)
+      } else {
+        this.content.products = [...this.content.products, this.orderAddonsMap().get(id)]
+      }
+      this.calculateTotal()
   }
 
 }

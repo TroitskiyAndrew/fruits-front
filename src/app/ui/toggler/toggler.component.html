@@ -1,15 +1,35 @@
-<div class="toggler">
+@if (options.length) {
 
-  @for (opt of options; track opt.value) {
-
-    <div
-      class="option"
-      [class.active]="value === opt.value"
-      (click)="select(opt.value)"
-    >
-      {{ opt.label }}
-    </div>
-
-  }
-
-</div>
+  <ui-row [ngClass]="['toggler', rowClass]" [rowClass]="rowClass">
+    @for (opt of options; track opt.value) {
+      <div
+        class="option flex center"
+        [class.active]="value === opt.value"
+        (click)="select(opt.value)"
+      >
+        {{ opt.label }}
+      </div>
+    }
+  </ui-row>
+} @else if (buttons.length) {
+  <ui-row class="toggler-btn">
+    @for (button of buttons; track button.value) {
+      @if(showOptions || value === button.value){
+        <ui-button
+          variant="ghost"
+          [size]="button.size"
+          [icon]="true"
+          (action)="onClickButton(button.value)"
+          [btnClass]="showOptions && value === button.value ? 'active' : ''"
+        >
+        @if (button.icon) {
+          <i [ngClass]="['fa-solid', button.icon]"></i>
+        }
+        @if (button.content) {
+          {{button.content}}
+        }
+        </ui-button>
+      }
+    }
+  </ui-row>
+}

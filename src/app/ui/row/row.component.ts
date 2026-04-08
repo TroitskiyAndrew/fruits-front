@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
 selector:'ui-row',
 standalone:true,
-template:`<div class="row"><ng-content/></div>`
+template:`<div class="row" [ngClass]="rowClass"><ng-content/></div>`,
+imports: [CommonModule]
 })
-export class RowComponent{}
+export class RowComponent{
+  @Input() rowClass = ''
+}

@@ -1,0 +1,19 @@
+<ui-row >
+
+  <ui-input
+    label="Date"
+    type="date"
+    [value]="date"
+    [min]="minDate"
+    (input)="changeDate($any($event.target).value)">
+  </ui-input>
+
+  <ui-select
+    label="Time"
+    [options]="timeOptions"
+    [value]="time"
+    (change)="changeTime($event)"
+    class="field">
+  </ui-select>
+
+</ui-row>

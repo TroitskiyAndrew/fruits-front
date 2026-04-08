@@ -14,19 +14,18 @@ import { AccountPageComponent } from './pages/account-page/account-page.componen
 import { OrderPageComponent } from './pages/order-page/order-page.component';
 
 export const routes: Routes = [
-    {
+  {
     path: '',
-    redirectTo: 'admin',
+    redirectTo: 'shop',
     pathMatch: 'full'
   },
-
   {
-    path: 'admin',
-    component: AdminPageComponent
+    path: 'shop',
+    component: ShopPageComponent
   },
 
   {
-    path: 'admin/products',
+    path: 'products',
     component: ProductsPageComponent
   },
 
@@ -45,10 +44,6 @@ export const routes: Routes = [
     component: PaymentsPageComponent
   },
 
-  {
-    path: 'admin/shop',
-    component: ShopPageComponent
-  },
   {
     path: 'cart',
     component: CartPageComponent

@@ -11,7 +11,15 @@ font-size:13px;
 color:var(--color-text-soft);
 }
 
+.green-text{
+color:var(--color-green);
+}
+
 .price{
 color:var(--color-gold);
 font-weight:600;
+}
+
+.bold {
+  font-weight:900;
 }

@@ -19,30 +19,37 @@
 /* sizes */
 
 .size-m {
-  height: 44px;
-  padding: 0 16px;
+  &:not(.icon) {
+    height: 44px;
+    padding: 0 16px;
+  }
+  &.icon {
+    font-size: 1.1rem;
+  }
 }
 
 .size-s {
-  height: 34px;
-  padding: 0 12px;
+  &:not(.icon) {
+    height: 34px;
+    padding: 0 12px;
+  }
 }
 
 /* icon */
 
 .icon {
-  padding: 0;
+  margin: 1px;
 }
 
 /* variants */
 
 .btn-primary {
-  background: var(--color-gold);
-  color: black;
+  background: var(--color-green);
+  color: var(--color-text-white);
 }
 
 .btn-primary:hover {
-  background: var(--color-gold-soft);
+  background: var(--color-green-soft);
 }
 
 .btn-outline {
@@ -89,4 +96,8 @@ i {
   font-size: 14px;
   display: flex;
   align-items: center;
+}
+
+.active {
+  color: var(--color-green);
 }

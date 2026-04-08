@@ -403,4 +403,8 @@ export class ProductCardComponent {
     }
   }
 
+  changeCounter(p: Product){
+    return this.usage === ProductCardPlace.Cart && ((this.price - p.price[this.currency()]) < this.productPrice)
+  }
+
 }

@@ -5,7 +5,7 @@
         class="w-100"
         [isExpanded]="products.length === 1"
         [product]="product"
-        [usage]="ProductCardPlace.OrderPage"
+        [usage]="productCardUsage"
         [cartIndex]="$index"
         [_currency]="currency()"
         (changeContent)="changeContent($event, $index)"
@@ -13,32 +13,13 @@
       />
     }
   </ui-stack>
-  @if (products.length) {
-    <ui-stack [formGroup]="addonsForm">
-      @for (key of orderAddonsKeys; track key) {
-        <ui-row>
-          @switch (usage) {
-            @case (OrderContentPlace.CartPage) {
-              <ui-checkbox
-                [label]="orderAddonsNamesMap().get(key)"
-                [formControlName]="key"
-              ></ui-checkbox>
+  @let addons = orderAddons();
+  @if(addons.length){
+    <ui-stack>
+        @for (addon of addons; track addon.id) {
+          <addon-card [addon]="addon" (selectAddon)="selectAddon(addon.id)" [usage]="usage === OrderContentPlace.CartPage ? AddonCardPlace.Cart : AddonCardPlace.OrderPage"></addon-card>
+        }
+      </ui-stack>
 
-            }
-            @case (OrderContentPlace.OrderPage) {
-              <ui-checkbox
-                [label]="orderAddonsNamesMap().get(key)"
-                [value]="addonsForm.get(key)?.value || false"
-                [disabled]="true"
-              ></ui-checkbox>
-
-            }
-          }
-        <div>
-          {{orderAddonsPriceMap().get(key)[this.currency()] | priceString : this.currency()}} {{currencySymbol()}}
-        </div>
-        </ui-row>
-      }
-    </ui-stack>
   }
 </ui-stack>

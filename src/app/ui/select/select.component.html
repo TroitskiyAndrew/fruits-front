@@ -1,15 +1,18 @@
-<label *ngIf="label">{{ label }}</label>
+<div class="field">
+  <label *ngIf="label">{{ label }}</label>
 
-<select
-  [ngModel]="value"
-  (change)="onChangeSelect($event)"
-  [compareWith]="compareWith"
-  [disabled]="disabled"
->
-  <option
-    *ngFor="let option of options"
-    [ngValue]="option.value"
+  <select
+    [ngModel]="value"
+    (change)="onChangeSelect($event)"
+    [compareWith]="compareWith"
+    [disabled]="disabled"
   >
-    {{ option.label }}
-  </option>
-</select>
+    <option
+      *ngFor="let option of options"
+      [ngValue]="option.value"
+    >
+      {{ option.label }}
+    </option>
+  </select>
+
+</div>

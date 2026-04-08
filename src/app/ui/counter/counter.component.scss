@@ -1,19 +1,19 @@
 .counter {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-button {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid #e5e5e5;
-  background: white;
+  border-radius: var(--radius-m);
+  border: solid 1px var(--color-border);
 }
 
 .value {
-  width: 24px;
-  text-align: center;
-  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-green);
+  color: var(--color-text-white);
+  padding: 5px 10px;
+}
+
+ui-button {
+  padding: 0 5px;
 }

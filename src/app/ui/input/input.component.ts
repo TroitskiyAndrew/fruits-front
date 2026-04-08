@@ -20,14 +20,18 @@ export class InputComponent implements ControlValueAccessor {
 
   @Input() label = ''
   @Input() placeholder = ''
-  @Input() type: 'text' | 'number' | 'date' = 'text'
+  @Input() type: 'text' | 'number' | 'date' | 'time' = 'text'
   @Input() clearable = false
 
-  value: any = ''
+  @Input() value: any = ''
+
+  @Input() min: string | number | null = null
+  @Input() step: string | number | null = null
+
   disabled = false
 
-  onChange: any = () => {}
-  onTouched: any = () => {}
+  onChange: any = () => { }
+  onTouched: any = () => { }
 
   writeValue(value: any) {
     this.value = value

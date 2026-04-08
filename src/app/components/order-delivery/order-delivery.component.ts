@@ -8,6 +8,7 @@ import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RowComponent } from "../../ui/row/row.component";
 import { CommonModule } from '@angular/common';
+import { DatetimeComponent } from "../../ui/datetime/datetime.component";
 
 export enum OrderDeliveryPlace {
   PlacingOrderPage,
@@ -15,7 +16,7 @@ export enum OrderDeliveryPlace {
 }
 @Component({
   selector: 'order-delivery',
-  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule],
+  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule, DatetimeComponent],
   templateUrl: './order-delivery.component.html',
   styleUrl: './order-delivery.component.scss'
 })
@@ -32,7 +33,7 @@ export class OrderDeliveryComponent {
     placeType: new FormControl(PlaceType.Hotel, { nonNullable: true }),
     place: new FormControl('', { nonNullable: true }),
     placeAdd: new FormControl('', { nonNullable: true }),
-    date: new FormControl('', { nonNullable: true }),
+    date: new FormControl(Date.now(), { nonNullable: true }),
     deliveryType: new FormControl(DeliveryType.Reception, { nonNullable: true }),
   });
 

@@ -25,7 +25,7 @@ import { CURRENCY_OPTIONS } from '../../constants/constants';
 @Component({
   selector: 'shop-page',
   standalone: true,
-  imports: [CommonModule, StackComponent, PageComponent, TogglerComponent, ProductCardComponent, PriceStringPipe, ButtonComponent],
+  imports: [CommonModule, StackComponent, PageComponent, ProductCardComponent],
   templateUrl: './shop-page.component.html'
 })
 export class ShopPageComponent {
@@ -39,7 +39,6 @@ export class ShopPageComponent {
     this.trigger()
     return sets;
   });
-  cartTotal = computed(() => this.stateService.cartTotal());
   currencySymbol = computed(() => this.stateService.currencySymbol());
   currency = computed(() => this.stateService.currency());
 

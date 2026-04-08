@@ -13,9 +13,11 @@ export class ButtonComponent {
 
   @Input() variant: 'primary' | 'outline' | 'ghost' = 'primary'
 
-  @Input() size: 'm' | 's' = 'm'
+  @Input() size: 'm' | 's' | '0' = 'm'
 
   @Input() icon = false
+
+  @Input() btnClass = ''
 
   @Input() disabled = false
 

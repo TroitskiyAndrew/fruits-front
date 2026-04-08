@@ -9,18 +9,19 @@
         [options]="deliveryPlaceOptions"
         formControlName="placeType"
         [value]="form.controls.placeType.value"
+        rowClass="w-100"
       ></ui-toggler>
       @if (isHotel) {
         <ui-input label="Отель" formControlName="place"> </ui-input>
         <ui-input label="Комната" formControlName="placeAdd"> </ui-input>
       }
-      <ui-input label="Дата доставки" type="date" formControlName="date">
-      </ui-input>
+      <ui-datetime label="Дата доставки" formControlName="date"></ui-datetime>
       @if (isHotel) {
         <ui-toggler
           [options]="deliveryTypeOptions"
           formControlName="deliveryType"
           [value]="form.controls.deliveryType.value"
+          rowClass="w-100"
         ></ui-toggler>
       }
     </ui-stack>

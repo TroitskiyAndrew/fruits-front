@@ -1,3 +1,4 @@
+import { DEFAULT_CURRENCY } from "../constants/constants";
 import { Currency, IOrderContent, ISimpleProduct, IUser, OrderProduct } from "../models/models";
 
 export function getTotal(orderContent: IOrderContent) {
@@ -43,7 +44,8 @@ export function getEmptyUser(): IUser {
       [Currency.Rub]: null,
       [Currency.VND]: null,
       [Currency.USDT]: null,
-    }
+    },
+    currency: DEFAULT_CURRENCY
   }
 }
 

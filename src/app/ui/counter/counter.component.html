@@ -1,11 +1,12 @@
-<div class="counter">
-
-  <button (click)="decrease()" [disabled]="blockDecrease">-</button>
+<ui-row class="counter" rowClass="gap-0">
+  <ui-button variant="ghost" size="m" [icon]="true" (action)="decrease()" class="padding" [disabled]="blockDecrease">
+    <i class="fa-solid fa-minus"></i>
+  </ui-button>
 
   <div class="value">
     {{ value }}
   </div>
-
-  <button (click)="increase()">+</button>
-
-</div>
+  <ui-button variant="ghost" size="m" [icon]="true" (action)="increase()">
+    <i class="fa-solid fa-plus"></i>
+  </ui-button>
+</ui-row>

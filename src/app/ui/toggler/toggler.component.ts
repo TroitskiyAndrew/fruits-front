@@ -1,16 +1,24 @@
 import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
+import { RowComponent } from "../row/row.component";
+import { ButtonComponent } from "../button/button.component";
 
 export interface TogglerOption {
   label: string
   value: any
 }
+export interface TogglerButton {
+  icon?: string
+  content?: string
+  value: any
+  size: any
+}
 
 @Component({
   selector: 'ui-toggler',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RowComponent, ButtonComponent],
   templateUrl: './toggler.component.html',
   styleUrl: './toggler.component.scss',
   providers: [
@@ -24,6 +32,8 @@ export interface TogglerOption {
 export class TogglerComponent implements ControlValueAccessor {
 
   @Input() options: TogglerOption[] = []
+  @Input() buttons: TogglerButton[] = []
+  @Input() rowClass = ''
   @Input() _disabled = false
 
   // 👉 теперь value можно передавать извне
@@ -36,8 +46,11 @@ export class TogglerComponent implements ControlValueAccessor {
   }
 
   @Output() valueChange = new EventEmitter<any>()
+  @Output() showButtonsOptions = new EventEmitter<boolean>()
 
   private _value: any
+
+  showOptions = false
 
   onChange = (v: any) => {}
   onTouched = () => {}
@@ -54,6 +67,17 @@ export class TogglerComponent implements ControlValueAccessor {
 
     // внешний биндинг
     this.valueChange.emit(v)
+  }
+
+  onClickButton(v: any) {
+    if(this.showOptions) {
+      this.showOptions = false;
+      this.showButtonsOptions.emit(false)
+      this.select(v);
+    } else {
+      this.showOptions = true;
+      this.showButtonsOptions.emit(true)
+    }
   }
 
   writeValue(v: any): void {
