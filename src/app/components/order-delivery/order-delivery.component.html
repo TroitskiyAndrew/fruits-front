@@ -1,8 +1,13 @@
 @switch (usage) {
   @case (OrderDeliveryPlace.PlacingOrderPage) {
+    {{form.valid}}
     <ui-stack [formGroup]="form">
-      <ui-input label="Имя" formControlName="name"> </ui-input>
-      <ui-input label="Контактная информация" formControlName="contact">
+      <ui-input label="Имя" formControlName="name" [form]="form"> </ui-input>
+      <ui-input
+        label="Контактная информация"
+        [form]="form"
+        formControlName="contact"
+      >
       </ui-input>
 
       <ui-toggler
@@ -12,10 +17,20 @@
         rowClass="w-100"
       ></ui-toggler>
       @if (isHotel) {
-        <ui-input label="Отель" formControlName="place"> </ui-input>
-        <ui-input label="Комната" formControlName="placeAdd"> </ui-input>
+        <ui-input label="Отель" [form]="form" formControlName="place">
+        </ui-input>
+        <ui-input label="Комната" [form]="form" formControlName="placeAdd">
+        </ui-input>
       }
-      <ui-datetime label="Дата доставки" formControlName="date"></ui-datetime>
+      <ui-input
+        [min]="getMinimalDate().string"
+        label="Дата доставки"
+        type="date"
+        [form]="form"
+        formControlName="date"
+      >
+        <div class="no-wrap">с 18:00 до 21:00</div>
+      </ui-input>
       @if (isHotel) {
         <ui-toggler
           [options]="deliveryTypeOptions"
@@ -24,6 +39,20 @@
           rowClass="w-100"
         ></ui-toggler>
       }
+      <ui-button
+        [disabled]="
+          !canCreateOrder  || !canCreateOrderOutside || form.controls.deliveryType.value === DeliveryType.Reception
+        "
+        (action)="createOrder(PaymentMethod.Cash)"
+      >
+        Оплата наличными
+      </ui-button>
+      <ui-button
+        [disabled]="!canCreateOrder || !canCreateOrderOutside"
+        (action)="createOrder(PaymentMethod.Bank)"
+      >
+        Оплата картой
+      </ui-button>
     </ui-stack>
   }
   @case (OrderDeliveryPlace.OrderCard) {
@@ -52,9 +81,9 @@
         </ui-row>
       }
       <ui-row>
-          <div class="subtitle">Дата доставки</div>
-          <div>{{ delivery.date | date : 'dd.MM.yyyy' }}</div>
-        </ui-row>
+        <div class="subtitle">Дата доставки</div>
+        <div>{{ delivery.date | date: "dd.MM.yyyy" }}</div>
+      </ui-row>
       @if (delivery.placeType === PlaceType.Hotel) {
         <ui-toggler
           [options]="deliveryType"

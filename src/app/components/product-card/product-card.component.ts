@@ -195,6 +195,7 @@ export class ProductCardComponent {
     set: new FormControl(false, { nonNullable: true }),
     products: new FormGroup<ControlsOf<Record<string, number>>>({}),
     orderAddon: new FormControl(false, { nonNullable: true }),
+    defaultAddon: new FormControl(false, { nonNullable: true }),
   });
 
   get productsForm(): FormGroup {

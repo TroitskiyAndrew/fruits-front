@@ -5,57 +5,94 @@
         {{ name }}
       </div>
       <div class="subtitle">
-        {{user.user.username}}
+        {{ user.user.username }}
       </div>
-
     </ui-row>
 
     @switch (usage) {
-    @case (UserCardPlace.MyAccount) {
-      <ui-expandable title="Методы оплаты">
-        <ui-stack [formGroup]="form" >
-          <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
-            (valueChange)="currency.set($event)"></ui-toggler>
-          @let accept = acceptCurrency();
-          <ui-checkbox [value]="accept" label="Принимать платежи"
-            (valueChange)="acceptCurrencyChange($event)"></ui-checkbox>
-          @if (accept) {
-          <ui-stack [formGroup]="currencyMethodForm">
-            <ui-toggler class="center-self" [options]="paymentOptions" formControlName="paymentOption"></ui-toggler>
-            @if (currencyMethodForm.controls['paymentOption'].value === OnlinePaymentOption.Account) {
-            <ui-input label="Реквизиты" formControlName="accountInfo" [clearable]="true">
-            </ui-input>
-            <ui-input label="Комментарий к реквизитам" formControlName="comment" [clearable]="true">
-            </ui-input>
-            } @else {
-            @let currentUrl = currencyMethodForm.controls['qrUrl'].value;
-            @if(currentUrl) {
-            <img [src]="currentUrl" alt="QR code for payment" class="qr">
-            }
-            <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
-            <ui-button class="center-self" (action)="fileInput.click()">
-              {{currentUrl ? 'Изменить' : 'Приложить'}} QR-код
-            </ui-button>
-            }
-          </ui-stack>
-          }
-          <ui-button class="center-self" (action)="savePaymentMethods()" [disabled]="!canSavePaymentMethodChanges()">
-            Сохранить метод {{currencySymbol()}}
-          </ui-button>
+      @case (UserCardPlace.MyAccount) {
+        <ui-expandable title="Методы оплаты">
+          <ui-stack [formGroup]="form">
+            <ui-toggler
+              class="center-self"
+              [options]="currencyOptions"
+              [value]="currency()"
+              (valueChange)="currency.set($event)"
+            ></ui-toggler>
+            @let accept = acceptCurrency();
+            <ui-stack [formGroup]="currencyMethodForm">
+              <ui-checkbox
+                formControlName="cash"
+                label="Принимать наличные"
+              ></ui-checkbox>
+              <ui-checkbox
+                formControlName="bank"
+                label="Принимать переводы"
+              ></ui-checkbox>
+              @if (accept) {
+                <ui-toggler
+                  class="center-self"
+                  [options]="paymentOptions"
+                  formControlName="paymentOption"
+                ></ui-toggler>
+                @if (
+                  currencyMethodForm.controls["paymentOption"].value ===
+                  OnlinePaymentOption.Account
+                ) {
+                  <ui-input
+                    label="Реквизиты"
+                    formControlName="accountInfo"
+                    [clearable]="true"
+                  >
+                  </ui-input>
+                  <ui-input
+                    label="Комментарий к реквизитам"
+                    formControlName="comment"
+                    [clearable]="true"
+                  >
+                  </ui-input>
+                } @else {
+                  @let currentUrl = currencyMethodForm.controls["qrUrl"].value;
+                  @if (currentUrl) {
+                    <img
+                      [src]="currentUrl"
+                      alt="QR code for payment"
+                      class="qr"
+                    />
+                  }
+                  <input
+                    type="file"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    hidden
+                    #fileInput
+                  />
+                  <ui-button class="center-self" (action)="fileInput.click()">
+                    {{ currentUrl ? "Изменить" : "Приложить" }} QR-код
+                  </ui-button>
+                }
+              }
+            </ui-stack>
 
-        </ui-stack>
-      </ui-expandable>
-      <ui-expandable title="Реферал">
-        <img [src]="qrLink" alt="QR code for payment" class="qr">
-        <ui-button class="center-self" (action)="downloadReferralQR()">
-          Скачать QR-код
-        </ui-button>
-        <ui-button class="center-self" (action)="copyReferralToClipboard()">
-          Скопировать ссылку
-        </ui-button>
-      </ui-expandable>
-    }
+            <ui-button
+              class="center-self"
+              (action)="savePaymentMethods()"
+              [disabled]="!canSavePaymentMethodChanges()"
+            >
+              Сохранить метод {{ currencySymbol() }}
+            </ui-button>
+          </ui-stack>
+        </ui-expandable>
+        <ui-expandable title="Реферал">
+          <img [src]="qrLink" alt="QR code for payment" class="qr" />
+          <ui-button class="center-self" (action)="downloadReferralQR()">
+            Скачать QR-код
+          </ui-button>
+          <ui-button class="center-self" (action)="copyReferralToClipboard()">
+            Скопировать ссылку
+          </ui-button>
+        </ui-expandable>
+      }
     }
   </ui-stack>
-
 </ui-card>

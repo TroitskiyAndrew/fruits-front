@@ -41,9 +41,9 @@ export function getEmptyUser(): IUser {
     _created: 0,
     sessionId: '',
     paymentMethods: {
-      [Currency.Rub]: null,
-      [Currency.VND]: null,
-      [Currency.USDT]: null,
+      [Currency.Rub]: {bank: null, cash: false},
+      [Currency.VND]:{bank: null, cash: false},
+      [Currency.USDT]: {bank: null, cash: false},
     },
     currency: DEFAULT_CURRENCY
   }
@@ -54,3 +54,10 @@ export function getUserName(user: IUser): string {
   const tgUser = user.user;
   return `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`;
 }
+
+export function getMinimalDate(){
+    const dayToSet = new Date();
+    const after21 = new Date().getHours() > 21;
+    dayToSet.setDate(dayToSet.getDate() + (after21 ? 2 : 1))
+    return {string: dayToSet.toISOString().slice(0, 10), number: dayToSet.getTime()}
+  }

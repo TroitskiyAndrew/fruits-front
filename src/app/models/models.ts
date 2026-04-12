@@ -22,19 +22,26 @@ export enum OnlinePaymentOption {
   QR = 'qr',
   Account = 'account',
 }
-
-export type IAccount = {
+export interface OnlinePayment {
   paymentOption: OnlinePaymentOption;
   account: string;
-  comment?: string
+  comment?: string;
 }
 
-export type AccountForm = Pick<IAccount, 'paymentOption' | 'comment'> & {
+
+
+export type IAccount = {
+  bank: OnlinePayment | null
+  cash: boolean
+}
+
+export type AccountForm = Pick<OnlinePayment, 'paymentOption' | 'comment'> & {
   accountInfo?: string
   qrUrl?: string
-}
+  bank: boolean
+} & Pick<IAccount, 'cash'>
 
-export type IPaymentMethods = Record<Currency, IAccount | null>;
+export type IPaymentMethods = Record<Currency, IAccount>;
 
 export interface ITelegrammUser {
   id: number;
@@ -113,7 +120,7 @@ interface ProductBase {
   price: IPrices;
   set: boolean;
 }
-export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number, orderAddon?: boolean };
+export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number } & Partial<Addon>;
 
 export type ISetProducts = Record<string, OrderProduct<ISimpleProduct>>;
 
@@ -123,13 +130,17 @@ export interface ISet extends ProductBase {
   set: true;
 }
 
+export type Addon = {
+  orderAddon: boolean;
+  defaultAddon: boolean;
+}
+
 export type ProductForm = Omit<ISet, 'set' | 'products'> & {
   set: boolean;
   products: Record<string, number>;
-  orderAddon: boolean
-}
+} & Addon
 
-export interface ISimpleProduct extends ProductBase { set: false, orderAddon: boolean };
+export interface ISimpleProduct extends ProductBase, Addon { set: false };
 
 export type Product = ISet | ISimpleProduct;
 

@@ -10,7 +10,7 @@ import { LoaderDirective } from '../../ui/loader/loader.directive';
 
 @Component({
   selector: 'placing-order-page',
-  imports: [PageComponent, OrderDeliveryComponent, ButtonComponent],
+  imports: [PageComponent, OrderDeliveryComponent],
   templateUrl: './placing-order-page.component.html',
   styleUrl: './placing-order-page.component.scss'
 })
@@ -21,33 +21,5 @@ export class PlacingOrderPageComponent {
   OrderDeliveryPlace = OrderDeliveryPlace
   canCreateOrder = false;
 
-  constructor(private stateService: StateService, private apiService: ApiService, private router: Router){}
-
-  submitDeliveryValue(delivery: IOrderDelivery | null){
-    if(delivery) {
-      this.stateService.updateDelivery(delivery);
-      this.canCreateOrder = true;
-    } else {
-      this.canCreateOrder = false
-    }
-  }
-
-  async createOrder(method: PaymentMethod){
-    const order = this.stateService.order();
-    this.stateService.load(true);
-    const newOrderInfo = await this.apiService.createOrder(order, method);
-    this.stateService.load(false);
-    if(newOrderInfo){
-      const {order, payment} = newOrderInfo;
-      this.stateService.orders.update((orders) => [...orders, order]);
-      this.stateService.payments.update((payments) => [...payments, payment]);
-      if(method === PaymentMethod.Bank) {
-        this.router.navigate(['online-payment', payment.id]);
-      } else {
-        this.stateService.dropOrder();
-        this.router.navigate(['order-placed']);
-      }
-
-    }
-  }
+  constructor(private stateService: StateService){}
 }

@@ -75,6 +75,9 @@
     </ui-toggler>
     } @else {
     <ui-checkbox label="Модификатор заказа" formControlName="orderAddon"></ui-checkbox>
+    @if(orderAddon) {
+      <ui-checkbox label="Обязательный" formControlName="orderAddon"></ui-checkbox>
+    }
 
     @if (!orderAddon) {
     <ui-row class="row">

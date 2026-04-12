@@ -6,22 +6,22 @@
       Общая сумма: {{total() | priceString : currency()}} {{currencySymbol()}}
     </div>
     @let method = paymentMethod();
-    @if(method) {
+    @if(method.bank) {
 
-    @if(method.paymentOption === OnlinePaymentOption.QR) {
-    <img [src]="method.account" alt="QR code for payment" class="qr">
-    <ui-button (action)="downloadQR(method.account)">
+    @if(method.bank.paymentOption === OnlinePaymentOption.QR) {
+    <img [src]="method.bank.account" alt="QR code for payment" class="qr">
+    <ui-button (action)="downloadQR(method.bank.account)">
       Скачать QR-код
     </ui-button>
     } @else {
     <div>
-      {{method.comment || 'Реквизиты для оплаты:'}}:
+      {{method.bank.comment || 'Реквизиты для оплаты:'}}:
     </div>
     <ui-row>
       <div>
-        {{method.account}}
+        {{method.bank.account}}
       </div>
-      <ui-button (action)="copyToClipboard(method.account!)" size="s" [icon]="true" variant="ghost"
+      <ui-button (action)="copyToClipboard(method.bank.account!)" size="s" [icon]="true" variant="ghost"
         fa="fa-solid fa-copy"> </ui-button>
     </ui-row>
 

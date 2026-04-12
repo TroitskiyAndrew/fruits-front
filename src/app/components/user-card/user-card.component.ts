@@ -48,20 +48,23 @@ export class UserCardComponent {
     { label: 'QR-код', value: OnlinePaymentOption.QR },
   ]
   OnlinePaymentOption = OnlinePaymentOption;
-  acceptCurrency = computed(() => this.paymentMethodsFormChanges()[this.currency()] !== null);
+  acceptCurrency = computed(() => this.paymentMethodsFormChanges()[this.currency()].bank);
   canSavePaymentMethodChanges = computed(() => {
     this.canSavePaymentMethodTrigger()
     const value = this.paymentMethodsFormChanges()[this.currency()];
     const currentMethod = this.user.paymentMethods[this.currency()];
-    if(value === currentMethod){
+    if(value.bank === (currentMethod.bank || false) && value.cash === currentMethod.cash){
       return false;
     }
-    if(value !== null) {
+    if(value.cash !== currentMethod.cash){
+      return true
+    }
+    if(value.bank) {
       const newMethod = this.getPaymentMethod(value);
-      if(!newMethod.account) {
+      if(!newMethod.bank?.account) {
         return false;
       }
-      if(currentMethod != null && currentMethod.paymentOption === newMethod.paymentOption && currentMethod.account === newMethod.account && currentMethod.comment === newMethod.comment) {
+      if(currentMethod.bank != null && currentMethod.bank?.paymentOption === newMethod.bank?.paymentOption && currentMethod.bank?.account === newMethod.bank?.account && currentMethod.bank?.comment === newMethod.bank?.comment) {
           return false
         }
     }
@@ -86,9 +89,9 @@ export class UserCardComponent {
   }
   paymentMethodsFormChanges = toSignal(this.paymentMethodsForm.valueChanges, {
     initialValue: {
-      [Currency.Rub]: null,
-      [Currency.VND]: null,
-      [Currency.USDT]: null,
+      [Currency.Rub]: {bank: null, cash: false},
+      [Currency.VND]: {bank: null, cash: false},
+      [Currency.USDT]: {bank: null, cash: false},
     }
   });
 
@@ -110,12 +113,14 @@ export class UserCardComponent {
         this.paymentMethodsForm.removeControl(key);
       });
       Object.entries(user.paymentMethods).forEach(([currency, account]) => {
-        this.paymentMethodsForm.addControl(currency, account ? new FormGroup<ControlsOf<AccountForm>>({
-          paymentOption: new FormControl(account.paymentOption, { nonNullable: true }),
-          comment: new FormControl(account.comment, { nonNullable: true }),
-          accountInfo: new FormControl(account.paymentOption === OnlinePaymentOption.Account ? account.account : '', { nonNullable: true }),
-          qrUrl: new FormControl(account.paymentOption === OnlinePaymentOption.QR ? account.account : '', { nonNullable: true }),
-        }) : new FormControl(null));
+        this.paymentMethodsForm.addControl(currency,new FormGroup<ControlsOf<AccountForm>>({
+          paymentOption: new FormControl(account.bank?.paymentOption || OnlinePaymentOption.Account, { nonNullable: true }),
+          comment: new FormControl(account.bank?.comment, { nonNullable: true }),
+          accountInfo: new FormControl(account.bank?.paymentOption === OnlinePaymentOption.Account ? account.bank?.account : '', { nonNullable: true }),
+          qrUrl: new FormControl(account.bank?.paymentOption === OnlinePaymentOption.QR ? account.bank?.account : '', { nonNullable: true }),
+          cash: new FormControl(account.cash, { nonNullable: true }),
+          bank: new FormControl(account.bank != null, { nonNullable: true }),
+        }));
       })
     });
   }
@@ -128,6 +133,8 @@ export class UserCardComponent {
       comment: new FormControl('', { nonNullable: true }),
       accountInfo: new FormControl('', { nonNullable: true }),
       qrUrl: new FormControl('', { nonNullable: true }),
+      cash: new FormControl(false, { nonNullable: true }),
+      bank: new FormControl(false, { nonNullable: true }),
     }) : new FormControl(null));
   }
 
@@ -145,9 +152,12 @@ export class UserCardComponent {
 
   getPaymentMethod(formValue: AccountForm): IAccount {
     return {
-      paymentOption: formValue.paymentOption,
-      account: formValue.paymentOption === OnlinePaymentOption.Account ? (formValue.accountInfo || '') : (formValue.qrUrl || ''),
-      comment: formValue.comment,
+      bank: formValue.bank ? {
+        paymentOption: formValue.paymentOption,
+        account: formValue.paymentOption === OnlinePaymentOption.Account ? (formValue.accountInfo || '') : (formValue.qrUrl || ''),
+        comment: formValue.comment,
+      } : null,
+      cash: formValue.cash
     }
   }
 

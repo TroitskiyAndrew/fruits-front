@@ -1,9 +1,10 @@
-<div class="field">
+<div class="field" [class.invalid]="form != null ? form.controls[formControlName].invalid : false">
   @if (label) {
-    <label>{{ label }}</label>
+    <label>{{ label + (isRequired ? "*" : "")}}</label>
   }
 
-  <div class="input-wrapper">
+  <ui-row class="relative" rowClass="w-100">
+    @let clear = clearable && value;
     <input
       [type]="type"
       [placeholder]="placeholder"
@@ -13,10 +14,12 @@
       [attr.step]="step"
       (input)="change($any($event.target).value)"
       (blur)="onTouched()"
+      [class.clear-space]="clear"
     />
 
-    @if (clearable && value) {
+    @if (clear) {
       <button type="button" class="clear" (click)="clear()">×</button>
     }
-  </div>
+    <ng-content></ng-content>
+  </ui-row>
 </div>

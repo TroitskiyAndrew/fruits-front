@@ -109,11 +109,12 @@ export class DatetimeComponent implements ControlValueAccessor {
     const today = new Date()
     const tomorrow = new Date()
     tomorrow.setDate(today.getDate() + 1)
-
-    if (now.getHours() < 15) {
-      this.minDate = this.formatDate(today)
-    } else {
+    const afterTomorrow = new Date()
+    afterTomorrow.setDate(today.getDate() + 2)
+    if (now.getHours() < 18) {
       this.minDate = this.formatDate(tomorrow)
+    } else {
+      this.minDate = this.formatDate(afterTomorrow)
     }
   }
 
@@ -121,7 +122,7 @@ export class DatetimeComponent implements ControlValueAccessor {
 
     const result: { label: string; value: string }[] = []
 
-    for (let h = 0; h < 24; h++) {
+    for (let h = 18; h < 21; h++) {
 
       const hh = String(h).padStart(2, '0')
       const value = `${hh}:00`
