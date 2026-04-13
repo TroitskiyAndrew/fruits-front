@@ -136,7 +136,7 @@ export class OrderDeliveryComponent {
   }
 
   get freeDeliveryFromPice(){
-    if([DefaultAddonBy.Price, DefaultAddonBy.Count].includes(this.deliverProduct.default)){
+    if(this.deliverProduct.default !== DefaultAddonBy.Unconditional){
       return 0;
     }
     const freeDelivery = this.stateService.deliveries().find(d => d.default === DefaultAddonBy.Price);
@@ -144,7 +144,7 @@ export class OrderDeliveryComponent {
   }
 
   get freeDeliveryFromCount(){
-    if([DefaultAddonBy.Price, DefaultAddonBy.Count].includes(this.deliverProduct.default)){
+    if(this.deliverProduct.default !== DefaultAddonBy.Unconditional){
       return 0;
     }
     const freeDelivery = this.stateService.deliveries().find(d => d.default === DefaultAddonBy.Count);
