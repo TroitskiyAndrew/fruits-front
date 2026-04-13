@@ -1,7 +1,7 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product } from '../models/models';
+import { Currency, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product, ProductType } from '../models/models';
 import { CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../constants/constants';
 import { getEmptyUser, getTotal, getUserName } from './utils';
 import { environment } from '../../environments/environment';
@@ -17,14 +17,17 @@ export class StateService {
     return map;
   }, new Map()));
   simpleProducts = computed(() => {
-    return this.products().filter(p => !p.set && !p.orderAddon)
+    return this.products().filter(p => p.type === ProductType.SimpleProduct)
   })
   simpleProductsMap = computed(() => this.simpleProducts().reduce((map, product) => {
     map.set(product.id, product);
     return map;
   }, new Map()));
   orderAddons = computed(() => {
-    return this.products().filter(p => !p.set && p.orderAddon)
+    return this.products().filter(p => p.type === ProductType.OrderAddon)
+  })
+  deliveries = computed(() => {
+    return this.products().filter(p => p.type === ProductType.Delivery)
   })
   orderAddonsMap = computed(() => this.orderAddons().reduce((map, addon) => {
     map.set(addon.id, addon);
@@ -41,7 +44,7 @@ export class StateService {
     return this.order().content.prices[this.currency()]
   });
   cartAddons = computed(() => {
-    return this.order().content.products.filter(p => p.orderAddon)
+    return this.order().content.products.filter(p => p.type === ProductType.OrderAddon)
   });
   orderDelivery = computed(() => this.order().delivery);
   orders = signal<IOrder[]>([]);
@@ -83,10 +86,20 @@ export class StateService {
       const user = this.user();
       this.currency.set(user.currency);
       const tgUsername = user.user.username;
+      const emptyOrder = this.getEmptyOrder();
       this.updateDelivery({
-        name: getUserName(user),
-        contact: tgUsername ? 'В личные сообщения или через бот' : '',
+        name: emptyOrder.delivery.name,
+        contact: emptyOrder.delivery.contact
       })
+    })
+    effect(() => {
+      this.products();
+      const emptyOrder = this.getEmptyOrder();
+      if (emptyOrder.delivery.deliveryProduct) {
+        this.updateDelivery({
+          deliveryProduct: emptyOrder.delivery.deliveryProduct
+        })
+      }
     })
   }
 
@@ -178,7 +191,7 @@ export class StateService {
     date.setHours(15, 0, 0, 0);
 
     const timestamp = date.getTime();
-    return {
+    const order: IOrder = {
       id: '',
       number: 0,
       userId: this.user().userId,
@@ -213,6 +226,16 @@ export class StateService {
         deliveryType: DeliveryType.Reception
       }
     }
+    const deliveries = this.deliveries();
+    const defaultDelivery = deliveries.filter(d => d.default).sort((a, b) => (a.minPrice != null ? 1 : 0) - (b.minPrice != null ? 1 : 0))[0];
+    if (defaultDelivery) {
+      order.delivery.deliveryProduct = defaultDelivery;
+    }
+    const user = this.user()
+    const tgUsername = user.user.username;
+    order.delivery.name = getUserName(user)
+    order.delivery.contact = tgUsername ? 'В личные сообщения или через бот' : ''
+    return order;
   }
 
   dropOrder() {

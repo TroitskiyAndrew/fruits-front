@@ -1,5 +1,5 @@
 import { Component, computed, effect, signal } from '@angular/core';
-import { Currency, ISet, Measure, Product } from '../../models/models';
+import { Currency, Set, Measure, Product, ProductType } from '../../models/models';
 import { StackComponent } from '../../ui/stack/stack.component';
 import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '../../ui/avatar/avatar.component';
@@ -35,7 +35,7 @@ export class ShopPageComponent {
   trigger = signal<boolean>(false)
   selectedSet = signal<string | null>(null)
   sets = computed(() => {
-    const sets = this.stateService.products().filter(p => p.set);
+    const sets = this.stateService.products().filter(p => p.type === ProductType.Set);
     this.trigger()
     return sets;
   });
@@ -61,7 +61,7 @@ export class ShopPageComponent {
     this.triggerSets()
     this.selectedSet.set(null);
   }
-  addToCart(product: ISet){
+  addToCart(product: Product){
     this.stateService.updateCart([...this.stateService.cart(), {...product, count: 1}]);
   }
 

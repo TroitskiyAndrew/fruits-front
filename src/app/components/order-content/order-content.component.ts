@@ -3,7 +3,7 @@ import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { StackComponent } from "../../ui/stack/stack.component";
 import { ProductCardComponent, ProductCardPlace } from "../product-card/product-card.component";
 import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS } from '../../constants/constants';
-import { ControlsOf, Currency, IOrderContent, IPrices, ISet, ISetProducts, ISimpleProduct, OrderProduct, Product, ProductForm } from '../../models/models';
+import { ControlsOf, Currency, IOrderContent, IPrices,  ISetProducts,  OrderProduct, Product, ProductForm, ProductType } from '../../models/models';
 import { StateService } from '../../services/state.service';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -44,7 +44,7 @@ export class OrderContentComponent {
   ]
 
   get products() {
-    return this.content.products.filter(p => !p.orderAddon)
+    return this.content.products.filter(p => [ProductType.Set, ProductType.SimpleProduct].includes(p.type))
   }
 
   get productCardUsage () {
@@ -59,7 +59,7 @@ export class OrderContentComponent {
     this.updateContent.emit(this.content);
   }
 
-  changeContent(product: ISet, index: number) {
+  changeContent(product: Product, index: number) {
     this.content.products[index] = { ...product, count: 1 };
     this.calculateTotal()
   }
@@ -69,7 +69,7 @@ export class OrderContentComponent {
   }
 
   selectAddon(id: string){
-      const addonIds = this.content.products.filter(p => p.orderAddon).map(a => a.id);
+      const addonIds = this.content.products.filter(p => p.type === ProductType.OrderAddon).map(a => a.id);
       if (addonIds.includes(id)){
         this.content.products = this.content.products.filter(p => p.id !== id)
       } else {

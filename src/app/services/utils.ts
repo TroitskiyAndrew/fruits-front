@@ -1,5 +1,5 @@
 import { DEFAULT_CURRENCY } from "../constants/constants";
-import { Currency, IOrderContent, ISimpleProduct, IUser, OrderProduct } from "../models/models";
+import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType } from "../models/models";
 
 export function getTotal(orderContent: IOrderContent) {
   const newTotal = {
@@ -8,13 +8,13 @@ export function getTotal(orderContent: IOrderContent) {
     [Currency.USDT]: 0,
   }
   orderContent.products.forEach((product) => {
-    if (!product.set || product.fixedSet) {
+    if(product.type !== ProductType.Set || product.setType === SetType.Fixed){
       newTotal[Currency.Rub] += product.price[Currency.Rub];
       newTotal[Currency.VND] += product.price[Currency.VND];
       newTotal[Currency.USDT] += product.price[Currency.USDT];
     }
-    if (product.set) {
-      Object.values(product.products).forEach((product: OrderProduct<ISimpleProduct>) => {
+    if (product.type == ProductType.Set) {
+      Object.values(product.products).forEach((product: OrderProduct<SimpleProduct>) => {
         newTotal[Currency.Rub] += product.price[Currency.Rub] * (product.count - (product.fixedCount || 0));
         newTotal[Currency.VND] += product.price[Currency.VND] * (product.count - (product.fixedCount || 0));
         newTotal[Currency.USDT] += product.price[Currency.USDT] * (product.count - (product.fixedCount || 0));
@@ -41,9 +41,9 @@ export function getEmptyUser(): IUser {
     _created: 0,
     sessionId: '',
     paymentMethods: {
-      [Currency.Rub]: {bank: null, cash: false},
-      [Currency.VND]:{bank: null, cash: false},
-      [Currency.USDT]: {bank: null, cash: false},
+      [Currency.Rub]: { bank: null, cash: false },
+      [Currency.VND]: { bank: null, cash: false },
+      [Currency.USDT]: { bank: null, cash: false },
     },
     currency: DEFAULT_CURRENCY
   }
@@ -55,9 +55,9 @@ export function getUserName(user: IUser): string {
   return `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`;
 }
 
-export function getMinimalDate(){
-    const dayToSet = new Date();
-    const after21 = new Date().getHours() > 21;
-    dayToSet.setDate(dayToSet.getDate() + (after21 ? 2 : 1))
-    return {string: dayToSet.toISOString().slice(0, 10), number: dayToSet.getTime()}
-  }
+export function getMinimalDate() {
+  const dayToSet = new Date();
+  const after21 = new Date().getHours() > 21;
+  dayToSet.setDate(dayToSet.getDate() + (after21 ? 2 : 1))
+  return { string: dayToSet.toISOString().slice(0, 10), number: dayToSet.getTime() }
+}

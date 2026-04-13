@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { RowComponent } from "../row/row.component";
 import { StateService } from '../../services/state.service';
 import { CURRENCY_BUTTONS } from '../../constants/constants';
-import { Currency } from '../../models/models';
+import { Currency, ProductType } from '../../models/models';
 import { StackComponent } from "../stack/stack.component";
 import { TogglerComponent } from "../toggler/toggler.component";
 
@@ -23,7 +23,7 @@ export class PageComponent {
 
   myAccountLink = computed(() => `account/${this.stateService.user().id}`);
   isAdmin = computed(() => this.stateService.isAdmin());
-  cartCount = computed(() => this.stateService.cart().filter(p => !p.orderAddon).length);
+  cartCount = computed(() => this.stateService.cart().filter(p => [ProductType.Set, ProductType.SimpleProduct].includes(p.type)).length);
   currency = computed(() => this.stateService.currency());
   currencyButtons = CURRENCY_BUTTONS;
   selectCurrency = false;

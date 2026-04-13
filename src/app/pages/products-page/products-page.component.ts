@@ -1,7 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProductCardComponent, ProductCardPlace } from '../../components/product-card/product-card.component';
-import { ISet, Currency, Product } from '../../models/models';
+import { Currency, Product, ProductType, Set } from '../../models/models';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { StackComponent } from '../../ui/stack/stack.component';
 import { InputComponent } from '../../ui/input/input.component';
@@ -39,10 +39,16 @@ export class ProductsPageComponent {
 
   products = computed(() => {
     const searchValue = this.search()?.toLowerCase() || '';
-
-    return this.stateService.products()
-      .filter(p => p.name.toLowerCase().includes(searchValue))
-      .sort((a, b) => (b.set ? 1 : 0) - (a.set ? 1 : 0));
+    let products = this.stateService.products();
+    if(searchValue) {
+      products = products.filter(p => p.name.toLowerCase().includes(searchValue))
+    }
+    return products
+      .sort((a, b) => {
+        const valA = a.type === ProductType.Set ? -1 : a.type
+        const valB = b.type === ProductType.Set ? -1 : b.type
+        return valA - valB
+      });
   });
 
   constructor(private stateService: StateService) { }
@@ -51,7 +57,7 @@ export class ProductsPageComponent {
 
   editProduct(product: Product) { }
 
-  editSet(set: ISet) { }
+  editSet(set: Set) { }
 
   addProduct(product: Product) {
 

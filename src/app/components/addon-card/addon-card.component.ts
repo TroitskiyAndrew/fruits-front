@@ -1,5 +1,5 @@
 import { Component, computed, EventEmitter, input, Input, Output } from '@angular/core';
-import { Currency, ISimpleProduct, Product } from '../../models/models';
+import { Currency,  Product } from '../../models/models';
 import { StackComponent } from "../../ui/stack/stack.component";
 import { CardComponent } from "../../ui/card/card.component";
 import { RowComponent } from "../../ui/row/row.component";

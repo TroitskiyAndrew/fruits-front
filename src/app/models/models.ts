@@ -1,4 +1,4 @@
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormControl, FormGroup } from '@angular/forms';
 
 export interface IUser {
   id: string;
@@ -16,7 +16,7 @@ export interface IUser {
   currency: Currency;
 }
 
-export type UserForm = Pick<IUser, 'admin' | 'paymentMethods'>
+export type UserForm = Pick<IUser, 'admin' | 'paymentMethods'>;
 
 export enum OnlinePaymentOption {
   QR = 'qr',
@@ -28,18 +28,16 @@ export interface OnlinePayment {
   comment?: string;
 }
 
-
-
 export type IAccount = {
-  bank: OnlinePayment | null
-  cash: boolean
-}
+  bank: OnlinePayment | null;
+  cash: boolean;
+};
 
 export type AccountForm = Pick<OnlinePayment, 'paymentOption' | 'comment'> & {
-  accountInfo?: string
-  qrUrl?: string
-  bank: boolean
-} & Pick<IAccount, 'cash'>
+  accountInfo?: string;
+  qrUrl?: string;
+  bank: boolean;
+} & Pick<IAccount, 'cash'>;
 
 export type IPaymentMethods = Record<Currency, IAccount>;
 
@@ -71,7 +69,7 @@ export interface IOrderStatus {
   deleted: number | null;
 }
 export interface IOrderContent {
-  prices: IPrices,
+  prices: IPrices;
   currency: Currency;
   products: OrderProduct[];
 }
@@ -82,7 +80,8 @@ export interface IOrderDelivery {
   place: string;
   placeAdd: string;
   date: number;
-  deliveryType: DeliveryType
+  deliveryType: DeliveryType;
+  deliveryProduct?: Delivery;
 }
 export interface IOrder {
   id: string;
@@ -99,50 +98,84 @@ export interface IOrder {
 export enum Currency {
   Rub = 'rub',
   VND = 'vnd',
-  USDT = 'usdt'
+  USDT = 'usdt',
 }
 
 export enum Measure {
   KG = 'кг',
-  Item = 'шт'
+  Item = 'шт',
 }
 
 export type IPrices = Record<Currency, number>;
 
-interface ProductBase {
+export enum ProductType {
+  SimpleProduct,
+  Set,
+  Delivery,
+  SetAddon,
+  OrderAddon,
+}
+
+export type ProductBase = {
   id: string;
+  type: ProductType;
   name: string;
   description: string;
+  price: IPrices;
+  deleted: boolean;
+};
+
+export type SimpleProduct = ProductBase & {
+  weight: number;
   measure: Measure;
   amount: number;
+  type: ProductType.SimpleProduct;
+};
+
+export enum SetType {
+  Fixed,
+  MinPrice,
+}
+
+export type Set = ProductBase & {
   weight: number;
-  deleted: boolean;
-  price: IPrices;
-  set: boolean;
-}
-export type OrderProduct<T = Product> = T & { count: number, fixedCount?: number } & Partial<Addon>;
-
-export type ISetProducts = Record<string, OrderProduct<ISimpleProduct>>;
-
-export interface ISet extends ProductBase {
+  type: ProductType.Set;
+  setType: SetType;
   products: ISetProducts;
-  fixedSet: boolean;
-  set: true;
-}
+};
 
-export type Addon = {
-  orderAddon: boolean;
-  defaultAddon: boolean;
-}
+export type OrderProduct<T = Product> = T & {
+  count: number;
+  fixedCount?: number;
+};
 
-export type ProductForm = Omit<ISet, 'set' | 'products'> & {
-  set: boolean;
-  products: Record<string, number>;
-} & Addon
+export type ISetProducts = Record<string, OrderProduct<SimpleProduct>>;
 
-export interface ISimpleProduct extends ProductBase, Addon { set: false };
+export type AddonBase = {
+  default: boolean;
+  minPrice?: IPrices;
+};
 
-export type Product = ISet | ISimpleProduct;
+export type Delivery = ProductBase &
+  AddonBase & {
+    type: ProductType.Delivery;
+  };
+
+  export type Addon = ProductBase & AddonBase & {
+    type: ProductType.OrderAddon | ProductType.SetAddon;
+    weight: number;
+  }
+
+export type Product = SimpleProduct | Set | Addon | Delivery;
+export type ProductForm =
+  Omit<SimpleProduct, 'type'> &
+  Omit<Set, 'type'> &
+  Omit<Addon, 'type'> &
+  Omit<Delivery, 'type'> & {
+    type: ProductType;
+    fromMinPrice: boolean;
+    minPrice: IPrices;
+  };
 
 export enum PaymentMethod {
   Bank = 'bank',
@@ -192,15 +225,14 @@ export interface Share {
 }
 
 export type ControlsOf<T> = {
-  [K in keyof T]:
-  T[K] extends Record<string, any>
-  ? FormGroup<any>
-  : FormControl<T[K]>
-}
+  [K in keyof T]: T[K] extends Record<string, any>
+    ? FormGroup<any>
+    : FormControl<T[K]>;
+};
 
 export interface INewOrderInfo {
-  order: IOrder,
-  payment: IPayment,
+  order: IOrder;
+  payment: IPayment;
 }
 
 export interface IConfig {
