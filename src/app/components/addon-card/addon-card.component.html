@@ -1,20 +1,25 @@
 <ui-card>
   <ui-row rowClass="w-100">
-    <ui-checkbox [value]="isSelected()" (valueChange)="changeAddonSelect()" label="" [disabled]="usage === AddonCardPlace.OrderPage"></ui-checkbox>
-    <ui-stack class="left">
+    @switch (usage) {
+      @case (AddonCardPlace.SetCard) {
+        <ui-checkbox [value]="value" (valueChange)="changeAddonSelect()" label="" [disabled]="disabled" [value]="value"></ui-checkbox>
+        <ui-stack class="left">
 
-      <div class="title">
-        {{ addon.name }}
-      </div>
+          <div class="title">
+            {{ addon.name }} {{ titleMeasure }}
+          </div>
 
-      <div class="green-text">
-        {{ addon.description }}
-      </div>
+          <div class="green-text">
+            {{ addon.description }}
+          </div>
 
-    </ui-stack>
-    <div class="right bold">
-      {{ addonPrice() | priceString : currency() }} {{currencySymbol()}}
-    </div>
+        </ui-stack>
+        <div class="right bold">
+          {{ addonPrice() | priceString : currency() }} {{currencySymbol()}}
+        </div>
+
+      }
+    }
 
   </ui-row>
 

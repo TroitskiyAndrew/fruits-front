@@ -1,5 +1,5 @@
 import { Component, computed, EventEmitter, input, Input, Output } from '@angular/core';
-import { Currency,  Product } from '../../models/models';
+import { Addon, Currency,  Delivery,  Product, ProductType } from '../../models/models';
 import { StackComponent } from "../../ui/stack/stack.component";
 import { CardComponent } from "../../ui/card/card.component";
 import { RowComponent } from "../../ui/row/row.component";
@@ -9,10 +9,14 @@ import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../../constants/constants';
 
 export enum AddonCardPlace {
-  Cart,
-  OrderPage
+  SetContent,
+  SetCard,
 }
 
+export interface ToggleAddon {
+  addon: Addon | Delivery;
+  selected: boolean
+}
 @Component({
   selector: 'addon-card',
   imports: [StackComponent, CardComponent, RowComponent, CheckboxComponent, PriceStringPipe],
@@ -21,20 +25,27 @@ export enum AddonCardPlace {
 })
 export class AddonCardComponent {
 
-  @Input() usage: AddonCardPlace = AddonCardPlace.Cart;
+  @Input() usage: AddonCardPlace = AddonCardPlace.SetCard;
   AddonCardPlace = AddonCardPlace;
-  @Input() addon!: Product
+  @Input() addon!: Addon | Delivery
+  @Input() disabled = true;
+  @Input() value = false;
   currency = input(DEFAULT_CURRENCY);
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
-  isSelected = computed(() => this.stateService.cartAddons().find(a => a.id === this.addon.id) != null)
   addonPrice = computed(() => this.addon.price[this.currency()])
 
-  @Output() selectAddon = new EventEmitter<boolean>();
+  @Output() toggleAddon = new EventEmitter<ToggleAddon>();
 
   constructor(private stateService: StateService) {}
 
   changeAddonSelect() {
-    this.selectAddon.emit(!this.isSelected())
+    this.value = !this.value;
+    this.toggleAddon.emit( {addon: this.addon, selected: this.value})
+  }
+
+  get titleMeasure() {
+    const weight = this.addon.type === ProductType.SetAddon ? this.addon.weight : 0;
+    return weight > 0 ? `(${weight} кг)` : '';
   }
 
 }

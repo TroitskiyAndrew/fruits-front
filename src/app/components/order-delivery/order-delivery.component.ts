@@ -15,6 +15,7 @@ import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
 import { CURRENCY_SYMBOLS } from '../../constants/constants';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
+import { AddonCardComponent, ToggleAddon } from "../addon-card/addon-card.component";
 
 export enum OrderDeliveryPlace {
   PlacingOrder,
@@ -22,7 +23,7 @@ export enum OrderDeliveryPlace {
 }
 @Component({
   selector: 'order-delivery',
-  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule, PriceStringPipe],
+  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule, PriceStringPipe, AddonCardComponent],
   templateUrl: './order-delivery.component.html',
   styleUrl: './order-delivery.component.scss'
 })
@@ -63,20 +64,14 @@ export class OrderDeliveryComponent {
     return this.stateService.deliveriesMap().get(deliveryProductId)!.default !== DefaultAddonBy.None
   }
 
+  get additionalDelivery() {
+    return this.stateService.deliveries().find(delivery => delivery.default === DefaultAddonBy.None)
+  }
 
-  deliveryOptions = computed(() => {
-    const deliveries = this.stateService.deliveries();
-    const cartTotal = this.stateService.cartTotal()
-    const cartCount = this.stateService.cart().length
-    const { defaultDeliveries, addon } = deliveries.reduce<{ defaultDeliveries: Delivery[], addon: Delivery[] }>((acc, delivery) => {
-      delivery.default === DefaultAddonBy.None ?  acc.addon.push(delivery) : acc.defaultDeliveries.push(delivery);
-      return acc
-    }, { defaultDeliveries: [], addon: [] });
 
-    const result = [chooseDefaultDelivery(defaultDeliveries, this.currency, cartTotal, cartCount), ...addon].filter(Boolean).map(delivery => ({ label: delivery!.name, value: delivery!.id }))
-    console.log(result, this.delivery.deliveryProduct.id)
-    return result;
-  })
+  get disableAddons() {
+    return this.usage === OrderDeliveryPlace.OrderCard
+  }
 
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router) {
     this.form.valueChanges
@@ -136,7 +131,7 @@ export class OrderDeliveryComponent {
   }
 
   get freeDeliveryFromPice(){
-    if(this.deliverProduct.default !== DefaultAddonBy.Unconditional){
+    if(this.deliverProduct.default !== DefaultAddonBy.None){
       return 0;
     }
     const freeDelivery = this.stateService.deliveries().find(d => d.default === DefaultAddonBy.Price);
@@ -174,11 +169,37 @@ export class OrderDeliveryComponent {
     }
   }
 
-  changeDeliveryProduct(deliveryProductId: string) {
-    const delivery = this.stateService.deliveriesMap().get(deliveryProductId)!;
-    this.stateService.updateDelivery({
-      deliveryProduct: delivery
-    })
+  deliveryOptions = computed(() => {
+    const deliveries = this.stateService.deliveries();
+    const cartTotal = this.stateService.cartTotal()
+    const cartCount = this.stateService.cart().length
+    const { defaultDeliveries, addon } = deliveries.reduce<{ defaultDeliveries: Delivery[], addon: Delivery[] }>((acc, delivery) => {
+      delivery.default === DefaultAddonBy.None ?  acc.addon.push(delivery) : acc.defaultDeliveries.push(delivery);
+      return acc
+    }, { defaultDeliveries: [], addon: [] });
+
+    const result = [chooseDefaultDelivery(defaultDeliveries, this.currency, cartTotal, cartCount), ...addon].filter(Boolean).map(delivery => ({ label: delivery!.name, value: delivery!.id }))
+    console.log(result, this.delivery.deliveryProduct.id)
+    return result;
+  })
+
+  changeDeliveryProduct(options: ToggleAddon) {
+
+    let delivery: Delivery;
+    if(options.selected){
+      delivery = options.addon as Delivery
+    } else {
+      const deliveries = this.stateService.deliveries();
+      const defaultDeliveries = deliveries.filter(d => d.default !== DefaultAddonBy.None)
+      delivery = chooseDefaultDelivery(defaultDeliveries, this.currency, this.stateService.cartTotal(), this.stateService.cart().length)
+    }
+    this.form.controls.deliveryProductId.setValue(delivery.id)
+    if(this.usage === OrderDeliveryPlace.PlacingOrder){
+      this.stateService.updateDelivery({
+        deliveryProduct: delivery
+      })
+
+    }
     const date = new Date()
     if(delivery.default !== DefaultAddonBy.None){
       date.setDate(date.getDate() + 1)

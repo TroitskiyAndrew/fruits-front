@@ -17,7 +17,7 @@
   @if(addons.length){
     <ui-stack>
         @for (addon of addons; track addon.id) {
-          <addon-card [addon]="addon" (selectAddon)="selectAddon(addon.id)" [usage]="usage === OrderContentPlace.CartPage ? AddonCardPlace.Cart : AddonCardPlace.OrderPage"></addon-card>
+          <addon-card [addon]="addon" (toggleAddon)="toggleAddon($event)" [disabled]="usage === OrderContentPlace.OrderPage"></addon-card>
         }
       </ui-stack>
 

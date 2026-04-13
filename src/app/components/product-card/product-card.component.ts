@@ -21,6 +21,7 @@ import { Router } from '@angular/router'
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 import { LoaderDirective } from '../../ui/loader/loader.directive'
 import { CURRENCY_SYMBOLS } from '../../constants/constants'
+import { AddonCardComponent, ToggleAddon } from "../addon-card/addon-card.component";
 
 export enum ProductCardPlace {
   AllProducts,
@@ -45,6 +46,7 @@ export enum ProductCardPlace {
     TogglerComponent,
     GridComponent,
     PriceStringPipe,
+    AddonCardComponent
   ],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
@@ -103,9 +105,9 @@ export class ProductCardComponent {
         productPrice[Currency.USDT] = 0;
       }
       const products = product.products;
-      const productsFromForm = this.form.controls.products.getRawValue() as Record<string, number>;
+      const productsFromForm = this.productsForm.getRawValue() as Record<string, number>;
       Object.entries(productsFromForm).forEach(([id, count]: [string, number]) => {
-        const product = this.stateService.simpleProductsMap().get(id);
+        const product = this.stateService.simpleProductsMap().get(id) || this.stateService.setAddonsMap().get(id);
         productPrice[Currency.Rub] += (product?.price[Currency.Rub] || 0) * (count - (products[id]?.fixedCount || 0));
         productPrice[Currency.VND] += (product?.price[Currency.VND] || 0) * (count - (products[id]?.fixedCount || 0));
         productPrice[Currency.USDT] += (product?.price[Currency.USDT] || 0) * (count - (products[id]?.fixedCount || 0));
@@ -143,12 +145,12 @@ export class ProductCardComponent {
     return this.form.controls.setType.value === SetType.Fixed
   }
   get products() {
-    return this.form.controls.products.getRawValue()
+    return this.productsForm.getRawValue()
   }
   get productsArray() {
     const products = this.products as Record<string, number>;
     const simpleProductsMap = this.stateService.simpleProductsMap();
-    return Array(...Object.entries(products)).filter(([_, count]) => count > 0).map(([id]) => simpleProductsMap.get(id)!)
+    return Array(...Object.entries(products)).filter(([id, count]) => count > 0 && simpleProductsMap.get(id)).map(([id]) => simpleProductsMap.get(id)!)
   }
 
   get weight() {
@@ -164,7 +166,7 @@ export class ProductCardComponent {
         break;
       case ProductType.Set:
         return Object.entries(products).reduce((acc: number, [id, count]: [string, number]) => {
-          const product = this.stateService.simpleProductsMap().get(id)
+          const product = this.stateService.simpleProductsMap().get(id) || this.stateService.setAddonsMap().get(id)
           acc += (product?.weight || 0) * count;
           return acc;
         }, 0);
@@ -177,9 +179,11 @@ export class ProductCardComponent {
   get titleMeasure() {
     switch (this.form.controls.type.value) {
       case ProductType.Set:
-        return this.form.controls.setType.value === SetType.Fixed ? `Общий вес: ${this.weight} кг` : '';
+        return this.form.controls.setType.value === SetType.Fixed ? `(${this.weight} кг)` : '';
       case ProductType.SimpleProduct:
         return `(${this.amount} ${this.measure})`
+      case ProductType.SetAddon:
+        return this.weight > 0 ? `(${this.weight} кг)` : '';
 
       default:
         return ``
@@ -189,6 +193,10 @@ export class ProductCardComponent {
   simpleProducts = computed(() => {
     return this.stateService.simpleProducts()
   })
+
+  setAddons = computed(() => this.stateService.setAddons());
+  setAddonsMap = computed(() => this.stateService.setAddonsMap());
+  addons = [];
 
 
   @Output() accept = new EventEmitter<Product>();
@@ -246,10 +254,16 @@ export class ProductCardComponent {
   editing = false;
 
 
-  measureOptions = [
-    { label: 'шт', value: Measure.Item },
-    { label: 'кг', value: Measure.KG }
-  ]
+  get measureOptions() {
+    const options = [
+      { label: 'шт', value: Measure.Item },
+      { label: 'кг', value: Measure.KG }
+    ] as { label: string; value: Measure | '' }[];
+    if (this.form.controls.type.value === ProductType.SetAddon) {
+      options.push({ label: '', value: '' });
+    }
+    return options;
+  }
 
   typeOptions = [
     { label: 'Продукт', value: ProductType.SimpleProduct },
@@ -275,7 +289,7 @@ export class ProductCardComponent {
   }
   blockSetProducts = false;
   get showSetProducts() {
-    if(this.blockSetProducts){
+    if (this.blockSetProducts) {
       return false
     }
     if (!this.isSet) {
@@ -312,7 +326,7 @@ export class ProductCardComponent {
     Object.keys(productsGroup.controls).forEach(key => {
       productsGroup.removeControl(key, { emitEvent: false });
     });
-    this.simpleProducts().forEach(prod => {
+    [...this.simpleProducts(), ...this.setAddons()].forEach(prod => {
       this.form.controls.products.addControl(
         prod.id,
         new FormControl(
@@ -323,22 +337,25 @@ export class ProductCardComponent {
     })
   }
 
-  changeType() {
-    this.blockSetProducts = true;
-    const productsGroup = this.productsForm;
-    Object.keys(productsGroup.controls).forEach(key => {
-      productsGroup.removeControl(key, { emitEvent: false });
-    });
-    this.simpleProducts().forEach(prod => {
-      this.form.controls.products.addControl(
-        prod.id,
-        new FormControl(
-          (this.product() as Set)?.products?.[prod.id]?.count ?? 0,
-          { nonNullable: true }
-        ), { emitEvent: false }
-      )
-    })
-    this.blockSetProducts = false;
+  changeType(value: ProductType) {
+    if (value === ProductType.Set) {
+      this.blockSetProducts = true;
+      const productsGroup = this.productsForm;
+      Object.keys(productsGroup.controls).forEach(key => {
+        productsGroup.removeControl(key, { emitEvent: false });
+      });
+
+      [...this.simpleProducts(), ...this.setAddons()].forEach(prod => {
+        this.form.controls.products.addControl(
+          prod.id,
+          new FormControl(
+            (this.product() as Set)?.products?.[prod.id]?.count ?? 0,
+            { nonNullable: true }
+          ), { emitEvent: false }
+        )
+      })
+      this.blockSetProducts = false;
+    }
 
   }
 
@@ -348,6 +365,9 @@ export class ProductCardComponent {
   }
 
   deleteFromContent() {
+    if (this.cartIndex === null) {
+      return;
+    }
     this.deleteContent.emit(this.cartIndex)
   }
 
@@ -394,14 +414,14 @@ export class ProductCardComponent {
         const products: ISetProducts = {}
         Object.entries(this.productsForm.getRawValue() as Record<string, number>).forEach(([id, count]: [string, number]) => {
 
-          const product = this.stateService.simpleProductsMap().get(id)
+          const product = this.stateService.simpleProductsMap().get(id) || this.stateService.setAddonsMap().get(id)!
 
           if (product && count > 0) {
             products[id] = {
               ...product,
               count
             }
-            if (formValue.setType === SetType.Fixed) {
+            if (formValue.setType === SetType.Fixed && product.type === ProductType.SimpleProduct) {
               products[id].fixedCount = count;
             }
           }
@@ -409,7 +429,7 @@ export class ProductCardComponent {
         })
 
 
-        result.weight = this.weight;
+        result.weight = Number(formValue.weight);
         result.products = products;
         result.setType = formValue.setType;
         return result;
@@ -417,9 +437,9 @@ export class ProductCardComponent {
       }
       case ProductType.SimpleProduct: {
 
-        result.weight = formValue.weight;
+        result.weight = Number(formValue.weight);
         result.measure = formValue.measure;
-        result.amount = formValue.amount;
+        result.amount = Number(formValue.amount);
         return result
       }
       case ProductType.Delivery: {
@@ -436,7 +456,11 @@ export class ProductCardComponent {
       }
       case ProductType.SetAddon:
       case ProductType.OrderAddon: {
-        result.weight = formValue.weight;
+        result.weight = Number(formValue.weight);
+        result.amount = Number(formValue.amount);
+        if (formValue.measure) {
+          result.measure = formValue.measure;
+        }
         result.default = formValue.default;
         if (result.default === DefaultAddonBy.Price) {
           result.minPrice = formValue.minPrice as IPrices
@@ -494,6 +518,18 @@ export class ProductCardComponent {
     this.stateService.updateCart([...this.stateService.cart(), { ...result, count: 1 }])
 
     this.isExpanded = false
+  }
+
+  toggleAddon(options: ToggleAddon) {
+    const {id} = options.addon;
+    const current = this.productsForm.controls[id].value;
+    this.productsForm.controls[id].setValue(current ? 0 : 1);
+    if (this.usage === ProductCardPlace.Cart) {
+      const result = this.getProductFromForm();
+      const cart = this.stateService.cart();
+      cart[this.cartIndex] = { ...result, count: 1 }
+      this.stateService.updateCart([...cart])
+    }
   }
 
   buy() {

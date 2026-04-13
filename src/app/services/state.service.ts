@@ -1,7 +1,7 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, DefaultAddonBy, Delivery, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product, ProductType } from '../models/models';
+import { Addon, Currency, DefaultAddonBy, Delivery, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product, ProductType } from '../models/models';
 import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../constants/constants';
 import { chooseDefaultDelivery, getEmptyUser, getTotal, getUserName } from './utils';
 import { environment } from '../../environments/environment';
@@ -23,9 +23,7 @@ export class StateService {
     map.set(product.id, product);
     return map;
   }, new Map()));
-  orderAddons = computed(() => {
-    return this.products().filter(p => p.type === ProductType.OrderAddon)
-  })
+
   deliveries = computed(() => {
     return this.products().filter(p => p.type === ProductType.Delivery)
   })
@@ -33,7 +31,17 @@ export class StateService {
     map.set(product.id, product);
     return map;
   }, new Map()));
-  orderAddonsMap = computed(() => this.orderAddons().reduce((map, addon) => {
+  orderAddons = computed(() => {
+    return this.products().filter(p => p.type === ProductType.OrderAddon) as Addon[]
+  })
+  orderAddonsMap = computed(() => this.orderAddons().reduce<Map<string, Addon>>((map, addon) => {
+    map.set(addon.id, addon);
+    return map;
+  }, new Map()));
+  setAddons = computed(() => {
+    return this.products().filter(p => p.type === ProductType.SetAddon) as Addon[]
+  })
+  setAddonsMap = computed(() => this.setAddons().reduce<Map<string, Addon>>((map, addon) => {
     map.set(addon.id, addon);
     return map;
   }, new Map()));

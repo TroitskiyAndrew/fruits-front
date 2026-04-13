@@ -62,8 +62,13 @@
   @if (isExpanded) {
     <ui-stack [formGroup]="form">
       @if (editing) {
-        <ui-toggler [options]="typeOptions" formControlName="type" rowClass="w-100" (valueChange)="changeType()">
-          </ui-toggler>
+        <ui-toggler
+          [options]="typeOptions"
+          formControlName="type"
+          rowClass="w-100"
+          (valueChange)="changeType($event)"
+        >
+        </ui-toggler>
         <ui-input label="Название" formControlName="name" [clearable]="true">
         </ui-input>
 
@@ -74,9 +79,12 @@
         >
         </ui-input>
         @if (isSet) {
-          <ui-toggler [options]="setTypeOptions" formControlName="setType" rowClass="w-100">
+          <ui-toggler
+            [options]="setTypeOptions"
+            formControlName="setType"
+            rowClass="w-100"
+          >
           </ui-toggler>
-          {{ titleMeasure }}
         } @else {
           @if (isSimpleProduct || isOrderAddon || isSetAddon) {
             <ui-row class="row">
@@ -105,8 +113,12 @@
           </ui-input>
         </ui-row>
 
-        @if (isOrderAddon || isSetAddon || isDelivery) {
-          <ui-toggler [options]="addonDefaultOptions" formControlName="default" rowClass="w-100">
+        @if (isDelivery) {
+          <ui-toggler
+            [options]="addonDefaultOptions"
+            formControlName="default"
+            rowClass="w-100"
+          >
           </ui-toggler>
           @if (isFromMinPrice) {
             <ui-row class="row" [formGroup]="minPricesForm">
@@ -141,7 +153,8 @@
                 </div>
               </ui-row>
             }
-          } @else  {
+          } @else {
+            <div class="bold">Общий вес: {{ weight }} кг</div>
             @for (p of simpleProducts(); track p.id) {
               <ui-row class="w-100">
                 <div>{{ p.name }} ({{ p.amount }} {{ p.measure }})</div>
@@ -161,8 +174,7 @@
         </ui-stack>
       }
       <ui-stack>
-        @switch (usage) {
-          @case (ProductCardPlace.AllProducts) {
+        @if(usage === ProductCardPlace.AllProducts) {
             <ui-button
               variant="primary"
               (action)="saveProduct()"
@@ -174,7 +186,24 @@
               Отмена
             </ui-button>
           }
-          @case (ProductCardPlace.Shop) {
+          @if([ProductCardPlace.Shop, ProductCardPlace.Cart].includes(usage)){
+            @let addons = setAddons();
+            @if (addons.length) {
+              <ui-stack>
+                @for (addon of addons; track addon.id) {
+                  <addon-card
+                    [addon]="addon"
+                    (toggleAddon)="toggleAddon($event)"
+                    [value]="productsForm.controls[addon.id].value > 0"
+                    [disabled]="false"
+                    [currency]="currency()"
+                  ></addon-card>
+                }
+              </ui-stack>
+            }
+          }
+        @if(usage === ProductCardPlace.Shop) {
+
             @if (price < productPrice) {
               <ui-button
                 btnClass="w-100"
@@ -200,7 +229,6 @@
               Отмена
             </ui-button>
           }
-        }
       </ui-stack>
     </ui-stack>
   }

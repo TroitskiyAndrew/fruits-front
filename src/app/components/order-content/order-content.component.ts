@@ -3,7 +3,7 @@ import { TogglerComponent } from "../../ui/toggler/toggler.component";
 import { StackComponent } from "../../ui/stack/stack.component";
 import { ProductCardComponent, ProductCardPlace } from "../product-card/product-card.component";
 import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS } from '../../constants/constants';
-import { ControlsOf, Currency, IOrderContent, IPrices,  ISetProducts,  OrderProduct, Product, ProductForm, ProductType } from '../../models/models';
+import { Addon, ControlsOf, Currency, IOrderContent, IPrices, ISetProducts, OrderProduct, Product, ProductForm, ProductType } from '../../models/models';
 import { StateService } from '../../services/state.service';
 import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ import { getTotal } from '../../services/utils';
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RowComponent } from "../../ui/row/row.component";
-import { AddonCardComponent, AddonCardPlace } from "../addon-card/addon-card.component";
+import { AddonCardComponent, AddonCardPlace, ToggleAddon } from "../addon-card/addon-card.component";
 
 export enum OrderContentPlace {
   CartPage,
@@ -47,7 +47,7 @@ export class OrderContentComponent {
     return this.content.products.filter(p => [ProductType.Set, ProductType.SimpleProduct].includes(p.type))
   }
 
-  get productCardUsage () {
+  get productCardUsage() {
     return this.usage === OrderContentPlace.CartPage ? ProductCardPlace.Cart : ProductCardPlace.OrderPage
   }
   constructor(public stateService: StateService) {
@@ -68,14 +68,16 @@ export class OrderContentComponent {
     this.calculateTotal()
   }
 
-  selectAddon(id: string){
-      const addonIds = this.content.products.filter(p => p.type === ProductType.OrderAddon).map(a => a.id);
-      if (addonIds.includes(id)){
-        this.content.products = this.content.products.filter(p => p.id !== id)
-      } else {
-        this.content.products = [...this.content.products, this.orderAddonsMap().get(id)]
-      }
-      this.calculateTotal()
+  toggleAddon(options: ToggleAddon) {
+    const { id } = options.addon;
+    const addonIds = this.content.products.filter(p => p.type === ProductType.OrderAddon).map(a => a.id);
+    if (addonIds.includes(id)) {
+      this.content.products = this.content.products.filter(p => p.id !== id)
+    } else {
+      const addon = this.stateService.orderAddonsMap().get(id)!;
+      this.content.products = [...this.content.products, { ...addon, count: 1 }]
+    }
+    this.calculateTotal()
   }
 
 }

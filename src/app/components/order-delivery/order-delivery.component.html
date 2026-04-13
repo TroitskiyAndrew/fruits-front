@@ -23,12 +23,9 @@
           </ui-input>
         }
       }
-      <ui-toggler
-        [options]="deliveryOptions()"
-        formControlName="deliveryProductId"
-        (valueChange)="changeDeliveryProduct($event)"
-        rowClass="w-100"
-      ></ui-toggler>
+      @if(additionalDelivery) {
+        <addon-card [addon]="additionalDelivery" [disabled]="disableAddons" [currency]="currency" (toggleAddon)="changeDeliveryProduct($event)" [value]="!isDefaultDelivery"></addon-card>
+      }
       <ui-row>
         <div>
 

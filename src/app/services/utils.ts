@@ -1,5 +1,5 @@
 import { DEFAULT_CURRENCY } from "../constants/constants";
-import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType, Delivery, DefaultAddonBy } from "../models/models";
+import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType, Delivery, DefaultAddonBy, Addon } from "../models/models";
 
 export function getTotal(orderContent: IOrderContent) {
   const newTotal = {
@@ -14,7 +14,7 @@ export function getTotal(orderContent: IOrderContent) {
       newTotal[Currency.USDT] += product.price[Currency.USDT];
     }
     if (product.type == ProductType.Set) {
-      Object.values(product.products).forEach((product: OrderProduct<SimpleProduct>) => {
+      Object.values(product.products).forEach((product: OrderProduct<SimpleProduct | Addon>) => {
         newTotal[Currency.Rub] += product.price[Currency.Rub] * (product.count - (product.fixedCount || 0));
         newTotal[Currency.VND] += product.price[Currency.VND] * (product.count - (product.fixedCount || 0));
         newTotal[Currency.USDT] += product.price[Currency.USDT] * (product.count - (product.fixedCount || 0));

@@ -153,7 +153,7 @@ export type OrderProduct<T = Product> = T & {
   fixedCount?: number;
 };
 
-export type ISetProducts = Record<string, OrderProduct<SimpleProduct>>;
+export type ISetProducts = Record<string, OrderProduct<SimpleProduct | Addon>>;
 
 export enum DefaultAddonBy {
   None,
@@ -176,6 +176,8 @@ export type Delivery = ProductBase &
   export type Addon = ProductBase & AddonBase & {
     type: ProductType.OrderAddon | ProductType.SetAddon;
     weight: number;
+    amount: number;
+    measure?: Measure;
   }
 
 export type Product = SimpleProduct | Set | Addon | Delivery;
