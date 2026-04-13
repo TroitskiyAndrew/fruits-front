@@ -28,7 +28,8 @@ import { PlacingOrderComponent } from "../../components/placing-order/placing-or
 export class CartPageComponent {
 
   content = computed<IOrderContent>(() => this.stateService.orderContent())
-  total = computed(() => this.stateService.cartTotal())
+  cartTotal = computed(() => this.stateService.cartTotal())
+  orderTotal = computed(() => this.stateService.orderTotal())
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
   currencyOptions = CURRENCY_OPTIONS;

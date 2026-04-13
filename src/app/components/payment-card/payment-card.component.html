@@ -10,7 +10,7 @@
 
     @if(method.bank.paymentOption === OnlinePaymentOption.QR) {
     <img [src]="method.bank.account" alt="QR code for payment" class="qr">
-    <ui-button (action)="downloadQR(method.bank.account)">
+    <ui-button btnClass="w-100" (action)="downloadQR(method.bank.account)">
       Скачать QR-код
     </ui-button>
     } @else {
@@ -21,7 +21,7 @@
       <div>
         {{method.bank.account}}
       </div>
-      <ui-button (action)="copyToClipboard(method.bank.account!)" size="s" [icon]="true" variant="ghost"
+      <ui-button  (action)="copyToClipboard(method.bank.account!)" size="s" [icon]="true" variant="ghost"
         fa="fa-solid fa-copy"> </ui-button>
     </ui-row>
 
@@ -31,7 +31,7 @@
       Произведите оплату и отправьте скрин квитанции с помощью кнопки ниже:
     </div>
     <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
-    <ui-button (action)="fileInput.click()">
+    <ui-button btnClass="w-100" (action)="fileInput.click()">
       Отправить квитанцию
     </ui-button>
     } @else {

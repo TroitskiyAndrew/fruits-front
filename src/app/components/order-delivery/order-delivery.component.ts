@@ -77,13 +77,14 @@ export class OrderDeliveryComponent {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(value => {
-        if (value) {
-          const { deliveryProductId, ...delivery } = value
+
+        const { deliveryProductId, ...delivery } = value;
+        const deliveryProduct = this.stateService.deliveriesMap().get(deliveryProductId || '');
+        const newDelivery = {...delivery, deliveryProduct} as  IOrderDelivery
           this.stateService.updateDelivery({
-            ...delivery,
-            deliveryProduct: this.stateService.deliveriesMap().get(deliveryProductId || '')
+            deliveryProduct: newDelivery.deliveryProduct
           });
-        }
+        this.deliverValue.emit(this.form.valid ? newDelivery : null)
       });
     this.form.controls.placeType.valueChanges
       .pipe(takeUntilDestroyed())

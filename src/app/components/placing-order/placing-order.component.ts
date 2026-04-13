@@ -8,10 +8,11 @@ import { OrderDeliveryComponent, OrderDeliveryPlace } from "../order-delivery/or
 import { StackComponent } from "../../ui/stack/stack.component";
 import { ButtonComponent } from "../../ui/button/button.component";
 import { CardComponent } from "../../ui/card/card.component";
+import { PriceStringPipe } from '../../pipes/price-string.pipe';
 
 @Component({
   selector: 'placing-order',
-  imports: [OrderDeliveryComponent, StackComponent, ButtonComponent, CardComponent],
+  imports: [OrderDeliveryComponent, StackComponent, ButtonComponent, CardComponent, PriceStringPipe],
   templateUrl: './placing-order.component.html',
   styleUrl: './placing-order.component.scss'
 })
@@ -20,8 +21,9 @@ export class PlacingOrderComponent {
   _currency = input(Currency.VND);
   currency = signal(Currency.VND)
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
-  canCreateOrder = false;
+  canPlaceOrder = false;
   OrderDeliveryPlace = OrderDeliveryPlace
+  orderTotal = computed(() => this.stateService.orderTotal())
 
   delivery = computed<IOrderDelivery>(() => this.stateService.orderDelivery());
   PaymentMethod = PaymentMethod;
@@ -33,9 +35,9 @@ export class PlacingOrderComponent {
   submitDeliveryValue(delivery: IOrderDelivery | null) {
     if (delivery) {
       this.stateService.updateDelivery(delivery);
-      this.canCreateOrder = true;
+      this.canPlaceOrder = true;
     } else {
-      this.canCreateOrder = false
+      this.canPlaceOrder = false
     }
   }
 
@@ -56,6 +58,22 @@ export class PlacingOrderComponent {
       }
 
     }
+  }
+
+  get cashError() {
+    return this.stateService.cashier.paymentMethods[this.stateService.currency()].cash ? '' : `К сожалению, мы не принимаем наличые ${this.currencySymbol()}`
+  }
+
+  get bankError() {
+    return this.stateService.cashier.paymentMethods[this.stateService.currency()].bank != null ? '' : `К сожалению, мы не принимаем переводы в ${this.currencySymbol()}`
+  }
+
+  get disableCash() {
+    return !this.canPlaceOrder || this.cashError !== ''
+  }
+
+  get disableBank() {
+    return !this.canPlaceOrder || this.bankError !== ''
   }
 
 }

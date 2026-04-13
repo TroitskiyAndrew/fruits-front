@@ -55,9 +55,10 @@ export class StateService {
   cartTotal = computed(() => {
     return this.order().content.prices[this.currency()]
   });
-  cartAddons = computed(() => {
-    return this.order().content.products.filter(p => p.type === ProductType.OrderAddon)
-  });
+  orderTotal = computed(() => {
+    const cartTotal = this.cartTotal();
+    return cartTotal + this.orderDelivery().deliveryProduct.price[this.currency()]
+  })
   orderDelivery = computed(() => this.order().delivery);
   orders = signal<IOrder[]>([]);
   ordersMap = computed(() => this.orders().reduce((map: Map<string, IOrder>, order: IOrder) => {
@@ -91,6 +92,7 @@ export class StateService {
     cashierId: 0,
     referralUrlBase: ''
   })
+  cashier: IUser = getEmptyUser();
 
   loading = signal(false);
 
@@ -107,6 +109,8 @@ export class StateService {
     const config = await this.apiService.getConfig();
     if (config) {
       this.config.set(config);
+      const cashier = await this.apiService.getUser(config.cashierId);
+      this.cashier = cashier!;
     }
     const userId = environment.production ? this.telegrammService.user?.id : 480144364;
     if (userId) {

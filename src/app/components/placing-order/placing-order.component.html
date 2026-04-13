@@ -8,10 +8,25 @@
       class="w-100"
     ></order-delivery>
   </ui-card>
-  <ui-button (action)="createOrder(PaymentMethod.Cash)" btnClass="w-100">
+
+  <div class="title right">
+    Общая сумма: {{ orderTotal() | priceString: currency() }}
+    {{ currencySymbol() }}
+  </div>
+  <ui-button (action)="createOrder(PaymentMethod.Cash)" btnClass="w-100" [disabled]="disableCash">
     Оплата наличными
   </ui-button>
-  <ui-button (action)="createOrder(PaymentMethod.Bank)" btnClass="w-100">
+  @if(cashError){
+    <div class="red">
+      {{cashError}}
+    </div>
+  }
+  <ui-button (action)="createOrder(PaymentMethod.Bank)" btnClass="w-100" [disabled]="disableBank">
     Оплата картой
   </ui-button>
+  @if(bankError){
+    <div class="red">
+      {{bankError}}
+    </div>
+  }
 </ui-stack>
