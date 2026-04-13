@@ -20,6 +20,7 @@ export class PlacingOrderPageComponent {
   PaymentMethod = PaymentMethod;
   OrderDeliveryPlace = OrderDeliveryPlace
   canCreateOrder = false;
+  currency = computed(() => this.stateService.currency())
 
   constructor(private stateService: StateService){}
 }

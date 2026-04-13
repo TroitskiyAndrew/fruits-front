@@ -1,9 +1,9 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
-import { Currency, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product, ProductType } from '../models/models';
-import { CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../constants/constants';
-import { getEmptyUser, getTotal, getUserName } from './utils';
+import { Currency, DefaultAddonBy, Delivery, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product, ProductType } from '../models/models';
+import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../constants/constants';
+import { chooseDefaultDelivery, getEmptyUser, getTotal, getUserName } from './utils';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -29,6 +29,10 @@ export class StateService {
   deliveries = computed(() => {
     return this.products().filter(p => p.type === ProductType.Delivery)
   })
+  deliveriesMap = computed<Map<string, Delivery>>(() => this.deliveries().reduce((map, product) => {
+    map.set(product.id, product);
+    return map;
+  }, new Map()));
   orderAddonsMap = computed(() => this.orderAddons().reduce((map, addon) => {
     map.set(addon.id, addon);
     return map;
@@ -82,7 +86,7 @@ export class StateService {
 
   loading = signal(false);
 
-  constructor(private apiService: ApiService, private telegrammService: TelegrammService) {}
+  constructor(private apiService: ApiService, private telegrammService: TelegrammService) { }
 
 
   async init() {
@@ -115,7 +119,7 @@ export class StateService {
           name: emptyOrder.delivery.name,
           contact: emptyOrder.delivery.contact
         })
-        this.changeCurrency(user.currency)
+        this.currency.set(user.currency);
       }
     }
 
@@ -146,21 +150,29 @@ export class StateService {
 
   changeCurrency(currency: Currency) {
     this.currency.set(currency);
-    // this.apiService.updateUser({
-    //   id: this.user().id,
-    //   currency: currency,
-    // })
+    this.apiService.updateUser({
+      id: this.user().id,
+      currency: currency,
+    })
   }
 
   updateCart(products: OrderProduct[]) {
     this.order.update(order => {
       order.content.products = products;
       order.content.prices = getTotal(order.content);
+      let delivery = order.delivery;
+      const currentDeliveryProduct = delivery.deliveryProduct!;
+      if(currentDeliveryProduct.default){
+        const newDelivery = chooseDefaultDelivery(this.deliveries().filter(d => d.default), this.currency(), order.content.prices[this.currency()], order.content.products.length);
+        if(newDelivery.id !== currentDeliveryProduct.id){
+          delivery = {...delivery, deliveryProduct: newDelivery}
+        }
+      }
       return {
         ...order,
         status: order.status,
         content: order.content,
-        delivery: order.delivery,
+        delivery,
       }
     });
   }
@@ -216,7 +228,22 @@ export class StateService {
         place: '',
         placeAdd: '',
         date: timestamp,
-        deliveryType: DeliveryType.Reception
+        deliveryType: DeliveryType.Reception,
+        deliveryProduct: {
+          id: '',
+          type: ProductType.Delivery,
+          name: '',
+          description: '',
+          price: {
+            [Currency.Rub]: 0,
+            [Currency.VND]: 0,
+            [Currency.USDT]: 0,
+          },
+          deleted: false,
+          default: DefaultAddonBy.None,
+          minCount: null,
+          minPrice: null,
+        }
       }
     }
     const deliveries = this.deliveries();

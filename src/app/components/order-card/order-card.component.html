@@ -15,7 +15,7 @@
     @switch (usage) {
     @case (OrderCardPlace.OrderPage) {
     <order-status [usage]="OrderStatusPlace.OrderPage" [status]="status"></order-status>
-    <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [delivery]="delivery"></order-delivery>
+    <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [currency]="this.currency()" [delivery]="delivery"></order-delivery>
     <order-content [usage]="OrderContentPlace.OrderPage" [content]="content" [_currency]="currency()"></order-content>
     }
     }

@@ -81,7 +81,11 @@ export interface IOrderDelivery {
   placeAdd: string;
   date: number;
   deliveryType: DeliveryType;
-  deliveryProduct?: Delivery;
+  deliveryProduct: Delivery;
+}
+
+export type OrderDeliveryForm = Omit<IOrderDelivery, 'deliveryProduct'> & {
+  deliveryProductId: string;
 }
 export interface IOrder {
   id: string;
@@ -151,9 +155,17 @@ export type OrderProduct<T = Product> = T & {
 
 export type ISetProducts = Record<string, OrderProduct<SimpleProduct>>;
 
+export enum DefaultAddonBy {
+  None,
+  Unconditional,
+  Price,
+  Count,
+}
+
 export type AddonBase = {
-  default: boolean;
-  minPrice?: IPrices;
+  default: DefaultAddonBy;
+  minPrice: IPrices | null;
+  minCount: number  | null;
 };
 
 export type Delivery = ProductBase &
@@ -171,10 +183,10 @@ export type ProductForm =
   Omit<SimpleProduct, 'type'> &
   Omit<Set, 'type'> &
   Omit<Addon, 'type'> &
-  Omit<Delivery, 'type'> & {
+  Omit<Delivery, 'type' | 'minPrice' | 'minCount'> & {
     type: ProductType;
-    fromMinPrice: boolean;
     minPrice: IPrices;
+  minCount: number;
   };
 
 export enum PaymentMethod {

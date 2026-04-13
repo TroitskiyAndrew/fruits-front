@@ -11,6 +11,7 @@
   </div>
   @if (showDelivery) {
     <placing-order [_currency]="currentCurrency" class="w-100"></placing-order>
+  } @else {
+    <ui-button link="placing-order" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
   }
-  <ui-button link="placing-order" [disabled]="orderContent.products.length === 0">Оформить заказ</ui-button>
 </ui-page>

@@ -111,28 +111,26 @@
         </ui-row>
 
         @if (isOrderAddon || isSetAddon || isDelivery) {
-          <ui-checkbox
-            label="По умолчанию"
-            formControlName="default"
-          ></ui-checkbox>
-          @if (isDefault) {
-            <ui-checkbox
-              label="Добавлять при цене от"
-              formControlName="fromMinPrice"
-            ></ui-checkbox>
-            @if(isFromMinPrice){
-              <ui-row class="row" [formGroup]="minPricesForm">
-                <ui-input label="RUB" type="number" formControlName="rub">
-                </ui-input>
+          <ui-toggler [options]="addonDefaultOptions" formControlName="default">
+          </ui-toggler>
+          @if (isFromMinPrice) {
+            <ui-row class="row" [formGroup]="minPricesForm">
+              <ui-input label="RUB" type="number" formControlName="rub">
+              </ui-input>
 
-                <ui-input label="VND" type="number" formControlName="vnd">
-                </ui-input>
+              <ui-input label="VND" type="number" formControlName="vnd">
+              </ui-input>
 
-                <ui-input label="USDT" type="number" formControlName="usdt">
-                </ui-input>
-              </ui-row>
-
-            }
+              <ui-input label="USDT" type="number" formControlName="usdt">
+              </ui-input>
+            </ui-row>
+          } @else if (isFromMinCount) {
+            <ui-input
+              label="От кол-ва позиций"
+              type="number"
+              formControlName="minCount"
+            >
+            </ui-input>
           }
         }
       }

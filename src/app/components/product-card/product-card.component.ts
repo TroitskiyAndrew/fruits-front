@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostLi
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import { ControlsOf, Currency, IPrices, Set, ISetProducts, SimpleProduct, Measure, Product, ProductForm, ProductType, SetType } from '../../models/models'
+import { ControlsOf, Currency, IPrices, Set, ISetProducts, SimpleProduct, Measure, Product, ProductForm, ProductType, SetType, DefaultAddonBy, Delivery, Addon } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -45,7 +45,6 @@ export enum ProductCardPlace {
     TogglerComponent,
     GridComponent,
     PriceStringPipe,
-    CheckboxComponent,
   ],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
@@ -84,9 +83,6 @@ export class ProductCardComponent {
   }
   get isDefault() {
     return this.form.controls.default.value
-  }
-  get isFromMinPrice() {
-    return this.form.controls.fromMinPrice.value
   }
   get amount() {
     return this.form.controls.amount.value
@@ -214,19 +210,19 @@ export class ProductCardComponent {
     amount: new FormControl(0, { nonNullable: true }),
     setType: new FormControl(SetType.Fixed, { nonNullable: true }),
     products: new FormGroup<ControlsOf<Record<string, number>>>({}),
-    default: new FormControl(false, { nonNullable: true }),
+    default: new FormControl(DefaultAddonBy.None, { nonNullable: true }),
 
     price: new FormGroup<ControlsOf<Record<Currency, number>>>({
       rub: new FormControl(0, { nonNullable: true }),
       vnd: new FormControl(0, { nonNullable: true }),
       usdt: new FormControl(0, { nonNullable: true }),
     }),
-    fromMinPrice: new FormControl(false, { nonNullable: true }),
     minPrice: new FormGroup<ControlsOf<IPrices>>({
       rub: new FormControl(0, { nonNullable: true }),
       vnd: new FormControl(0, { nonNullable: true }),
       usdt: new FormControl(0, { nonNullable: true }),
     }),
+    minCount: new FormControl(0, { nonNullable: true }),
   });
 
   get productsForm(): FormGroup {
@@ -238,6 +234,13 @@ export class ProductCardComponent {
   }
   get minPricesForm(): FormGroup {
     return this.form.controls.minPrice as FormGroup
+  }
+
+  get isFromMinPrice() {
+    return this.form.controls.default.value === DefaultAddonBy.Price;
+  }
+  get isFromMinCount() {
+    return this.form.controls.default.value === DefaultAddonBy.Count;
   }
 
   editing = false;
@@ -252,6 +255,13 @@ export class ProductCardComponent {
     { label: 'Продукт', value: ProductType.SimpleProduct },
     { label: 'Набор', value: ProductType.Set },
     { label: 'Доставка', value: ProductType.Delivery },
+  ]
+
+  addonDefaultOptions = [
+    { label: 'Нет', value: DefaultAddonBy.None },
+    { label: 'По умолачнию', value: DefaultAddonBy.Unconditional },
+    { label: 'От цены', value: DefaultAddonBy.Price },
+    { label: 'От количества', value: DefaultAddonBy.Count },
   ]
 
   setTypeOptions = [
@@ -287,7 +297,13 @@ export class ProductCardComponent {
   }
 
   patchForm(product: Product) {
-    this.form.patchValue({ ...product, products: {} }, { emitEvent: false });
+    let minPrice;
+    let minCount;
+    if([ProductType.Delivery, ProductType.OrderAddon, ProductType.SetAddon].includes(product.type)){
+      minPrice = (product as Delivery | Addon).minPrice || undefined;
+      minCount = (product as Delivery | Addon).minCount || 100;
+    }
+    this.form.patchValue({ ...product, products: {}, minPrice, minCount }, { emitEvent: false });
     const productsGroup = this.productsForm;
     Object.keys(productsGroup.controls).forEach(key => {
       productsGroup.removeControl(key);
@@ -388,8 +404,12 @@ export class ProductCardComponent {
       case ProductType.Delivery: {
 
         result.default = formValue.default;
-        if (formValue.fromMinPrice) {
+        if (result.default === DefaultAddonBy.Price) {
           result.minPrice = formValue.minPrice as IPrices
+          result.minCount = null;
+        } else if(result.default === DefaultAddonBy.Count){
+          result.minCount = Number(formValue.minCount);
+          result.minPrice = null;
         }
         return result
       }
@@ -397,8 +417,12 @@ export class ProductCardComponent {
       case ProductType.OrderAddon: {
         result.weight = formValue.weight;
         result.default = formValue.default;
-        if (formValue.fromMinPrice) {
+        if (result.default === DefaultAddonBy.Price) {
           result.minPrice = formValue.minPrice as IPrices
+          result.minCount = null;
+        } else if(result.default === DefaultAddonBy.Count){
+          result.minCount = Number(formValue.minCount);
+          result.minPrice = null;
         }
         return result
       }

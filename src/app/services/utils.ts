@@ -1,5 +1,5 @@
 import { DEFAULT_CURRENCY } from "../constants/constants";
-import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType } from "../models/models";
+import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType, Delivery, DefaultAddonBy } from "../models/models";
 
 export function getTotal(orderContent: IOrderContent) {
   const newTotal = {
@@ -8,7 +8,7 @@ export function getTotal(orderContent: IOrderContent) {
     [Currency.USDT]: 0,
   }
   orderContent.products.forEach((product) => {
-    if(product.type !== ProductType.Set || product.setType === SetType.Fixed){
+    if (product.type !== ProductType.Set || product.setType === SetType.Fixed) {
       newTotal[Currency.Rub] += product.price[Currency.Rub];
       newTotal[Currency.VND] += product.price[Currency.VND];
       newTotal[Currency.USDT] += product.price[Currency.USDT];
@@ -55,9 +55,31 @@ export function getUserName(user: IUser): string {
   return `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`;
 }
 
-export function getMinimalDate() {
+export function getMinimalDate(express = false) {
   const dayToSet = new Date();
   const after21 = new Date().getHours() > 21;
-  dayToSet.setDate(dayToSet.getDate() + (after21 ? 2 : 1))
+  dayToSet.setDate(dayToSet.getDate() + (express ? 0 : (after21 ? 2 : 1)))
   return { string: dayToSet.toISOString().slice(0, 10), number: dayToSet.getTime() }
+}
+
+
+export function chooseDefaultDelivery(deliveries: Delivery[], currency: Currency, price: number, count: number): Delivery {
+  let defaultOption: Delivery;
+  const options = new Set(deliveries.map(delivery => delivery.default));
+  const byCount = options.has(DefaultAddonBy.Count);
+  const byPrice = options.has(DefaultAddonBy.Price);
+  deliveries.forEach(delivery => {
+    const hasTrigger =  byCount ? delivery.minCount != null : (byPrice ? delivery.minPrice : false)
+    const trigger = byCount ? (delivery.minCount || 1000) : byPrice ? delivery.minPrice?.[currency] || 10000000 : 99999999999;
+    const limit = byCount ? count : (byPrice ? price : 0)
+    if (hasTrigger) {
+      if (trigger <= limit) {
+        defaultOption = delivery;
+      }
+    } else if (!defaultOption || (defaultOption?.minPrice == null && defaultOption?.minCount == null)) {
+      defaultOption = delivery;
+    }
+  });
+  return defaultOption!;
+
 }
