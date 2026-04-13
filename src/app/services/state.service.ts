@@ -74,6 +74,7 @@ export class StateService {
     const userId = this.user().user.id;
     return this.config().cashierId === userId || userId === 480144364;
   });
+  userCurrency = computed(() => this.user().currency)
   config = signal<IConfig>({
     cashierId: 0,
     referralUrlBase: ''
@@ -81,27 +82,7 @@ export class StateService {
 
   loading = signal(false);
 
-  constructor(private apiService: ApiService, private telegrammService: TelegrammService) {
-    effect(() => {
-      const user = this.user();
-      this.currency.set(user.currency);
-      const tgUsername = user.user.username;
-      const emptyOrder = this.getEmptyOrder();
-      this.updateDelivery({
-        name: emptyOrder.delivery.name,
-        contact: emptyOrder.delivery.contact
-      })
-    })
-    effect(() => {
-      this.products();
-      const emptyOrder = this.getEmptyOrder();
-      if (emptyOrder.delivery.deliveryProduct) {
-        this.updateDelivery({
-          deliveryProduct: emptyOrder.delivery.deliveryProduct
-        })
-      }
-    })
-  }
+  constructor(private apiService: ApiService, private telegrammService: TelegrammService) {}
 
 
   async init() {
@@ -129,12 +110,24 @@ export class StateService {
           }
           return order;
         })
+        const emptyOrder = this.getEmptyOrder();
+        this.updateDelivery({
+          name: emptyOrder.delivery.name,
+          contact: emptyOrder.delivery.contact
+        })
+        this.changeCurrency(user.currency)
       }
     }
 
     const products = await this.apiService.getAllProducts();
     this.load(false);
     this.products.set(products);
+    const emptyOrder = this.getEmptyOrder();
+    if (emptyOrder.delivery.deliveryProduct) {
+      this.updateDelivery({
+        deliveryProduct: emptyOrder.delivery.deliveryProduct
+      })
+    }
   }
 
   load(value: boolean) {
@@ -153,10 +146,10 @@ export class StateService {
 
   changeCurrency(currency: Currency) {
     this.currency.set(currency);
-    this.apiService.updateUser({
-      id: this.user().id,
-      currency: currency,
-    })
+    // this.apiService.updateUser({
+    //   id: this.user().id,
+    //   currency: currency,
+    // })
   }
 
   updateCart(products: OrderProduct[]) {

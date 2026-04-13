@@ -1,6 +1,5 @@
 @switch (usage) {
-  @case (OrderDeliveryPlace.PlacingOrderPage) {
-    {{form.valid}}
+  @case (OrderDeliveryPlace.PlacingOrder) {
     <ui-stack [formGroup]="form">
       <ui-input label="Имя" formControlName="name" [form]="form"> </ui-input>
       <ui-input
@@ -39,20 +38,7 @@
           rowClass="w-100"
         ></ui-toggler>
       }
-      <ui-button
-        [disabled]="
-          !canCreateOrder  || !canCreateOrderOutside || form.controls.deliveryType.value === DeliveryType.Reception
-        "
-        (action)="createOrder(PaymentMethod.Cash)"
-      >
-        Оплата наличными
-      </ui-button>
-      <ui-button
-        [disabled]="!canCreateOrder || !canCreateOrderOutside"
-        (action)="createOrder(PaymentMethod.Bank)"
-      >
-        Оплата картой
-      </ui-button>
+
     </ui-stack>
   }
   @case (OrderDeliveryPlace.OrderCard) {

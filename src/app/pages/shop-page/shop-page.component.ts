@@ -43,7 +43,7 @@ export class ShopPageComponent {
   currency = computed(() => this.stateService.currency());
 
 
-  constructor(private stateService: StateService) { }
+  constructor(private stateService: StateService) {}
 
   changeCurrency(currency: Currency){
     this.stateService.changeCurrency(currency)

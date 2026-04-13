@@ -17,17 +17,17 @@ import { OrderDeliveryComponent, OrderDeliveryPlace } from "../../components/ord
 import { TelegrammService } from '../../services/telegramm.service';
 import { environment } from '../../../environments/environment';
 import { CardComponent } from "../../ui/card/card.component";
+import { PlacingOrderComponent } from "../../components/placing-order/placing-order.component";
 
 @Component({
   selector: 'cart-page',
-  imports: [ReactiveFormsModule, PageComponent, ButtonComponent, OrderContentComponent, PriceStringPipe, OrderDeliveryComponent, CardComponent],
+  imports: [ReactiveFormsModule, PageComponent, ButtonComponent, OrderContentComponent, PriceStringPipe,  PlacingOrderComponent],
   templateUrl: './cart-page.component.html',
   styleUrl: './cart-page.component.scss'
 })
 export class CartPageComponent {
 
   content = computed<IOrderContent>(() => this.stateService.orderContent())
-  delivery = computed<IOrderDelivery>(() => this.stateService.orderDelivery())
   total = computed(() => this.stateService.cartTotal())
   currency = computed(() => this.stateService.currency());
   currencySymbol = computed(() => this.stateService.currencySymbol());
@@ -39,16 +39,16 @@ export class CartPageComponent {
   showDelivery = false;
 
 
-  constructor(private stateService: StateService, private telegrammService: TelegrammService , private router: Router) {
-    if(this.stateService.cart().length === 0){
+  constructor(private stateService: StateService, private telegrammService: TelegrammService, private router: Router) {
+    if (this.stateService.cart().length === 0) {
       this.router.navigate([''])
     }
     effect(() => {
-      if(this.stateService.cart().length === 0) {
+      if (this.stateService.cart().length === 0) {
         this.router.navigate([''])
       }
     })
-    if (this.telegrammService.initData || !environment.production){
+    if (this.telegrammService.initData || !environment.production) {
       this.showDelivery = true;
     }
   }
@@ -60,12 +60,12 @@ export class CartPageComponent {
   changeCurrency(currency: Currency) {
     this.stateService.changeCurrency(currency)
   }
-  submitDeliveryValue(delivery: IOrderDelivery | null){
-      if(delivery) {
-        this.stateService.updateDelivery(delivery);
-        this.canCreateOrder = true;
-      } else {
-        this.canCreateOrder = false
-      }
+  submitDeliveryValue(delivery: IOrderDelivery | null) {
+    if (delivery) {
+      this.stateService.updateDelivery(delivery);
+      this.canCreateOrder = true;
+    } else {
+      this.canCreateOrder = false
     }
+  }
 }

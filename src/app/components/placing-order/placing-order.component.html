@@ -1,0 +1,16 @@
+<ui-stack>
+  <ui-card>
+    <order-delivery
+      [delivery]="delivery()"
+      [usage]="OrderDeliveryPlace.PlacingOrder"
+      (deliverValue)="submitDeliveryValue($event)"
+      class="w-100"
+    ></order-delivery>
+  </ui-card>
+  <ui-button (action)="createOrder(PaymentMethod.Cash)">
+    Оплата наличными
+  </ui-button>
+  <ui-button (action)="createOrder(PaymentMethod.Bank)">
+    Оплата картой
+  </ui-button>
+</ui-stack>

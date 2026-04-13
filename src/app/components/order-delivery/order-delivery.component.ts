@@ -15,18 +15,18 @@ import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
 
 export enum OrderDeliveryPlace {
-  PlacingOrderPage,
+  PlacingOrder,
   OrderCard
 }
 @Component({
   selector: 'order-delivery',
-  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule, ButtonComponent],
+  imports: [ReactiveFormsModule, StackComponent, InputComponent, TogglerComponent, RowComponent, CommonModule],
   templateUrl: './order-delivery.component.html',
   styleUrl: './order-delivery.component.scss'
 })
 export class OrderDeliveryComponent {
   @Input() delivery!: IOrderDelivery;
-  @Input() usage: OrderDeliveryPlace = OrderDeliveryPlace.PlacingOrderPage;
+  @Input() usage: OrderDeliveryPlace = OrderDeliveryPlace.PlacingOrder;
   @Input() canCreateOrderOutside = true;
   @Output() deliverValue = new EventEmitter<IOrderDelivery | null>();
   OrderDeliveryPlace = OrderDeliveryPlace;

@@ -86,7 +86,6 @@ export class ProductCardComponent {
     return this.form.controls.default.value
   }
   get isFromMinPrice() {
-    console.log('isFromMinPrice', this.form.controls.fromMinPrice.value)
     return this.form.controls.fromMinPrice.value
   }
   get amount() {
