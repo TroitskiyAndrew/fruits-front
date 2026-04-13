@@ -62,14 +62,8 @@
   @if (isExpanded) {
     <ui-stack [formGroup]="form">
       @if (editing) {
-        <div class="row">
-          <ui-toggler [options]="typeOptions" formControlName="type">
+        <ui-toggler [options]="typeOptions" formControlName="type" rowClass="w-100" (valueChange)="changeType()">
           </ui-toggler>
-          @if (isSet) {
-            {{ titleMeasure }}
-          }
-        </div>
-
         <ui-input label="Название" formControlName="name" [clearable]="true">
         </ui-input>
 
@@ -80,8 +74,9 @@
         >
         </ui-input>
         @if (isSet) {
-          <ui-toggler [options]="setTypeOptions" formControlName="setType">
+          <ui-toggler [options]="setTypeOptions" formControlName="setType" rowClass="w-100">
           </ui-toggler>
+          {{ titleMeasure }}
         } @else {
           @if (isSimpleProduct || isOrderAddon || isSetAddon) {
             <ui-row class="row">
@@ -111,7 +106,7 @@
         </ui-row>
 
         @if (isOrderAddon || isSetAddon || isDelivery) {
-          <ui-toggler [options]="addonDefaultOptions" formControlName="default">
+          <ui-toggler [options]="addonDefaultOptions" formControlName="default" rowClass="w-100">
           </ui-toggler>
           @if (isFromMinPrice) {
             <ui-row class="row" [formGroup]="minPricesForm">
@@ -146,7 +141,7 @@
                 </div>
               </ui-row>
             }
-          } @else {
+          } @else  {
             @for (p of simpleProducts(); track p.id) {
               <ui-row class="w-100">
                 <div>{{ p.name }} ({{ p.amount }} {{ p.measure }})</div>

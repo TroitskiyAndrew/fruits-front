@@ -177,7 +177,7 @@ export class ProductCardComponent {
   get titleMeasure() {
     switch (this.form.controls.type.value) {
       case ProductType.Set:
-        return this.form.controls.setType.value === SetType.Fixed ? `(${this.weight} кг)` : '';
+        return this.form.controls.setType.value === SetType.Fixed ? `Общий вес: ${this.weight} кг` : '';
       case ProductType.SimpleProduct:
         return `(${this.amount} ${this.measure})`
 
@@ -255,13 +255,14 @@ export class ProductCardComponent {
     { label: 'Продукт', value: ProductType.SimpleProduct },
     { label: 'Набор', value: ProductType.Set },
     { label: 'Доставка', value: ProductType.Delivery },
+    { label: 'Апсейл', value: ProductType.SetAddon },
   ]
 
   addonDefaultOptions = [
     { label: 'Нет', value: DefaultAddonBy.None },
-    { label: 'По умолачнию', value: DefaultAddonBy.Unconditional },
+    { label: 'Авто', value: DefaultAddonBy.Unconditional },
     { label: 'От цены', value: DefaultAddonBy.Price },
-    { label: 'От количества', value: DefaultAddonBy.Count },
+    { label: 'От кол-ва', value: DefaultAddonBy.Count },
   ]
 
   setTypeOptions = [
@@ -272,8 +273,11 @@ export class ProductCardComponent {
   get showCardTitle() {
     return !this.isExpanded || this.usage !== ProductCardPlace.AllProducts
   }
-
+  blockSetProducts = false;
   get showSetProducts() {
+    if(this.blockSetProducts){
+      return false
+    }
     if (!this.isSet) {
       return false;
     }
@@ -299,26 +303,43 @@ export class ProductCardComponent {
   patchForm(product: Product) {
     let minPrice;
     let minCount;
-    if([ProductType.Delivery, ProductType.OrderAddon, ProductType.SetAddon].includes(product.type)){
+    if ([ProductType.Delivery, ProductType.OrderAddon, ProductType.SetAddon].includes(product.type)) {
       minPrice = (product as Delivery | Addon).minPrice || undefined;
       minCount = (product as Delivery | Addon).minCount || 100;
     }
     this.form.patchValue({ ...product, products: {}, minPrice, minCount }, { emitEvent: false });
     const productsGroup = this.productsForm;
     Object.keys(productsGroup.controls).forEach(key => {
-      productsGroup.removeControl(key);
+      productsGroup.removeControl(key, { emitEvent: false });
     });
-    if (product.type === ProductType.Set) {
-      this.simpleProducts().forEach(prod => {
-        this.form.controls.products.addControl(
-          prod.id,
-          new FormControl(
-            product.products?.[prod.id]?.count ?? 0,
-            { nonNullable: true }
-          )
-        )
-      })
-    }
+    this.simpleProducts().forEach(prod => {
+      this.form.controls.products.addControl(
+        prod.id,
+        new FormControl(
+          (product as Set).products?.[prod.id]?.count ?? 0,
+          { nonNullable: true }
+        ), { emitEvent: false }
+      )
+    })
+  }
+
+  changeType() {
+    this.blockSetProducts = true;
+    const productsGroup = this.productsForm;
+    Object.keys(productsGroup.controls).forEach(key => {
+      productsGroup.removeControl(key, { emitEvent: false });
+    });
+    this.simpleProducts().forEach(prod => {
+      this.form.controls.products.addControl(
+        prod.id,
+        new FormControl(
+          (this.product() as Set)?.products?.[prod.id]?.count ?? 0,
+          { nonNullable: true }
+        ), { emitEvent: false }
+      )
+    })
+    this.blockSetProducts = false;
+
   }
 
   startEdit() {
@@ -407,7 +428,7 @@ export class ProductCardComponent {
         if (result.default === DefaultAddonBy.Price) {
           result.minPrice = formValue.minPrice as IPrices
           result.minCount = null;
-        } else if(result.default === DefaultAddonBy.Count){
+        } else if (result.default === DefaultAddonBy.Count) {
           result.minCount = Number(formValue.minCount);
           result.minPrice = null;
         }
@@ -420,7 +441,7 @@ export class ProductCardComponent {
         if (result.default === DefaultAddonBy.Price) {
           result.minPrice = formValue.minPrice as IPrices
           result.minCount = null;
-        } else if(result.default === DefaultAddonBy.Count){
+        } else if (result.default === DefaultAddonBy.Count) {
           result.minCount = Number(formValue.minCount);
           result.minPrice = null;
         }

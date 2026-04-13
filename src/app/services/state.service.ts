@@ -124,6 +124,7 @@ export class StateService {
     }
 
     const products = await this.apiService.getAllProducts();
+    console.log(products)
     this.load(false);
     this.products.set(products);
     const emptyOrder = this.getEmptyOrder();
