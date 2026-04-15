@@ -1,4 +1,4 @@
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 export interface IUser {
   id: string;
@@ -149,6 +149,7 @@ export type Set = ProductBase & {
   type: ProductType.Set;
   setType: SetType;
   products: ISetProducts;
+  addons: Record<string, boolean>;
 };
 
 export type OrderProduct<T = Product> = T & {
@@ -168,7 +169,7 @@ export enum DefaultAddonBy {
 export type AddonBase = {
   default: DefaultAddonBy;
   minPrice: IPrices | null;
-  minCount: number  | null;
+  minCount: number | null;
 };
 
 export type Delivery = ProductBase &
@@ -176,12 +177,12 @@ export type Delivery = ProductBase &
     type: ProductType.Delivery;
   };
 
-  export type Addon = ProductBase & AddonBase & {
-    type: ProductType.OrderAddon | ProductType.SetAddon;
-    weight: number;
-    amount: number;
-    measure?: Measure;
-  }
+export type Addon = ProductBase & AddonBase & {
+  type: ProductType.OrderAddon | ProductType.SetAddon;
+  weight: number;
+  amount: number;
+  measure?: Measure;
+}
 
 export type Product = SimpleProduct | Set | Addon | Delivery;
 export type ProductForm =
@@ -191,7 +192,7 @@ export type ProductForm =
   Omit<Delivery, 'type' | 'minPrice' | 'minCount'> & {
     type: ProductType;
     minPrice: IPrices;
-  minCount: number;
+    minCount: number;
   };
 
 export enum PaymentMethod {
@@ -242,9 +243,16 @@ export interface Share {
 }
 
 export type ControlsOf<T> = {
-  [K in keyof T]: T[K] extends Record<string, any>
-    ? FormGroup<any>
-    : FormControl<T[K]>;
+  [K in keyof T]:
+  T[K] extends Array<infer U>
+  ? FormArray<
+    U extends Record<string, any>
+    ? FormGroup<ControlsOf<U>>
+    : FormControl<U>
+  >
+  : T[K] extends Record<string, any>
+  ? FormGroup<any>
+  : FormControl<T[K]>;
 };
 
 export interface INewOrderInfo {

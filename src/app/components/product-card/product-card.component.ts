@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostListener, effect, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
+import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
 import { ControlsOf, Currency, IPrices, Set, ISetProducts, SimpleProduct, Measure, Product, ProductForm, ProductType, SetType, DefaultAddonBy, Delivery, Addon } from '../../models/models'
 
@@ -21,7 +21,8 @@ import { Router } from '@angular/router'
 import { CheckboxComponent } from "../../ui/checkbox/checkbox.component";
 import { LoaderDirective } from '../../ui/loader/loader.directive'
 import { CURRENCY_SYMBOLS } from '../../constants/constants'
-import { AddonCardComponent, ToggleAddon } from "../addon-card/addon-card.component";
+import { AddonCardComponent, AddonCardPlace, ToggleAddon } from "../addon-card/addon-card.component";
+import { ExpandableComponent } from "../../ui/expandable/expandable.component";
 
 export enum ProductCardPlace {
   AllProducts,
@@ -46,8 +47,9 @@ export enum ProductCardPlace {
     TogglerComponent,
     GridComponent,
     PriceStringPipe,
-    AddonCardComponent
-  ],
+    AddonCardComponent,
+    ExpandableComponent
+],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
@@ -62,6 +64,7 @@ export class ProductCardComponent {
   product = input<Product | undefined>();
   @Input() cartIndex: number = 0;
   Measure = Measure;
+  AddonCardPlace = AddonCardPlace;
 
   get name() {
     return this.form.controls.name.value;
@@ -197,6 +200,16 @@ export class ProductCardComponent {
   })
 
   setAddons = computed(() => this.stateService.setAddons());
+
+  get availableSetAddons () {
+    const product = this.product();
+    const addons = this.stateService.setAddons()
+    if(product?.type === ProductType.Set) {
+      return addons.filter(addon => product.addons[addon.id] )
+    }
+    return addons
+  };
+
   get currentSelectedAddons() {
     const product = this.getProductFromForm();
     switch (product.type) {
@@ -232,8 +245,8 @@ export class ProductCardComponent {
     amount: new FormControl(0, { nonNullable: true }),
     setType: new FormControl(SetType.Fixed, { nonNullable: true }),
     products: new FormGroup<ControlsOf<Record<string, number>>>({}),
+    addons: new FormGroup<ControlsOf<Record<string, number>>>({}),
     default: new FormControl(DefaultAddonBy.None, { nonNullable: true }),
-
     price: new FormGroup<ControlsOf<Record<Currency, number>>>({
       rub: new FormControl(0, { nonNullable: true }),
       vnd: new FormControl(0, { nonNullable: true }),
@@ -249,6 +262,9 @@ export class ProductCardComponent {
 
   get productsForm(): FormGroup {
     return this.form.controls.products as FormGroup
+  }
+  get addonsForm(): FormGroup {
+    return this.form.controls.addons as FormGroup
   }
 
   get pricesForm(): FormGroup {
@@ -318,6 +334,23 @@ export class ProductCardComponent {
 
   constructor(private stateService: StateService, private apiService: ApiService, private router: Router) {
     effect(() => {
+      const addons = this.stateService.setAddons();
+      const addonsForm = this.addonsForm;
+      Object.keys(addonsForm.controls).forEach(key => {
+        addonsForm.removeControl(key, { emitEvent: false });
+      });
+      [...addons].forEach(prod => {
+        addonsForm.addControl(
+          prod.id,
+          new FormControl(
+            false,
+            { nonNullable: true }
+          ), { emitEvent: false }
+        )
+      })
+
+    });
+    effect(() => {
       const product = this.product();
       if (!product) {
         this.editing = true;
@@ -325,6 +358,7 @@ export class ProductCardComponent {
         this.patchForm(product)
       }
     });
+
     effect(() => this.currency.set(this._currency()));
   }
 
@@ -442,7 +476,7 @@ export class ProductCardComponent {
 
         })
 
-
+        result.addons = formValue.addons
         result.weight = Number(formValue.weight);
         result.products = products;
         result.setType = formValue.setType;
@@ -535,7 +569,7 @@ export class ProductCardComponent {
   }
 
   toggleAddon(options: ToggleAddon) {
-    const {id} = options.addon;
+    const { id } = options.addon;
     const current = this.productsForm.controls[id].value;
     this.productsForm.controls[id].setValue(current ? 0 : 1);
     if (this.usage === ProductCardPlace.Cart) {
@@ -559,6 +593,10 @@ export class ProductCardComponent {
 
   changeCounter(p: Product) {
     return this.usage === ProductCardPlace.Cart && ((this.price - p.price[this.currency()]) < this.productPrice)
+  }
+
+  toggleAddonInSet(id: string) {
+    this.addonsForm.controls[id].setValue(!this.addonsForm.controls[id].value);
   }
 
 }

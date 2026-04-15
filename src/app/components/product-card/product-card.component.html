@@ -141,7 +141,25 @@
             </ui-input>
           }
         }
+        @if (isSet) {
+          <ui-expandable title="Модификаторы">
+            <ui-stack>
+              @for (addon of setAddons(); track addon.id) {
+                <addon-card
+                  [addon]="addon"
+                  (toggleAddon)="toggleAddonInSet(addon.id)"
+                  [value]="addonsForm.controls[addon.id].value"
+                  [disabled]="false"
+                  [currency]="currency()"
+                  [usage]="AddonCardPlace.SetEditing"
+                ></addon-card>
+              }
+
+            </ui-stack>
+          </ui-expandable>
+        }
       }
+
 
       @if (showSetProducts) {
         <ui-stack [formGroup]="productsForm">
@@ -220,7 +238,7 @@
           </ui-button>
         }
         @if ([ProductCardPlace.Shop, ProductCardPlace.Cart].includes(usage)) {
-          @let addons = setAddons();
+          @let addons = availableSetAddons;
           @if (addons.length) {
             <ui-stack>
               @for (addon of addons; track addon.id) {

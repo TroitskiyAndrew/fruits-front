@@ -9,8 +9,8 @@ import { PriceStringPipe } from '../../pipes/price-string.pipe';
 import { CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../../constants/constants';
 
 export enum AddonCardPlace {
-  SetContent,
   SetCard,
+  SetEditing,
 }
 
 export interface ToggleAddon {
