@@ -61,6 +61,7 @@ export class ProductCardComponent {
   @Input() isExpanded = false;
   product = input<Product | undefined>();
   @Input() cartIndex: number = 0;
+  Measure = Measure;
 
   get name() {
     return this.form.controls.name.value;
@@ -150,7 +151,8 @@ export class ProductCardComponent {
   get productsArray() {
     const products = this.products as Record<string, number>;
     const simpleProductsMap = this.stateService.simpleProductsMap();
-    return Array(...Object.entries(products)).filter(([id, count]) => count > 0 && simpleProductsMap.get(id)).map(([id]) => simpleProductsMap.get(id)!)
+    const result = Array(...Object.entries(products)).filter(([id, count]) => count > 0 && simpleProductsMap.get(id)).map(([id, count]) => ({ ...simpleProductsMap.get(id), count }));
+    return result;
   }
 
   get weight() {
@@ -195,6 +197,18 @@ export class ProductCardComponent {
   })
 
   setAddons = computed(() => this.stateService.setAddons());
+  get currentSelectedAddons() {
+    const product = this.getProductFromForm();
+    switch (product.type) {
+      case ProductType.Set:
+        return Object.values(product.products).filter(p => p.type === ProductType.SetAddon && p.count > 0).map(p => p as Addon);
+        break;
+
+      default:
+        return [];
+        break;
+    }
+  };
   setAddonsMap = computed(() => this.stateService.setAddonsMap());
   addons = [];
 

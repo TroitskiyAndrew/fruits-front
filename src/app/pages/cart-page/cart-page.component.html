@@ -1,13 +1,10 @@
-<ui-page [showCurrency]="true">
-  <div class="title">
-    Корзина
-  </div>
+<ui-page title="Корзина" [showCurrency]="true">
 
   @let orderContent = content();
   @let currentCurrency = currency();
   <order-content [_currency]="currentCurrency" [usage]="OrderContentPlace.CartPage" [content]="orderContent" (updateContent)="updateCart($event)" class="w-100"></order-content>
   <div class="title right">
-    Выбранные товары: {{cartTotal() | priceString : currentCurrency}} {{currencySymbol()}}
+    Выбранные наборы: {{cartTotal() | priceString : currentCurrency}} {{currencySymbol()}}
   </div>
   @if (showDelivery) {
     <placing-order [_currency]="currentCurrency" class="w-100"></placing-order>

@@ -1,9 +1,6 @@
-<ui-page [showCurrency]="true">
+<ui-page title="Онлайн оплата" [showCurrency]="true">
   @let payment = paymentSignal();
   @if (payment) {
-    <div class="title">
-      Онлайн оплата
-    </div>
     <payment-card class="w-100" [payment]="payment" [usage]="PaymentCardPlace.OnlinePayment" (payed)="paid($event)" [_currency]="currency()"></payment-card>
   }
 

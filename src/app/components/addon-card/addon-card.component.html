@@ -2,7 +2,9 @@
   <ui-row rowClass="w-100">
     @switch (usage) {
       @case (AddonCardPlace.SetCard) {
-        <ui-checkbox [value]="value" (valueChange)="changeAddonSelect()" label="" [disabled]="disabled" [value]="value"></ui-checkbox>
+        @if(!disabled) {
+          <ui-checkbox [value]="value" (valueChange)="changeAddonSelect()" label="" [disabled]="disabled" [value]="value"></ui-checkbox>
+        }
         <ui-stack class="left">
 
           <div class="title">

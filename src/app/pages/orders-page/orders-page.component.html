@@ -1,9 +1,7 @@
-<ui-page>
-  <div class="title">Заказы</div>
+<ui-page title="Заказы">
   <ui-stack class="w-100">
-
     @for (order of orders; track $index) {
-      <order-card class="w-100" [order]="order" [usage]="OrderCardPlace.AllOrdersPage" />
+      <order-card class="w-100" [order]="order" [usage]="OrderCardPlace.AllOrdersPage" [_currency]="order.content.currency" />
     }
   </ui-stack>
 </ui-page>

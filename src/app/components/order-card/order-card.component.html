@@ -2,21 +2,39 @@
   <ui-stack>
     <ui-row (click)="onTitleClick()">
       <div>№ {{ order.number }}</div>
+      <div class="subtitle">{{ date() | date: 'dd.MM.yyyy' }}</div>
       @if (!myOrder) {
       <ui-row>
         {{ name() }}
         <div class="subtitle">({{ username() }})</div>
       </ui-row>
       }
+      @if(usage === OrderCardPlace.AllOrdersPage){
       <div>
         {{ totalPrice() | priceString: currency() }} {{ currencySymbol() }}
       </div>
+    }
+
     </ui-row>
     @switch (usage) {
     @case (OrderCardPlace.OrderPage) {
     <order-status [usage]="OrderStatusPlace.OrderPage" [status]="status"></order-status>
-    <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [currency]="this.currency()" [delivery]="delivery"></order-delivery>
     <order-content [usage]="OrderContentPlace.OrderPage" [content]="content" [_currency]="currency()"></order-content>
+    <ui-expandable title="Детали доставки">
+      <order-delivery [usage]="OrderDeliveryPlace.OrderCard" [currency]="this.currency()"
+        [delivery]="delivery"></order-delivery>
+    </ui-expandable>
+    <addon-card
+          [addon]="delivery.deliveryProduct"
+          [disabled]="true"
+          [currency]="currency()"
+          [value]="true"
+        ></addon-card>
+        <ui-row rowClass="w-100">
+          <div class="title right">
+            Общая стоимость: {{ totalPrice() | priceString: currency() }} {{ currencySymbol() }}
+          </div>
+        </ui-row>
     }
     }
 

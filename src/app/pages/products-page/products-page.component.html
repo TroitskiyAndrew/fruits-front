@@ -1,8 +1,4 @@
-<ui-page>
-  <div class="title">
-    Товары
-  </div>
-
+<ui-page title="Товары" [showCurrency]="true">
   @if (creating) {
 
   <product-card class="w-100" [isExpanded]="true" [usage]="ProductCardPlace.AllProducts" (cancel)="creating = false" (accept)="creating = false" />

@@ -36,7 +36,8 @@
               isExpanded ||
               isFixedSet ||
               productPrice === 0 ||
-              usage === ProductCardPlace.Cart
+              usage === ProductCardPlace.Cart ||
+              usage === ProductCardPlace.OrderPage
             ) {
               {{ price | priceString: currency() }}
             } @else {
@@ -147,9 +148,41 @@
           @if (isFixedSet && usage !== ProductCardPlace.AllProducts) {
             @for (p of productsArray; track p.id) {
               <ui-row class="w-100">
-                <div>{{ p.name }} ({{ p.amount }} {{ p.measure }})</div>
+                @if (usage === ProductCardPlace.OrderPage) {
+                  <div>{{ p.name }}</div>
+                  <div>
+                    {{
+                      p.measure === Measure.KG
+                        ? p.weight * p.count * p.amount + " кг"
+                        : p.count * p.amount + " " + p.measure
+                    }}
+                  </div>
+                } @else {
+                  <div>{{ p.name }} ({{ p.amount }} {{ p.measure }})</div>
+                  <div>
+                    {{ products[p.id] }}
+                  </div>
+                }
+              </ui-row>
+            }
+          } @else if (!isFixedSet && usage === ProductCardPlace.OrderPage) {
+            @for (p of productsArray; track p.id) {
+              <ui-row class="w-100">
                 <div>
-                  {{ products[p.id] }}
+                  <div>
+                    {{ p.name }} ({{
+                      p.measure === Measure.KG
+                        ? p.weight * p.amount + " кг"
+                        : p.amount + " " + p.measure
+                    }})
+                  </div>
+                </div>
+                <div>
+                  {{
+                    p.count * p.price[currentCurrency]
+                      | priceString: currentCurrency
+                  }}
+                  {{ currencySymbol() }}
                 </div>
               </ui-row>
             }
@@ -174,61 +207,74 @@
         </ui-stack>
       }
       <ui-stack>
-        @if(usage === ProductCardPlace.AllProducts) {
+        @if (usage === ProductCardPlace.AllProducts) {
+          <ui-button
+            variant="primary"
+            (action)="saveProduct()"
+            btnClass="w-100"
+          >
+            Сохранить
+          </ui-button>
+          <ui-button variant="primary" (action)="onCancel()" btnClass="w-100">
+            Отмена
+          </ui-button>
+        }
+        @if ([ProductCardPlace.Shop, ProductCardPlace.Cart].includes(usage)) {
+          @let addons = setAddons();
+          @if (addons.length) {
+            <ui-stack>
+              @for (addon of addons; track addon.id) {
+                <addon-card
+                  [addon]="addon"
+                  (toggleAddon)="toggleAddon($event)"
+                  [value]="productsForm.controls[addon.id].value > 0"
+                  [disabled]="usage === ProductCardPlace.OrderPage"
+                  [currency]="currency()"
+                ></addon-card>
+              }
+            </ui-stack>
+          }
+        } @else if ([ProductCardPlace.OrderPage].includes(usage)) {
+          @let addons = currentSelectedAddons;
+          @if (addons.length) {
+            <ui-stack>
+              @for (addon of addons; track addon.id) {
+                <addon-card
+                  [addon]="addon"
+                  [value]="true"
+                  [disabled]="true"
+                  [currency]="currency()"
+                ></addon-card>
+              }
+            </ui-stack>
+          }
+        }
+        @if (usage === ProductCardPlace.Shop) {
+          @if (price < productPrice) {
             <ui-button
+              btnClass="w-100"
               variant="primary"
               (action)="saveProduct()"
-              btnClass="w-100"
+              [disabled]="true"
             >
-              Сохранить
+              от {{ productPrice | priceString }} {{ currencySymbol() }}
             </ui-button>
-            <ui-button variant="primary" (action)="onCancel()" btnClass="w-100">
-              Отмена
+          } @else {
+            <ui-button btnClass="w-100" variant="primary" (action)="buy()">
+              Заказать
             </ui-button>
-          }
-          @if([ProductCardPlace.Shop, ProductCardPlace.Cart].includes(usage)){
-            @let addons = setAddons();
-            @if (addons.length) {
-              <ui-stack>
-                @for (addon of addons; track addon.id) {
-                  <addon-card
-                    [addon]="addon"
-                    (toggleAddon)="toggleAddon($event)"
-                    [value]="productsForm.controls[addon.id].value > 0"
-                    [disabled]="false"
-                    [currency]="currency()"
-                  ></addon-card>
-                }
-              </ui-stack>
-            }
-          }
-        @if(usage === ProductCardPlace.Shop) {
-
-            @if (price < productPrice) {
-              <ui-button
-                btnClass="w-100"
-                variant="primary"
-                (action)="saveProduct()"
-                [disabled]="true"
-              >
-                от {{ productPrice | priceString }} {{ currencySymbol() }}
-              </ui-button>
-            } @else {
-              <ui-button btnClass="w-100" variant="primary" (action)="buy()">
-                Заказать
-              </ui-button>
-              <ui-button
-                btnClass="w-100"
-                variant="primary"
-                (action)="addToCart()"
-              >
-                Добавить в корзину
-              </ui-button>
-            }
-            <ui-button btnClass="w-100" variant="primary" (action)="onCancel()">
-              Отмена
+            <ui-button
+              btnClass="w-100"
+              variant="primary"
+              (action)="addToCart()"
+            >
+              Добавить в корзину
             </ui-button>
           }
+          <ui-button btnClass="w-100" variant="primary" (action)="onCancel()">
+            Отмена
+          </ui-button>
+        }
       </ui-stack>
     </ui-stack>
   }

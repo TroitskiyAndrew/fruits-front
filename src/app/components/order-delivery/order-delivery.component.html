@@ -18,27 +18,35 @@
       @if (isHotel) {
         <ui-input label="Отель" [form]="form" formControlName="place">
         </ui-input>
-        @if(form.controls.deliveryType.value === DeliveryType.Reception){
+        @if (form.controls.deliveryType.value === DeliveryType.Reception) {
           <ui-input label="Комната" [form]="form" formControlName="placeAdd">
           </ui-input>
         }
       }
-      @if(additionalDelivery) {
-        <addon-card [addon]="additionalDelivery" [disabled]="disableAddons" [currency]="currency" (toggleAddon)="changeDeliveryProduct($event)" [value]="!isDefaultDelivery"></addon-card>
+      @if (additionalDelivery) {
+        <addon-card
+          [addon]="additionalDelivery"
+          [disabled]="disableAddons"
+          [currency]="currency"
+          (toggleAddon)="changeDeliveryProduct($event)"
+          [value]="!isDefaultDelivery"
+        ></addon-card>
       }
       <ui-row>
         <div>
-
-          @if(freeDeliveryFromPice) {
-            Бесплатно при заказе от {{ freeDeliveryFromPice | priceString : currency }} {{CURRENCY_SYMBOLS[currency]}}
+          @if (freeDeliveryFromPice) {
+            Бесплатно при заказе от
+            {{ freeDeliveryFromPice | priceString: currency }}
+            {{ CURRENCY_SYMBOLS[currency] }}
           } @else if (freeDeliveryFromCount > 0) {
             Бесплатно от {{ freeDeliveryFromCount }} наборов
           } @else {
-            {{deliverProduct.description}}
+            {{ deliverProduct.description }}
           }
         </div>
         <div class="bold">
-          {{ deliverProduct.price[currency] | priceString : currency }} {{CURRENCY_SYMBOLS[currency]}}
+          {{ deliverProduct.price[currency] | priceString: currency }}
+          {{ CURRENCY_SYMBOLS[currency] }}
         </div>
       </ui-row>
       <ui-input
@@ -58,7 +66,6 @@
           rowClass="w-100"
         ></ui-toggler>
       }
-
     </ui-stack>
   }
   @case (OrderDeliveryPlace.OrderCard) {

@@ -1,59 +1,66 @@
-<div class="page">
-  <ui-row class="w-100 relative" rowClass="header">
-    <ui-row rowClass="gap-s">
-      @if (showBack) {
-        <ui-button variant="ghost" size="s" [icon]="true" (action)="goBack()">
-          <i class="fa-solid fa-chevron-left"></i>
-        </ui-button>
-        <ui-button variant="ghost" size="s" [icon]="true" link="shop">
-          <i class="fa-solid fa-home"></i>
-        </ui-button>
-      }
-    </ui-row>
-    <div class="title absolute-center">FRUIT CASE</div>
-    <ui-row rowClass="gap-s">
-      @if(showCurrency) {
-        <ui-toggler
-          class="center-self"
-          [buttons]="currencyButtons"
-          [value]="currency()"
-          (valueChange)="changeCurrency($event)"
-          (showButtonsOptions)="selectCurrency = $event"
-        ></ui-toggler>
-      }
-
-      @if(!selectCurrency) {
-        @if (isAdmin()) {
-          <ui-button variant="ghost" size="m" [icon]="true" link="products">
-            <i class="fa-solid fa-gear"></i>
+<ui-stack class="relative" stackClass="gap-0">
+  <ui-stack class="header w-100">
+    <ui-row rowClass="w-100 relative">
+      <ui-row rowClass="gap-s">
+        @if (showBack) {
+          <ui-button variant="ghost" size="s" [icon]="true" (action)="goBack()">
+            <i class="fa-solid fa-chevron-left"></i>
+          </ui-button>
+          <ui-button variant="ghost" size="s" [icon]="true" link="shop">
+            <i class="fa-solid fa-home"></i>
           </ui-button>
         }
-        <ui-row rowClass="gap-0">
-          @let itemsCount = cartCount();
+      </ui-row>
+      <div class="title absolute-center">FRUIT CASE</div>
+      <ui-row rowClass="gap-s">
+        @if(showCurrency) {
+          <ui-toggler
+            class="center-self"
+            [buttons]="currencyButtons"
+            [value]="currency()"
+            (valueChange)="changeCurrency($event)"
+            (showButtonsOptions)="selectCurrency = $event"
+          ></ui-toggler>
+        }
+
+        @if(!selectCurrency) {
+          @if (isAdmin()) {
+            <ui-button variant="ghost" size="m" [icon]="true" link="products">
+              <i class="fa-solid fa-gear"></i>
+            </ui-button>
+          }
+          <ui-row rowClass="gap-0">
+            @let itemsCount = cartCount();
+            <ui-button
+              variant="ghost"
+              size="m"
+              [icon]="true"
+              link="cart"
+              [disabled]="itemsCount === 0"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>
+            </ui-button>
+            @if (itemsCount) {
+              ({{ itemsCount }})
+            }
+          </ui-row>
           <ui-button
             variant="ghost"
             size="m"
             [icon]="true"
-            link="cart"
-            [disabled]="itemsCount === 0"
+            [link]="myAccountLink()"
           >
-            <i class="fa-solid fa-cart-shopping"></i>
+            <i class="fa-solid fa-user"></i>
           </ui-button>
-          @if (itemsCount) {
-            ({{ itemsCount }})
-          }
-        </ui-row>
-        <ui-button
-          variant="ghost"
-          size="m"
-          [icon]="true"
-          [link]="myAccountLink()"
-        >
-          <i class="fa-solid fa-user"></i>
-        </ui-button>
 
-      }
+        }
+      </ui-row>
     </ui-row>
-  </ui-row>
-  <ng-content />
-</div>
+    @if (title) {
+      <div class="title center-self">{{ title }}</div>
+    }
+  </ui-stack>
+  <div class="page">
+    <ng-content />
+  </div>
+</ui-stack>

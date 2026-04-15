@@ -97,6 +97,8 @@ export interface IOrder {
   status: IOrderStatus;
   content: IOrderContent;
   delivery: IOrderDelivery;
+  total: IPrices;
+  _created: number;
 }
 
 export enum Currency {
@@ -134,6 +136,7 @@ export type SimpleProduct = ProductBase & {
   measure: Measure;
   amount: number;
   type: ProductType.SimpleProduct;
+  products: ISetProducts;
 };
 
 export enum SetType {

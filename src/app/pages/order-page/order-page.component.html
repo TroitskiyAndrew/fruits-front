@@ -1,11 +1,6 @@
-<ui-page>
+<ui-page title="Заказ">
   @let order = orderSignal();
   @if(order){
-    <div class="title">
-      Заказ
-    </div>
-    <ui-toggler class="center-self" [options]="currencyOptions" [value]="currency()"
-      (valueChange)="changeCurrency($event)"></ui-toggler>
-    <order-card class="w-100" [order]="order" [usage]="OrderCardPlace.OrderPage" [_currency]="currency()"></order-card>
+    <order-card class="w-100" [order]="order" [usage]="OrderCardPlace.OrderPage" [_currency]="this.currency()"></order-card>
   }
 </ui-page>

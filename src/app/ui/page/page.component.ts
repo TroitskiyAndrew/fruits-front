@@ -13,13 +13,14 @@ import { TogglerComponent } from "../toggler/toggler.component";
   selector: 'ui-page',
   standalone: true,
   template: ``,
-  imports: [CommonModule, ButtonComponent, RowComponent, TogglerComponent],
+  imports: [CommonModule, ButtonComponent, RowComponent, TogglerComponent, StackComponent],
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
   @Input() showBack: boolean = true;
   @Input() showCurrency = false;
+  @Input() title = "";
 
   myAccountLink = computed(() => `account/${this.stateService.user().id}`);
   isAdmin = computed(() => this.stateService.isAdmin());

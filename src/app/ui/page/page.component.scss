@@ -1,6 +1,6 @@
+
 .page {
   max-width: 500px;
-  margin: auto;
   height: 100%;
   padding: var(--space-4);
   display: flex;
@@ -14,4 +14,10 @@
   margin-top: auto;
 }
 
+.header {
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  padding: var(--space-4);
+}
 

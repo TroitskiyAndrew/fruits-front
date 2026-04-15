@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
-selector:'ui-stack',
-standalone:true,
-template:`<div class="col gap-m"><ng-content/></div>`
+  selector: 'ui-stack',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './stack.component.html',
 })
-export class StackComponent{}
+export class StackComponent {
+  @Input() stackClass = '';
+}

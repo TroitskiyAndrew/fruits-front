@@ -1,5 +1,5 @@
 import { DEFAULT_CURRENCY } from "../constants/constants";
-import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType, Delivery, DefaultAddonBy, Addon } from "../models/models";
+import { Currency, IOrderContent, SimpleProduct, IUser, OrderProduct, ProductType, SetType, Delivery, DefaultAddonBy, Addon, IPrices } from "../models/models";
 
 export function getTotal(orderContent: IOrderContent) {
   const newTotal = {
@@ -83,3 +83,17 @@ export function chooseDefaultDelivery(deliveries: Delivery[], currency: Currency
   return defaultOption!;
 
 }
+
+export function summPrices(prices: IPrices[]) {
+  return prices.reduce((acc, price) => {
+    acc[Currency.Rub] += price[Currency.Rub];
+    acc[Currency.VND] += price[Currency.VND];
+    acc[Currency.USDT] += price[Currency.USDT];
+    return acc;
+  }, {
+    [Currency.Rub]: 0,
+    [Currency.VND]: 0,
+    [Currency.USDT]: 0,
+   })
+}
+

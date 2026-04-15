@@ -22,6 +22,8 @@ import { OrderStatusComponent, OrderStatusPlace } from "../order-status/order-st
 import { OrderDeliveryComponent, OrderDeliveryPlace } from '../order-delivery/order-delivery.component';
 import { OrderContentComponent, OrderContentPlace } from "../order-content/order-content.component";
 import { Router } from '@angular/router';
+import { ExpandableComponent } from "../../ui/expandable/expandable.component";
+import { AddonCardComponent } from "../addon-card/addon-card.component";
 
 export enum OrderCardPlace {
   OrderPage,
@@ -39,7 +41,9 @@ export enum OrderCardPlace {
     PriceStringPipe,
     OrderStatusComponent,
     OrderDeliveryComponent,
-    OrderContentComponent
+    OrderContentComponent,
+    ExpandableComponent,
+    AddonCardComponent
 ],
   templateUrl: './order-card.component.html',
 })
@@ -56,7 +60,8 @@ export class OrderCardComponent {
   currencySymbol = computed(() => CURRENCY_SYMBOLS[this.currency()]);
   Currency = Currency;
   user = signal(getEmptyUser());
-  totalPrice = computed(() => this.order.content.prices[this.currency()] || 0);
+  totalPrice = computed(() => this.order.total[this.currency()] || 0);
+  date = computed(() => this.order._created);
   name = computed(() => getUserName(this.user()));
   username = computed(() => this.user().user.username);
   get content() {

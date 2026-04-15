@@ -3,7 +3,7 @@ import { ApiService } from './api.service';
 import { TelegrammService } from './telegramm.service';
 import { Addon, Currency, DefaultAddonBy, Delivery, DeliveryType, IConfig, IOrder, IOrderDelivery, IPayment, IUser, OrderProduct, PlaceType, Product, ProductType } from '../models/models';
 import { CURRENCY_OPTIONS, CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../constants/constants';
-import { chooseDefaultDelivery, getEmptyUser, getTotal, getUserName } from './utils';
+import { chooseDefaultDelivery, getEmptyUser, getTotal, getUserName, summPrices } from './utils';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -55,10 +55,7 @@ export class StateService {
   cartTotal = computed(() => {
     return this.order().content.prices[this.currency()]
   });
-  orderTotal = computed(() => {
-    const cartTotal = this.cartTotal();
-    return cartTotal + this.orderDelivery().deliveryProduct.price[this.currency()]
-  })
+  orderTotal = computed(() => this.order().total[this.currency()]);
   orderDelivery = computed(() => this.order().delivery);
   orders = signal<IOrder[]>([]);
   ordersMap = computed(() => this.orders().reduce((map: Map<string, IOrder>, order: IOrder) => {
@@ -131,7 +128,7 @@ export class StateService {
           name: emptyOrder.delivery.name,
           contact: emptyOrder.delivery.contact
         })
-        this.currency.set(user.currency);
+        this.changeCurrency(user.currency);
       }
     }
 
@@ -162,23 +159,34 @@ export class StateService {
   }
 
   changeCurrency(currency: Currency) {
-    this.currency.set(currency);
-    this.apiService.updateUser({
-      id: this.user().id,
-      currency: currency,
+    this.currency.set(currency)
+    this.order.update(order => {
+      return {
+        ...order,
+        content: {
+          ...order.content,
+          currency,
+        }
+      }
     })
+    if (this.user().userId)
+      this.apiService.updateUser({
+        id: this.user().id,
+        currency: currency,
+      })
   }
 
   updateCart(products: OrderProduct[]) {
     this.order.update(order => {
       order.content.products = products;
       order.content.prices = getTotal(order.content);
+      this.updateTotal(order);
       let delivery = order.delivery;
       const currentDeliveryProduct = delivery.deliveryProduct!;
-      if(currentDeliveryProduct.default){
+      if (currentDeliveryProduct.default) {
         const newDelivery = chooseDefaultDelivery(this.deliveries().filter(d => d.default), this.currency(), order.content.prices[this.currency()], order.content.products.length);
-        if(newDelivery.id !== currentDeliveryProduct.id){
-          delivery = {...delivery, deliveryProduct: newDelivery}
+        if (newDelivery.id !== currentDeliveryProduct.id) {
+          delivery = { ...delivery, deliveryProduct: newDelivery }
         }
       }
       return {
@@ -190,9 +198,14 @@ export class StateService {
     });
   }
 
+  updateTotal(order: IOrder) {
+    order.total = summPrices([order.content.prices, order.delivery.deliveryProduct.price]);
+  }
+
   updateDelivery(delivery: Partial<IOrderDelivery>) {
     this.order.update(order => {
       order.delivery = { ...order.delivery, ...delivery };
+      this.updateTotal(order);
       return {
         ...order,
         status: order.status,
@@ -257,12 +270,19 @@ export class StateService {
           minCount: null,
           minPrice: null,
         }
-      }
+      },
+      total: {
+        [Currency.Rub]: 0,
+        [Currency.VND]: 0,
+        [Currency.USDT]: 0,
+      },
+      _created: Date.now(),
     }
     const deliveries = this.deliveries();
     const defaultDelivery = deliveries.filter(d => d.default).sort((a, b) => (a.minPrice != null ? 1 : 0) - (b.minPrice != null ? 1 : 0))[0];
     if (defaultDelivery) {
       order.delivery.deliveryProduct = defaultDelivery;
+      this.updateTotal(order);
     }
     const user = this.user()
     const tgUsername = user.user.username;

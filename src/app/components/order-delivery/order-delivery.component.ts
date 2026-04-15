@@ -38,6 +38,7 @@ export class OrderDeliveryComponent {
   PaymentMethod = PaymentMethod;
   PlaceType = PlaceType;
   CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
+  DefaultAddonBy = DefaultAddonBy;
   get deliverProduct() {
     const deliveryProductId = this.form.controls.deliveryProductId.value;
     return this.stateService.deliveriesMap().get(deliveryProductId)!
@@ -81,9 +82,6 @@ export class OrderDeliveryComponent {
         const { deliveryProductId, ...delivery } = value;
         const deliveryProduct = this.stateService.deliveriesMap().get(deliveryProductId || '');
         const newDelivery = {...delivery, deliveryProduct} as  IOrderDelivery
-          this.stateService.updateDelivery({
-            deliveryProduct: newDelivery.deliveryProduct
-          });
         this.deliverValue.emit(this.form.valid ? newDelivery : null)
       });
     this.form.controls.placeType.valueChanges

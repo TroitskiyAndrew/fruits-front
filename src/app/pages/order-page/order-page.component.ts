@@ -11,7 +11,7 @@ import { CURRENCY_OPTIONS } from '../../constants/constants';
 
 @Component({
   selector: 'app-order-page',
-  imports: [PageComponent, OrderCardComponent, TogglerComponent],
+  imports: [PageComponent, OrderCardComponent],
   templateUrl: './order-page.component.html',
   styleUrl: './order-page.component.scss'
 })
@@ -34,10 +34,6 @@ export class OrderPageComponent {
       console.log(order);
     }
     this.stateService.load(false);
-  }
-
-  changeCurrency(currency: Currency){
-    this.currency.set(currency);
   }
 
 }
