@@ -18,8 +18,8 @@ export class TelegrammService {
     try {
       this.tg?.ready?.();
       alert('Telegram WebApp is ready!' + (this.tg?.ready ? ' (ready)' : ' (not ready)'));
-      this.tg?.expand?.();
-      alert('Telegram WebApp is expanded!' + (this.tg?.expand ? ' (expand)' : ' (not expand)'));
+      // this.tg?.expand?.();
+      // alert('Telegram WebApp is expanded!' + (this.tg?.expand ? ' (expand)' : ' (not expand)'));
     } catch (error) {
       alert('Error occurred while initializing Telegram WebApp!');
     }
