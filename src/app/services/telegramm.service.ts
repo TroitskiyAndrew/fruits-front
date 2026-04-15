@@ -15,13 +15,6 @@ export class TelegrammService {
   readonly startParam = this.tg?.initDataUnsafe?.start_param ?? null;
 
   constructor() {
-    try {
-      this.tg?.ready?.();
-      alert('Telegram WebApp is ready!' + (this.tg?.ready ? ' (ready)' : ' (not ready)'));
-      // this.tg?.expand?.();
-      // alert('Telegram WebApp is expanded!' + (this.tg?.expand ? ' (expand)' : ' (not expand)'));
-    } catch (error) {
-      alert('Error occurred while initializing Telegram WebApp!');
-    }
+    try { this.tg?.ready?.(); this.tg?.expand?.(); } catch { }
   }
 }
