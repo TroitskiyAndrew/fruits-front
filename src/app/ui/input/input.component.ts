@@ -2,11 +2,12 @@ import { Component, Input, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { RowComponent } from "../row/row.component";
+import { ButtonComponent } from "../button/button.component";
 
 @Component({
   selector: 'ui-input',
   standalone: true,
-  imports: [CommonModule, RowComponent],
+  imports: [CommonModule, RowComponent, ButtonComponent],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
   providers: [
@@ -61,7 +62,7 @@ export class InputComponent implements ControlValueAccessor {
     this.onChange(value)
   }
 
-  clear() {
+  clearInput() {
     this.value = ''
     this.onChange('')
   }

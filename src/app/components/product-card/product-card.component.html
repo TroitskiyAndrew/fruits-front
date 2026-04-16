@@ -4,10 +4,11 @@
     <ui-row class="row" (click)="onExpand()" rowClass="w-100">
       <ui-stack class="left">
         <div class="title">{{ name }} {{ titleMeasure }}</div>
-
-        <div class="green-text">
-          {{ description }}
-        </div>
+        @if (description) {
+          <div class="green-text">
+            {{ description }}
+          </div>
+        }
       </ui-stack>
 
       @switch (usage) {
@@ -166,13 +167,13 @@
           @if (isFixedSet && usage !== ProductCardPlace.AllProducts) {
             @for (p of productsArray; track p.id) {
               <ui-row class="w-100">
-                @if (usage === ProductCardPlace.OrderPage) {
+                @if (usage === ProductCardPlace.OrderPage || usage === ProductCardPlace.Cart || usage === ProductCardPlace.Shop) {
                   <div>{{ p.name }}</div>
                   <div>
                     {{
                       p.measure === Measure.KG
-                        ? p.weight * p.count * p.amount + " кг"
-                        : p.count * p.amount + " " + p.measure
+                        ? (p.weight * p.count * p.amount | number) + " кг"
+                        : (p.count * p.amount | number) + " " + p.measure
                     }}
                   </div>
                 } @else {
@@ -190,7 +191,7 @@
                   <div>
                     {{ p.name }} ({{
                       p.measure === Measure.KG
-                        ? p.weight * p.amount + " кг"
+                        ? p.count * p.weight * p.amount + " кг"
                         : p.amount + " " + p.measure
                     }})
                   </div>
@@ -208,7 +209,7 @@
             <div class="bold">Общий вес: {{ weight }} кг</div>
             @for (p of simpleProducts(); track p.id) {
               <ui-row class="w-100">
-                <div>{{ p.name }} ({{ p.amount }} {{ p.measure }})</div>
+                <div>{{ p.name }} ({{ p.amount * p.weight }} {{ p.measure }})</div>
                 <div class="right">
                   {{ p.price[currentCurrency] | priceString: currentCurrency }}
                   {{ currencySymbol() }}

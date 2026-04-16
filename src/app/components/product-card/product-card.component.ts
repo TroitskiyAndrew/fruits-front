@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, computed, input, HostLi
 import { CommonModule } from '@angular/common'
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 
-import { ControlsOf, Currency, IPrices, Set, ISetProducts, SimpleProduct, Measure, Product, ProductForm, ProductType, SetType, DefaultAddonBy, Delivery, Addon } from '../../models/models'
+import { ControlsOf, Currency, IPrices, Set, ISetProducts, SimpleProduct, Measure, Product, ProductForm, ProductType, SetType, DefaultAddonBy, Delivery, Addon, OrderProduct } from '../../models/models'
 
 import { CardComponent } from '../../ui/card/card.component'
 import { StackComponent } from '../../ui/stack/stack.component'
@@ -215,6 +215,18 @@ export class ProductCardComponent {
     switch (product.type) {
       case ProductType.Set:
         return Object.values(product.products).filter(p => p.type === ProductType.SetAddon && p.count > 0).map(p => p as Addon);
+        break;
+
+      default:
+        return [];
+        break;
+    }
+  };
+  get currentSelectedProducts() {
+    const product = this.getProductFromForm();
+    switch (product.type) {
+      case ProductType.Set:
+        return Object.values(product.products).filter(p => p.type === ProductType.SimpleProduct).map(p => p as OrderProduct<SimpleProduct>);
         break;
 
       default:

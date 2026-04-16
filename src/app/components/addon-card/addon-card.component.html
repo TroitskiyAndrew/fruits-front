@@ -16,7 +16,7 @@
         {{ addon.description }}
       </div>
     </ui-stack>
-    @if (AddonCardPlace.SetCard) {
+    @if (usage ===AddonCardPlace.SetCard) {
         <div class="right bold">
           {{ addonPrice() | priceString: currency() }} {{ currencySymbol() }}
         </div>

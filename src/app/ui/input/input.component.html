@@ -3,7 +3,7 @@
     <label>{{ label + (isRequired ? "*" : "")}}</label>
   }
 
-  <ui-row class="relative" rowClass="w-100">
+  <ui-row rowClass="w-100 relative">
     @let clear = clearable && value;
     <input
       [type]="type"
@@ -18,7 +18,15 @@
     />
 
     @if (clear) {
-      <button type="button" class="clear" (click)="clear()">×</button>
+      <ui-button
+            (action)="clearInput()"
+            size="s"
+            [icon]="true"
+            variant="ghost"
+            fa="fa-solid fa-xmark"
+            class="clear"
+          >
+          </ui-button>
     }
     <ng-content></ng-content>
   </ui-row>
