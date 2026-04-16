@@ -11,6 +11,7 @@ import { CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '../../constants/constants';
 export enum AddonCardPlace {
   SetCard,
   SetEditing,
+  OrderPage,
 }
 
 export interface ToggleAddon {
